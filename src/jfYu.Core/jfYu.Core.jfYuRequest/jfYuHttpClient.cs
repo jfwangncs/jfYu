@@ -101,12 +101,10 @@ namespace jfYu.Core.jfYuRequest
                 {
                     if (Method.Equals(jfYuRequestMethod.Get))
                     {
-
                         using var response = Request.GetAsync(GetParaStr() == "" ? Url : Url + "?" + GetParaStr(), HttpCompletionOption.ResponseHeadersRead).GetAwaiter().GetResult();
                         StatusCode = response.StatusCode;
                         var bytes = response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
                         html = Encoding.GetString(bytes, 0, bytes.Length - 1);
-
                     }
                     else
                     {
@@ -233,12 +231,15 @@ namespace jfYu.Core.jfYuRequest
                     {
                         bytesRead = responseStream.Read(buffer, 0, buffer.Length);
                         fs.Write(buffer, 0, bytesRead);
-                        //计算进度
-                        Progress = fs.Length / FileSize * 100;
-                        //计算速度
-                        Speed = (decimal)(fs.Length - LastSaveSize) / 1024;
-                        //剩余时间
-                        Remain = (FileSize - fs.Length) / (Speed * 1024);
+                        if (setProgress != null)
+                        {
+                            //计算进度
+                            Progress = fs.Length / FileSize * 100;
+                            //计算速度
+                            Speed = (decimal)(fs.Length - LastSaveSize) / 1024;
+                            //剩余时间
+                            Remain = (FileSize - fs.Length) / ((Speed == 0 ? 1 : Speed) * 1024);
+                        }
                     }
                     while (bytesRead > 0);
                     fs.Flush();
@@ -250,7 +251,7 @@ namespace jfYu.Core.jfYuRequest
                     throw new Exception("下载文件出错", ex);
                 }
 
-                if (File.Exists(path) && new FileInfo(path).Length == FileSize)
+                if (File.Exists(path) && (new FileInfo(path).Length == FileSize || FileSize < 0))
                     return true;
                 else
                     return false;
@@ -303,12 +304,15 @@ namespace jfYu.Core.jfYuRequest
                     {
                         bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length);
                         await fs.WriteAsync(buffer, 0, bytesRead);
-                        //计算进度
-                        Progress = fs.Length / FileSize * 100;
-                        //计算速度
-                        Speed = (decimal)(fs.Length - LastSaveSize) / 1024;
-                        //剩余时间
-                        Remain = (FileSize - fs.Length) / (Speed * 1024);
+                        if (setProgress != null)
+                        {
+                            //计算进度
+                            Progress = fs.Length / FileSize * 100;
+                            //计算速度
+                            Speed = (decimal)(fs.Length - LastSaveSize) / 1024;
+                            //剩余时间
+                            Remain = (FileSize - fs.Length) / ((Speed == 0 ? 1 : Speed) * 1024);
+                        }
                     }
                     while (bytesRead > 0);
                     fs.Flush();
@@ -320,13 +324,141 @@ namespace jfYu.Core.jfYuRequest
                     throw new Exception("下载文件出错", ex);
                 }
 
-                if (File.Exists(path) && new FileInfo(path).Length == FileSize)
+                if (File.Exists(path) && (new FileInfo(path).Length == FileSize || FileSize < 0))
                     return true;
                 else
                     return false;
             }
             else
                 return false;
+        }
+
+        public Stream GetFile(Action<decimal, decimal, decimal> setProgress = null)
+        {
+            Init();
+            using var response = Request.GetAsync(GetParaStr() == "" ? Url : Url + "?" + GetParaStr(), HttpCompletionOption.ResponseHeadersRead).GetAwaiter().GetResult();
+            StatusCode = response.StatusCode;
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                using Stream responseStream = response.Content.ReadAsStreamAsync().GetAwaiter().GetResult();
+                //文件大小
+                var FileSize = decimal.Parse(response.Content.Headers.ContentLength.ToString());
+                //下载进度
+                decimal Progress = 0M;
+                //下载速度KB/s
+                decimal Speed = 0M;
+                //剩余时间/秒
+                decimal Remain = 0;
+                //下载文件块大小，后期可通过此次进行速度限制
+                byte[] buffer = new byte[4096];
+                try
+                {
+                    using MemoryStream fs = new MemoryStream();
+                    //开启计时
+                    long LastSaveSize = 0;
+                    var t = new System.Timers.Timer(1000)
+                    {
+                        AutoReset = true,
+                        Enabled = true
+                    };
+                    t.Elapsed += (s, e) =>
+                    {
+                        LastSaveSize = fs.Length;
+                        setProgress?.Invoke(Progress, Speed, Remain);
+                    };
+                    t.Start();
+                    int bytesRead;
+                    do
+                    {
+                        bytesRead = responseStream.Read(buffer, 0, buffer.Length);
+                        fs.Write(buffer, 0, bytesRead);
+                        if (setProgress != null)
+                        {
+                            //计算进度
+                            Progress = fs.Length / FileSize * 100;
+                            //计算速度
+                            Speed = (decimal)(fs.Length - LastSaveSize) / 1024;
+                            //剩余时间
+                            Remain = (FileSize - fs.Length) / ((Speed == 0 ? 1 : Speed) * 1024);
+                        }
+                    }
+                    while (bytesRead > 0);
+                    fs.Flush();
+                    t.Stop();
+                    setProgress?.Invoke(100M, 0M, 0M);
+                    return fs;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("下载文件出错", ex);
+                }
+            }
+            else
+                return null;
+        }
+
+        public async Task<Stream> GetFileAsync(Action<decimal, decimal, decimal> setProgress = null)
+        {
+            Init();
+            using var response = await Request.GetAsync(GetParaStr() == "" ? Url : Url + "?" + GetParaStr(), HttpCompletionOption.ResponseHeadersRead);
+            StatusCode = response.StatusCode;
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                using Stream responseStream = await response.Content.ReadAsStreamAsync();
+                //文件大小
+                var FileSize = decimal.Parse(response.Content.Headers.ContentLength.ToString());
+                //下载进度
+                decimal Progress = 0M;
+                //下载速度KB/s
+                decimal Speed = 0M;
+                //剩余时间/秒
+                decimal Remain = 0;
+                //下载文件块大小，后期可通过此次进行速度限制
+                byte[] buffer = new byte[4096];
+                try
+                {
+                    using MemoryStream fs = new MemoryStream();
+                    //开启计时
+                    long LastSaveSize = 0;
+                    var t = new System.Timers.Timer(1000)
+                    {
+                        AutoReset = true,
+                        Enabled = true
+                    };
+                    t.Elapsed += (s, e) =>
+                    {
+                        LastSaveSize = fs.Length;
+                        setProgress?.Invoke(Progress, Speed, Remain);
+                    };
+                    t.Start();
+                    int bytesRead;
+                    do
+                    {
+                        bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length);
+                        await fs.WriteAsync(buffer, 0, bytesRead);
+                        if (setProgress != null)
+                        {
+                            //计算进度
+                            Progress = fs.Length / FileSize * 100;
+                            //计算速度
+                            Speed = (decimal)(fs.Length - LastSaveSize) / 1024;
+                            //剩余时间
+                            Remain = (FileSize - fs.Length) / ((Speed == 0 ? 1 : Speed) * 1024);
+                        }
+                    }
+                    while (bytesRead > 0);
+                    fs.Flush();
+                    t.Stop();
+                    setProgress?.Invoke(100M, 0M, 0M);
+                    return fs;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("下载文件出错", ex);
+                }
+            }
+            else
+                return null;
         }
     }
 #endif

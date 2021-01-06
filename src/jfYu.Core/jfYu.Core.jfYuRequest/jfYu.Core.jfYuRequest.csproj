@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
     <LangVersion>8.0</LangVersion>
-    <Version>1.1.11</Version>
+    <Version>1.1.14</Version>
     <Authors>jfwang</Authors>
     <Description>HttpRequest Helper</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
