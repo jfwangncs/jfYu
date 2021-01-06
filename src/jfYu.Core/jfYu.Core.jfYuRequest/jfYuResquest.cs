@@ -452,7 +452,7 @@ namespace jfYu.Core.jfYuRequest
                 return false;
         }
 
-        public Stream GetFile(Action<decimal, decimal, decimal> setProgress = null)
+        public MemoryStream GetFile(Action<decimal, decimal, decimal> setProgress = null)
         {
 
             Init();
@@ -484,42 +484,42 @@ namespace jfYu.Core.jfYuRequest
                 byte[] buffer = new byte[4096];
                 try
                 {
-                    using (MemoryStream fs = new MemoryStream())
+                    MemoryStream fs = new MemoryStream();
+                    //开启计时
+                    long LastSaveSize = 0;
+                    var t = new System.Timers.Timer(1000)
                     {
-                        //开启计时
-                        long LastSaveSize = 0;
-                        var t = new System.Timers.Timer(1000)
+                        AutoReset = true,
+                        Enabled = true
+                    };
+                    t.Elapsed += (s, e) =>
+                    {
+                        LastSaveSize = fs.Length;
+                        setProgress?.Invoke(Progress, Speed, Remain);
+                    };
+                    t.Start();
+                    int bytesRead;
+                    do
+                    {
+                        bytesRead = responseStream.Read(buffer, 0, buffer.Length);
+                        fs.Write(buffer, 0, bytesRead);
+                        if (setProgress != null)
                         {
-                            AutoReset = true,
-                            Enabled = true
-                        };
-                        t.Elapsed += (s, e) =>
-                        {
-                            LastSaveSize = fs.Length;
-                            setProgress?.Invoke(Progress, Speed, Remain);
-                        };
-                        t.Start();
-                        int bytesRead;
-                        do
-                        {
-                            bytesRead = responseStream.Read(buffer, 0, buffer.Length);
-                            fs.Write(buffer, 0, bytesRead);
-                            if (setProgress != null)
-                            {
-                                //计算进度
-                                Progress = fs.Length / FileSize * 100;
-                                //计算速度
-                                Speed = (decimal)(fs.Length - LastSaveSize) / 1024;
-                                //剩余时间
-                                Remain = (FileSize - fs.Length) / ((Speed == 0 ? 1 : Speed) * 1024);
-                            }
+                            //计算进度
+                            Progress = fs.Length / FileSize * 100;
+                            //计算速度
+                            Speed = (decimal)(fs.Length - LastSaveSize) / 1024;
+                            //剩余时间
+                            Remain = (FileSize - fs.Length) / ((Speed == 0 ? 1 : Speed) * 1024);
                         }
-                        while (bytesRead > 0);
-                        fs.Flush();
-                        t.Stop();
-                        setProgress?.Invoke(100M, 0M, 0M);
-                        return fs;
                     }
+                    while (bytesRead > 0);
+                    fs.Flush();
+                    t.Stop();
+                    setProgress?.Invoke(100M, 0M, 0M);
+                    fs.Position = 0;
+                    return fs;
+
                 }
                 catch (Exception ex)
                 {
@@ -536,7 +536,7 @@ namespace jfYu.Core.jfYuRequest
                 return null;
         }
 
-        public async Task<Stream> GetFileAsync(Action<decimal, decimal, decimal> setProgress = null)
+        public async Task<MemoryStream> GetFileAsync(Action<decimal, decimal, decimal> setProgress = null)
         {
             Init();
             HttpWebResponse response;
@@ -567,42 +567,41 @@ namespace jfYu.Core.jfYuRequest
                 byte[] buffer = new byte[4096];
                 try
                 {
-                    using (MemoryStream fs = new MemoryStream())
+                    MemoryStream fs = new MemoryStream();
+                    //开启计时
+                    long LastSaveSize = 0;
+                    var t = new System.Timers.Timer(1000)
                     {
-                        //开启计时
-                        long LastSaveSize = 0;
-                        var t = new System.Timers.Timer(1000)
+                        AutoReset = true,
+                        Enabled = true
+                    };
+                    t.Elapsed += (s, e) =>
+                    {
+                        LastSaveSize = fs.Length;
+                        setProgress?.Invoke(Progress, Speed, Remain);
+                    };
+                    t.Start();
+                    int bytesRead;
+                    do
+                    {
+                        bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length);
+                        await fs.WriteAsync(buffer, 0, bytesRead);
+                        if (setProgress != null)
                         {
-                            AutoReset = true,
-                            Enabled = true
-                        };
-                        t.Elapsed += (s, e) =>
-                        {
-                            LastSaveSize = fs.Length;
-                            setProgress?.Invoke(Progress, Speed, Remain);
-                        };
-                        t.Start();
-                        int bytesRead;
-                        do
-                        {
-                            bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length);
-                            await fs.WriteAsync(buffer, 0, bytesRead);
-                            if (setProgress != null)
-                            {
-                                //计算进度
-                                Progress = fs.Length / FileSize * 100;
-                                //计算速度
-                                Speed = (decimal)(fs.Length - LastSaveSize) / 1024;
-                                //剩余时间
-                                Remain = (FileSize - fs.Length) / ((Speed == 0 ? 1 : Speed) * 1024);
-                            }
+                            //计算进度
+                            Progress = fs.Length / FileSize * 100;
+                            //计算速度
+                            Speed = (decimal)(fs.Length - LastSaveSize) / 1024;
+                            //剩余时间
+                            Remain = (FileSize - fs.Length) / ((Speed == 0 ? 1 : Speed) * 1024);
                         }
-                        while (bytesRead > 0);
-                        fs.Flush();
-                        t.Stop();
-                        setProgress?.Invoke(100M, 0M, 0M);
-                        return fs;
-                    }                   
+                    }
+                    while (bytesRead > 0);
+                    fs.Flush();
+                    t.Stop();
+                    setProgress?.Invoke(100M, 0M, 0M);
+                    fs.Position = 0;
+                    return fs;
                 }
                 catch (Exception ex)
                 {

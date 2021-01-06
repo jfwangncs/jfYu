@@ -333,7 +333,7 @@ namespace jfYu.Core.jfYuRequest
                 return false;
         }
 
-        public Stream GetFile(Action<decimal, decimal, decimal> setProgress = null)
+        public MemoryStream GetFile(Action<decimal, decimal, decimal> setProgress = null)
         {
             Init();
             using var response = Request.GetAsync(GetParaStr() == "" ? Url : Url + "?" + GetParaStr(), HttpCompletionOption.ResponseHeadersRead).GetAwaiter().GetResult();
@@ -353,7 +353,7 @@ namespace jfYu.Core.jfYuRequest
                 byte[] buffer = new byte[4096];
                 try
                 {
-                    using MemoryStream fs = new MemoryStream();
+                    MemoryStream fs = new MemoryStream();
                     //开启计时
                     long LastSaveSize = 0;
                     var t = new System.Timers.Timer(1000)
@@ -397,7 +397,7 @@ namespace jfYu.Core.jfYuRequest
                 return null;
         }
 
-        public async Task<Stream> GetFileAsync(Action<decimal, decimal, decimal> setProgress = null)
+        public async Task<MemoryStream> GetFileAsync(Action<decimal, decimal, decimal> setProgress = null)
         {
             Init();
             using var response = await Request.GetAsync(GetParaStr() == "" ? Url : Url + "?" + GetParaStr(), HttpCompletionOption.ResponseHeadersRead);
@@ -417,7 +417,7 @@ namespace jfYu.Core.jfYuRequest
                 byte[] buffer = new byte[4096];
                 try
                 {
-                    using MemoryStream fs = new MemoryStream();
+                    MemoryStream fs = new MemoryStream();
                     //开启计时
                     long LastSaveSize = 0;
                     var t = new System.Timers.Timer(1000)
