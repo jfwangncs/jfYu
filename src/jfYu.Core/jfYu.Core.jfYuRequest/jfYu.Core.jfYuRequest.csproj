@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
     <LangVersion>8.0</LangVersion>
-    <Version>1.1.15</Version>
+    <Version>1.1.16</Version>
     <Authors>jfwang</Authors>
     <Description>HttpRequest Helper</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -24,4 +24,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
     <DefineConstants>TRACE;NETSTANDARD20;NET461</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="brotli.net" Version="2.0.4.2" />
+  </ItemGroup>
 </Project>

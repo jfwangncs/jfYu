@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace jfYu.Core.jfYuRequest
@@ -153,9 +151,9 @@ namespace jfYu.Core.jfYuRequest
                         responseBody = reader.ReadToEnd();
                         responseBody = responseBody.Replace("\0", "");
                     }
-                    else
+                    else if (response.ContentEncoding.ToLower().Contains("br") || response.ContentEncoding.ToLower().Contains("brotli"))
                     {
-                        using Stream stream = response.GetResponseStream();
+                        using Brotli.BrotliStream stream = new Brotli.BrotliStream(response.GetResponseStream(), CompressionMode.Decompress);
                         using StreamReader reader = new StreamReader(stream, this.Encoding);
                         responseBody = reader.ReadToEnd();
                         responseBody = responseBody.Replace("\0", "");
