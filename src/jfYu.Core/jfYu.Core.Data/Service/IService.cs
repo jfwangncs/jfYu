@@ -45,6 +45,9 @@ namespace jfYu.Core.Data
         /// <returns>是否成功</returns>
         bool Update(T entity);
 
+        bool Update(Expression<Func<T, bool>> predicate = null, Action<T> scalar = null);
+
+        Task<bool> UpdateAsync(Expression<Func<T, bool>> predicate = null, Action<T> scalar = null);
         /// <summary>
         /// 更新
         /// </summary>
@@ -65,6 +68,7 @@ namespace jfYu.Core.Data
         /// <param name="list">实体列表</param>
         /// <returns>是否成功</returns>
         Task<bool> UpdateRangeAsync(List<T> list);
+
         #endregion
 
         #region 删除

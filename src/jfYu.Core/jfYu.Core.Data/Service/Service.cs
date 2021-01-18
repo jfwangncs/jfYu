@@ -62,6 +62,26 @@ namespace jfYu.Core.Data
             Master.Update(entity);
             return (await Master.SaveChangesAsync()) > 0;
         }
+
+        public virtual bool Update(Expression<Func<T, bool>> predicate = null, Action<T> scalar = null)
+        {
+            predicate ??= exprTrue;
+            if (scalar == null)
+                return false;
+            var data = Slave.Set<T>().Where(predicate).ToList();
+            data.ForEach(scalar);
+            return Master.SaveChanges() > 0;
+        }
+
+        public virtual async Task<bool> UpdateAsync(Expression<Func<T, bool>> predicate = null, Action<T> scalar = null)
+        {
+            predicate ??= exprTrue;
+            if (scalar == null)
+                return false;
+            var data = Slave.Set<T>().Where(predicate).ToList();
+            data.ForEach(scalar);
+            return (await Master.SaveChangesAsync()) > 0;
+        }
         public virtual bool UpdateRange(List<T> list)
         {
             list.ForEach(q =>
