@@ -29,6 +29,28 @@ namespace jfYu.Core.Common.Utilities
             return t;
         }
 
+
+        /// <summary>  
+        /// 获取当前本地时间戳  
+        /// </summary>  
+        /// <returns></returns>        
+        public static long GetUnixTimeMillis()
+        {
+            TimeSpan cha = DateTime.Now - localTime;
+            var t = (long)cha.TotalMilliseconds;
+            return t;
+        }
+        /// <summary>
+        ///获取时间戳
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        public static long GetUnixTimeMillis(DateTime date)
+        {
+            TimeSpan cha = date - localTime;
+            var t = (long)cha.TotalMilliseconds;
+            return t;
+        }
         /// <summary>  
         /// 时间戳转换为本地时间对象  
         /// </summary>  

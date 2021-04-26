@@ -1,4 +1,5 @@
-﻿using System;
+﻿using jfYu.Core.Common.SnowFlake;
+using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -9,11 +10,15 @@ namespace jfYu.Core.Data
     /// </summary>
     public abstract class BaseEntity
     {
+        public BaseEntity(ISnowFlake snowFlake)
+        {
+            Id = snowFlake.NextId();
+        }
         /// <summary>
         /// 编号
         /// </summary>
         [DisplayName("编号"), Key]
-        public Guid Id { get; set; }
+        public long Id { get; set; }
 
         /// <summary>
         /// 状态

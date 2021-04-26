@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using Autofac.Core;
 using jfYu.Core.Common.Configurations;
 using Microsoft.EntityFrameworkCore;
 using System;
