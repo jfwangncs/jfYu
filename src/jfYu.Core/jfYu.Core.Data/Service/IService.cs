@@ -174,6 +174,22 @@ namespace jfYu.Core.Data
 
         #endregion
 
+        #region 获取单个实体
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <param name="predicate">predicate</param>
+        /// <returns>数据</returns>
+        T GetOne(Expression<Func<T, bool>> predicate = null);
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <param name="predicate">predicate</param>
+        /// <returns>数据</returns>
+        Task<T> GetOneAsync(Expression<Func<T, bool>> predicate = null);
+        #endregion
+
         #region 获取列表
         /// <summary>
         /// 获取所有数据

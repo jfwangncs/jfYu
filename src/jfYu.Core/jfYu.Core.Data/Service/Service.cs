@@ -237,7 +237,11 @@ namespace jfYu.Core.Data
 
         public virtual bool IsExist(Expression<Func<T, bool>> predicate = null)
         {
-            return Slave.Set<T>().Any(predicate);
+            return predicate switch
+            {
+                null => false,
+                _ => Slave.Set<T>().Any(predicate),
+            };
         }
         public virtual async Task<bool> IsExistAsync(long id)
         {
@@ -257,7 +261,11 @@ namespace jfYu.Core.Data
         }
         public virtual async Task<bool> IsExistAsync(Expression<Func<T, bool>> predicate = null)
         {
-            return await Slave.Set<T>().AnyAsync(predicate);
+            return predicate switch
+            {
+                null => false,
+                _ => await Slave.Set<T>().AnyAsync(predicate),
+            };
         }
 
         #endregion
@@ -297,6 +305,27 @@ namespace jfYu.Core.Data
 
                 return null;
             }
+        }
+        #endregion
+
+        #region 获取单个实体
+
+        public virtual T GetOne(Expression<Func<T, bool>> predicate = null)
+        {
+            return predicate switch
+            {
+                null => null,
+                _ => Slave.Set<T>().FirstOrDefault(predicate)
+            };
+
+        }
+        public virtual async Task<T> GetOneAsync(Expression<Func<T, bool>> predicate = null)
+        {
+            return predicate switch
+            {
+                null => null,
+                _ => await Slave.Set<T>().FirstOrDefaultAsync(predicate)
+            };
         }
         #endregion
 
