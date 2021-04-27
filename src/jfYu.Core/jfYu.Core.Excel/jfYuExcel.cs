@@ -36,7 +36,7 @@ namespace jfYu.Core.Excel
         {
             var ext = Path.GetExtension(filePath);
             if (string.IsNullOrEmpty(ext))
-                filePath = filePath + ".xlsx";
+                filePath += ".xlsx";
             else
                 filePath = filePath.Replace(ext, ".xlsx");
             //创建工作簿
@@ -100,7 +100,7 @@ namespace jfYu.Core.Excel
         {
             var ext = Path.GetExtension(filePath);
             if (string.IsNullOrEmpty(ext))
-                filePath = filePath + ".xlsx";
+                filePath += ".xlsx";
             else
                 filePath = filePath.Replace(ext, ".xlsx");
             //创建工作簿
@@ -165,7 +165,7 @@ namespace jfYu.Core.Excel
         {
             var ext = Path.GetExtension(filePath);
             if (string.IsNullOrEmpty(ext))
-                filePath = filePath + ".xlsx";
+                filePath += ".xlsx";
             else
                 filePath = filePath.Replace(ext, ".xlsx");
             List<string> pops = new List<string>();
@@ -231,7 +231,7 @@ namespace jfYu.Core.Excel
         {
             var ext = Path.GetExtension(filePath);
             if (string.IsNullOrEmpty(ext))
-                filePath = filePath + ".xlsx";
+                filePath += ".xlsx";
             else
                 filePath = filePath.Replace(ext, ".xlsx");
             //创建工作簿
@@ -294,7 +294,7 @@ namespace jfYu.Core.Excel
         {
             var ext = Path.GetExtension(filePath);
             if (string.IsNullOrEmpty(ext))
-                filePath = filePath + ".xlsx";
+                filePath += ".xlsx";
             else
                 filePath = filePath.Replace(ext, ".xlsx");
             //创建工作簿
@@ -359,7 +359,7 @@ namespace jfYu.Core.Excel
         {
             var ext = Path.GetExtension(filePath);
             if (string.IsNullOrEmpty(ext))
-                filePath = filePath + ".xlsx";
+                filePath += ".xlsx";
             else
                 filePath = filePath.Replace(ext, ".xlsx");
             //获取表头字段
@@ -424,7 +424,7 @@ namespace jfYu.Core.Excel
         {
             var ext = Path.GetExtension(filePath);
             if (string.IsNullOrEmpty(ext))
-                filePath = filePath + ".csv";
+                filePath += ".csv";
             else
                 filePath = filePath.Replace(ext, ".csv");
             FileStream fs = File.Create(filePath);
@@ -478,7 +478,7 @@ namespace jfYu.Core.Excel
         {
             var ext = Path.GetExtension(filePath);
             if (string.IsNullOrEmpty(ext))
-                filePath = filePath + ".csv";
+                filePath += ".csv";
             else
                 filePath = filePath.Replace(ext, ".csv");
             FileStream fs = File.Create(filePath);
@@ -719,7 +719,7 @@ namespace jfYu.Core.Excel
         public SXSSFWorkbook Getworkbook<T>(string filePath)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            FileStream fs = null;
+            FileStream fs;
             try
             {
                 var dir = filePath.Replace(Path.GetFileName(filePath), "");
@@ -752,7 +752,7 @@ namespace jfYu.Core.Excel
         public SXSSFWorkbook Getworkbook(string filePath, List<string> cols)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            FileStream fs = null;
+            FileStream fs;
             try
             {
                 var dir = filePath.Replace(Path.GetFileName(filePath), "");
