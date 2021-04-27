@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using jfYu.Core.Common.SnowFlake;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace jfYu.Core.Data
         public Q Slave { get; }
 
         public List<Q> Slaves { get; }
-
+        public ISnowFlake SnowFlake { get; set; }
         public Service(IDbContextService<Q> contextService)
         {
 
@@ -28,24 +29,28 @@ namespace jfYu.Core.Data
         }
         public virtual bool Add(T entity)
         {
+            entity.Id = SnowFlake.NextId();
             Master.Add(entity);
             return Master.SaveChanges() > 0;
         }
 
         public virtual async Task<bool> AddAsync(T entity)
         {
+            entity.Id = SnowFlake.NextId();
             await Master.AddAsync(entity);
             return (await Master.SaveChangesAsync()) > 0;
         }
 
         public virtual bool AddRange(List<T> list)
         {
+            list.ForEach(q => q.Id = SnowFlake.NextId());
             Master.AddRange(list);
             return Master.SaveChanges() > 0;
         }
 
         public virtual async Task<bool> AddRangeAsync(List<T> list)
         {
+            list.ForEach(q => q.Id = SnowFlake.NextId());
             await Master.AddRangeAsync(list);
             return (await Master.SaveChangesAsync()) > 0;
         }
@@ -208,7 +213,7 @@ namespace jfYu.Core.Data
                 return (await Master.SaveChangesAsync()) > 0;
             }
             return false;
-        } 
+        }
         #endregion
 
         #region 是否有数据

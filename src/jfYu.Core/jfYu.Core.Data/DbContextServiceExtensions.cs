@@ -35,7 +35,7 @@ namespace jfYu.Core.Data
             {
                 throw new Exception($"配置错误无法实例化主从连接:{ex.Message} - {ex.StackTrace}");
             }
-           
+
 
 
         }
@@ -44,7 +44,7 @@ namespace jfYu.Core.Data
         /// IOC注册
         /// </summary>   
         public static void AddDbContextService<T>(this ContainerBuilder services, DatabaseConfiguration databaseConfiguration) where T : DbContext
-        {            
+        {
             try
             {
                 RegisterService<T>(services, databaseConfiguration);
@@ -55,8 +55,10 @@ namespace jfYu.Core.Data
             }
         }
 
-        private static void RegisterService<T>(ContainerBuilder services,DatabaseConfiguration config) where T : DbContext
+        private static void RegisterService<T>(ContainerBuilder services, DatabaseConfiguration config) where T : DbContext
         {
+            if (config == null)
+                throw new Exception($"读取配置为空。");
             //注册MasterDBContext
             var masterOptBuilder = new DbContextOptionsBuilder<T>();
             if (config.DatabaseType.Equals(DatabaseType.SqlServer))
