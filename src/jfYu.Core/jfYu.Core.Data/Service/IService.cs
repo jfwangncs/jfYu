@@ -75,117 +75,103 @@ namespace jfYu.Core.Data
         /// <summary>
         /// 软删除
         /// </summary>
-        /// <param name="guid">guid</param>
+        /// <param name="id">id</param>
         /// <returns>是否成功</returns>
-        bool Remove(Guid guid);
+        bool Remove(long id);
 
         /// <summary>
         /// 软删除
         /// </summary>
-        /// <param name="guid">guid</param>
+        /// <param name="id">id</param>
         /// <returns>是否成功</returns>
-        bool Remove(string guid);
+        bool Remove(string id);
 
         /// <summary>
         /// 软删除
         /// </summary>
-        /// <param name="guid">guid</param>
+        /// <param name="predicate">predicate</param>
         /// <returns>是否成功</returns>
-        Task<bool> RemoveAsync(Guid guid);
+        bool Remove(Expression<Func<T, bool>> predicate = null);
 
         /// <summary>
         /// 软删除
         /// </summary>
-        /// <param name="guid">guid</param>
+        /// <param name="id">id</param>
         /// <returns>是否成功</returns>
-        Task<bool> RemoveAsync(string guid);
+        Task<bool> RemoveAsync(long id);
+
+        /// <summary>
+        /// 软删除
+        /// </summary>
+        /// <param name="id">id</param>
+        /// <returns>是否成功</returns>
+        Task<bool> RemoveAsync(string id);
+        /// <summary>
+        /// 软删除
+        /// </summary>
+        /// <param name="predicate">predicate</param>
+        /// <returns>是否成功</returns>
+        Task<bool> RemoveAsync(Expression<Func<T, bool>> predicate = null);
 
         /// <summary>
         /// 硬删除
         /// </summary>
-        /// <param name="guid">guid</param>
+        /// <param name="id">id</param>
         /// <returns>是否成功</returns>
-        bool HardRemove(Guid guid);
+        bool HardRemove(long id);
 
         /// <summary>
         /// 硬删除
         /// </summary>
-        /// <param name="guid">guid</param>
+        /// <param name="id">id</param>
         /// <returns>是否成功</returns>
-        bool HardRemove(string guid);
+        bool HardRemove(string id);
 
         /// <summary>
         /// 硬删除
         /// </summary>
-        /// <param name="guid">guid</param>
+        /// <param name="id">id</param>
         /// <returns>是否成功</returns>
-        Task<bool> HardRemoveAsync(Guid guid);
+        Task<bool> HardRemoveAsync(long id);
 
         /// <summary>
         /// 硬删除
         /// </summary>
-        /// <param name="guid">guid</param>
+        /// <param name="id">id</param>
         /// <returns>是否成功</returns>
-        Task<bool> HardRemoveAsync(string guid);
+        Task<bool> HardRemoveAsync(string id);
         #endregion
 
-        #region 获取单个
+        #region 根据id获取实体
         /// <summary>
         /// 获取单个实体
         /// </summary>
-        /// <param name="guid">guid</param>
+        /// <param name="id">id</param>
         /// <returns>数据</returns>
-        T GetById(Guid guid);
+        T GetById(long id);
 
         /// <summary>
         /// 获取单个实体
         /// </summary>
-        /// <param name="guid">guid</param>
+        /// <param name="id">id</param>
         /// <returns>数据</returns>
-        T GetById(string guid);
+        T GetById(string id);
 
         /// <summary>
         /// 获取单个实体
         /// </summary>
-        /// <param name="guid">guid</param>
+        /// <param name="id">id</param>
         /// <returns>数据</returns>
-        Task<T> GetByIdAsync(Guid guid);
+        Task<T> GetByIdAsync(long id);
 
 
         /// <summary>
         /// 获取单个实体
         /// </summary>
-        /// <param name="guid">guid</param>
+        /// <param name="id">id</param>
         /// <returns>数据</returns>
-        Task<T> GetByIdAsync(string guid);
+        Task<T> GetByIdAsync(string id);
 
-        /// <summary>
-        /// 获取单个实体
-        /// </summary>
-        /// <param name="predicate">筛选条件</param>
-        /// <returns>数据</returns>
-        T GetSingle(Expression<Func<T, bool>> predicate = null);
-
-        /// <summary>
-        /// 获取单个实体
-        /// </summary>
-        /// <param name="predicate">筛选条件</param>
-        /// <returns>数据</returns>
-        Task<T> GetSingleAsync(Expression<Func<T, bool>> predicate = null);
-
-        /// <summary>
-        /// 获取单个实体
-        /// </summary>
-        /// <param name="predicate">筛选条件</param>
-        /// <returns>数据</returns>
-        T GetFirst(Expression<Func<T, bool>> predicate = null);
-
-        /// <summary>
-        /// 获取单个实体
-        /// </summary>
-        /// <param name="predicate">筛选条件</param>
-        /// <returns>数据</returns>
-        Task<T> GetFirstAsync(Expression<Func<T, bool>> predicate = null);
         #endregion
 
         #region 获取列表
@@ -227,31 +213,46 @@ namespace jfYu.Core.Data
         /// <summary>
         /// 该id是否存在
         /// </summary>
-        /// <param name="guid">guid</param>
+        /// <param name="id">id</param>
         /// <returns>是否存在</returns>
-        bool IsExist(Guid guid);
+        bool IsExist(long id);
 
         /// <summary>
         /// 该id是否存在
         /// </summary>
-        /// <param name="guid">guid</param>
+        /// <param name="id">id</param>
         /// <returns>是否存在</returns>
-        bool IsExist(string guid);
-
-
-        /// <summary>
-        /// 该id是否存在
-        /// </summary>
-        /// <param name="guid">guid</param>
-        /// <returns>是否存在</returns>
-        Task<bool> IsExistAsync(Guid guid);
+        bool IsExist(string id);
 
         /// <summary>
         /// 该id是否存在
         /// </summary>
-        /// <param name="guid">guid</param>
+        /// <param name="predicate">predicate</param>
         /// <returns>是否存在</returns>
-        Task<bool> IsExistAsync(string guid);
+        bool IsExist(Expression<Func<T, bool>> predicate = null);
+
+        /// <summary>
+        /// 该id是否存在
+        /// </summary>
+        /// <param name="id">id</param>
+        /// <returns>是否存在</returns>
+        Task<bool> IsExistAsync(long id);
+
+        /// <summary>
+        /// 该id是否存在
+        /// </summary>
+        /// <param name="id">id</param>
+        /// <returns>是否存在</returns>
+        Task<bool> IsExistAsync(string id);
+
+        /// <summary>
+        /// 该id是否存在
+        /// </summary>
+        /// <param name="predicate">predicate</param>
+        /// <returns>是否存在</returns>
+        Task<bool> IsExistAsync(Expression<Func<T, bool>> predicate = null);
+
+
         #endregion
     }
 }

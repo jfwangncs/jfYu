@@ -102,11 +102,12 @@ namespace jfYu.Core.Data
             return (await Master.SaveChangesAsync()) > 0;
         }
 
-        public virtual bool Remove(Guid id)
+        #region 删除
+        public virtual bool Remove(long id)
         {
             if (IsExist(id))
             {
-                var entity = Master.Find<T>(id);
+                var entity = GetById(id);
                 entity.UpdateTime = DateTime.Now;
                 entity.State = StateEnum.Disable;
                 return Master.SaveChanges() > 0;
@@ -117,18 +118,28 @@ namespace jfYu.Core.Data
         {
             if (IsExist(id))
             {
-                var entity = Master.Find<T>(id);
+                var entity = GetById(id);
                 entity.UpdateTime = DateTime.Now;
                 entity.State = StateEnum.Disable;
                 return Master.SaveChanges() > 0;
             }
             return false;
         }
-        public virtual async Task<bool> RemoveAsync(Guid id)
+        public virtual bool Remove(Expression<Func<T, bool>> predicate = null)
+        {
+            var lists = GetList(predicate);
+            foreach (var entity in lists)
+            {
+                entity.UpdateTime = DateTime.Now;
+                entity.State = StateEnum.Disable;
+            }
+            return Master.SaveChanges() > 0;
+        }
+        public virtual async Task<bool> RemoveAsync(long id)
         {
             if (await IsExistAsync(id))
             {
-                var entity = await Master.FindAsync<T>(id);
+                var entity = await GetByIdAsync(id);
                 entity.UpdateTime = DateTime.Now;
                 entity.State = StateEnum.Disable;
                 return (await Master.SaveChangesAsync()) > 0;
@@ -139,19 +150,29 @@ namespace jfYu.Core.Data
         {
             if (await IsExistAsync(id))
             {
-                var entity = await Master.FindAsync<T>(id);
+                var entity = await GetByIdAsync(id);
                 entity.UpdateTime = DateTime.Now;
                 entity.State = StateEnum.Disable;
                 return (await Master.SaveChangesAsync()) > 0;
             }
             return false;
         }
+        public virtual async Task<bool> RemoveAsync(Expression<Func<T, bool>> predicate = null)
+        {
+            var lists = await GetListAsync(predicate);
+            foreach (var entity in lists)
+            {
+                entity.UpdateTime = DateTime.Now;
+                entity.State = StateEnum.Disable;
+            }
+            return (await Master.SaveChangesAsync()) > 0;
+        }
 
-        public virtual bool HardRemove(Guid id)
+        public virtual bool HardRemove(long id)
         {
             if (IsExist(id))
             {
-                var entity = Master.Find<T>(id);
+                var entity = GetById(id);
                 Master.Remove(entity);
                 return Master.SaveChanges() > 0;
             }
@@ -161,18 +182,18 @@ namespace jfYu.Core.Data
         {
             if (IsExist(id))
             {
-                var entity = Master.Find<T>(id);
+                var entity = GetById(id);
                 Master.Remove(entity);
                 return Master.SaveChanges() > 0;
             }
             return false;
         }
 
-        public virtual async Task<bool> HardRemoveAsync(Guid id)
+        public virtual async Task<bool> HardRemoveAsync(long id)
         {
             if (await IsExistAsync(id))
             {
-                var entity = await Master.FindAsync<T>(id);
+                var entity = await GetByIdAsync(id);
                 Master.Remove(entity);
                 return (await Master.SaveChangesAsync()) > 0;
             }
@@ -182,67 +203,99 @@ namespace jfYu.Core.Data
         {
             if (await IsExistAsync(id))
             {
-                var entity = await Master.FindAsync<T>(id);
+                var entity = await GetByIdAsync(id);
                 Master.Remove(entity);
                 return (await Master.SaveChangesAsync()) > 0;
             }
             return false;
-        }
-        public virtual bool IsExist(Guid id)
+        } 
+        #endregion
+
+        #region 是否有数据
+        public virtual bool IsExist(long id)
         {
             return Slave.Set<T>().Any(q => q.Id.Equals(id));
         }
         public virtual bool IsExist(string id)
         {
-            return Slave.Set<T>().Any(q => q.Id.Equals(id));
+            try
+            {
+                var _id = long.Parse(id);
+                return Slave.Set<T>().Any(q => q.Id.Equals(id));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
         }
-        public virtual async Task<bool> IsExistAsync(Guid id)
+
+        public virtual bool IsExist(Expression<Func<T, bool>> predicate = null)
+        {
+            return Slave.Set<T>().Any(predicate);
+        }
+        public virtual async Task<bool> IsExistAsync(long id)
         {
             return await Slave.Set<T>().AnyAsync(q => q.Id.Equals(id));
         }
         public virtual async Task<bool> IsExistAsync(string id)
         {
-            return await Slave.Set<T>().AnyAsync(q => q.Id.Equals(id));
+            try
+            {
+                var _id = long.Parse(id);
+                return await Slave.Set<T>().AnyAsync(q => q.Id.Equals(id));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
-        public virtual T GetById(Guid id)
+        public virtual async Task<bool> IsExistAsync(Expression<Func<T, bool>> predicate = null)
         {
-            return Slave.Find<T>(id);
+            return await Slave.Set<T>().AnyAsync(predicate);
+        }
+
+        #endregion
+
+        #region 根据id获取实体
+        public virtual T GetById(long id)
+        {
+            return Slave.Set<T>().FirstOrDefault(q => q.Id.Equals(id));
         }
         public virtual T GetById(string id)
         {
-            return Slave.Find<T>(id);
+            try
+            {
+                var _id = long.Parse(id);
+                return Slave.Set<T>().FirstOrDefault(q => q.Id.Equals(_id));
+            }
+            catch (Exception)
+            {
+
+                return null;
+            }
+
         }
-        public virtual async Task<T> GetByIdAsync(Guid id)
+        public virtual async Task<T> GetByIdAsync(long id)
         {
-            return await Slave.FindAsync<T>(id);
+            return await Slave.Set<T>().FirstOrDefaultAsync(q => q.Id.Equals(id));
         }
         public virtual async Task<T> GetByIdAsync(string id)
         {
-            return await Slave.FindAsync<T>(id);
-        }
+            try
+            {
+                var _id = long.Parse(id);
+                return await Slave.Set<T>().FirstOrDefaultAsync(q => q.Id.Equals(_id));
+            }
+            catch (Exception)
+            {
 
-        public virtual T GetSingle(Expression<Func<T, bool>> predicate = null)
-        {
-            predicate ??= exprTrue;
-            return Slave.Set<T>().Where(predicate).SingleOrDefault();
+                return null;
+            }
         }
-        public virtual async Task<T> GetSingleAsync(Expression<Func<T, bool>> predicate = null)
-        {
-            predicate ??= exprTrue;
-            return await Slave.Set<T>().Where(predicate).SingleOrDefaultAsync();
-        }
+        #endregion
 
-        public virtual T GetFirst(Expression<Func<T, bool>> predicate = null)
-        {
-            predicate ??= exprTrue;
-            return Slave.Set<T>().Where(predicate).FirstOrDefault();
-        }
-        public virtual async Task<T> GetFirstAsync(Expression<Func<T, bool>> predicate = null)
-        {
-            predicate ??= exprTrue;
-            return await Slave.Set<T>().Where(predicate).FirstOrDefaultAsync();
-        }
-
+        #region 获取列表
         public virtual IQueryable<T> GetList(Expression<Func<T, bool>> predicate = null)
         {
             predicate ??= exprTrue;
@@ -260,7 +313,6 @@ namespace jfYu.Core.Data
                 return new List<T1>().AsQueryable();
             return Slave.Set<T>().Where(predicate).Select(scalar).AsQueryable();
         }
-
         public virtual async Task<IQueryable<T1>> GetListAsync<T1>(Expression<Func<T, bool>> predicate = null, Expression<Func<T, T1>> scalar = null)
         {
             predicate ??= exprTrue;
@@ -268,6 +320,7 @@ namespace jfYu.Core.Data
                 return new List<T1>().AsQueryable();
             return await Task.Run(() => Slave.Set<T>().Where(predicate).Select(scalar).AsQueryable());
         }
+        #endregion
 
     }
 }

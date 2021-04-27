@@ -9,7 +9,7 @@ namespace jfYu.Core.Common.SnowFlake
         /// 雪花ID单例注入
         /// </summary>
         /// <param name="services"></param>
-        public static void AddCaptcha(this ContainerBuilder services)
+        public static void AddSnowFlake(this ContainerBuilder services)
         {
             services.Register(q => new SnowFlake(1, 1)).As<ISnowFlake>().SingleInstance();
         }
@@ -17,7 +17,7 @@ namespace jfYu.Core.Common.SnowFlake
         /// 雪花ID单例注入
         /// </summary>
         /// <param name="services"></param>
-        public static void AddCaptchaAsProperties(this ContainerBuilder services)
+        public static void AddSnowFlakeAsProperties(this ContainerBuilder services)
         {
             services.Register(q => new SnowFlake(1, 1)).As<ISnowFlake>().SingleInstance().PropertiesAutowired();
         }
