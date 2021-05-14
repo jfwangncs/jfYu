@@ -20,12 +20,14 @@ namespace jfYu.Core.Common.Configurations
             path = EnvironmentHelper.GetEnvironmentVariable(path);
             if (File.Exists(path))
             {
-                if (provider == null && Path.IsPathRooted(path))
+                if (provider == null)
                 {
-                    provider = new PhysicalFileProvider(Path.GetDirectoryName(path));
-                    path = Path.GetFileName(path);
+                    builder.AddJsonFile(path, optional, reloadOnChange);
                 }
-                builder.AddJsonFile(path);
+                else
+                {
+                    builder.AddJsonFile(provider, path, optional, reloadOnChange);
+                }
                 AppConfig.Configuration = builder.Build();
             }
             return builder;

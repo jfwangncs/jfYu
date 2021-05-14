@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using jfYu.Core.Common.Configurations;
 
 namespace jfYu.Core.Common.SnowFlake
 {
@@ -11,7 +12,18 @@ namespace jfYu.Core.Common.SnowFlake
         /// <param name="services"></param>
         public static void AddSnowFlake(this ContainerBuilder services)
         {
-            services.Register(q => new SnowFlake(1, 1)).As<ISnowFlake>().SingleInstance();
+            int WorkerId = 1;
+            int DataCenterId = 1;
+            try
+            {
+                WorkerId = int.Parse(AppConfig.GetSection("WorkerId")?.Value);
+                DataCenterId = int.Parse(AppConfig.GetSection("DataCenterId")?.Value);
+            }
+            catch (System.Exception)
+            {
+
+            }
+            services.Register(q => new SnowFlake(WorkerId, DataCenterId)).As<ISnowFlake>().SingleInstance();
         }
         /// <summary>
         /// 雪花ID单例注入
@@ -19,7 +31,18 @@ namespace jfYu.Core.Common.SnowFlake
         /// <param name="services"></param>
         public static void AddSnowFlakeAsProperties(this ContainerBuilder services)
         {
-            services.Register(q => new SnowFlake(1, 1)).As<ISnowFlake>().SingleInstance().PropertiesAutowired();
+            int WorkerId = 1;
+            int DataCenterId = 1;
+            try
+            {
+                WorkerId = int.Parse(AppConfig.GetSection("WorkerId")?.Value);
+                DataCenterId = int.Parse(AppConfig.GetSection("DataCenterId")?.Value);
+            }
+            catch (System.Exception)
+            {
+
+            }
+            services.Register(q => new SnowFlake(WorkerId, DataCenterId)).As<ISnowFlake>().SingleInstance().PropertiesAutowired();
         }
     }
 }

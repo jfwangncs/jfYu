@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace jfYu.Core.Data
+namespace jfYu.Core.Common.Pagination
 {
 
     public static class PaginationExtensions

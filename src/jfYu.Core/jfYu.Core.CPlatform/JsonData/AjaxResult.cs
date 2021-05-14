@@ -5,9 +5,9 @@ namespace jfYu.Core.Common
     public class AjaxResult
     {
         /// <summary>
-        /// 状态码,默认200成功
+        /// 状态码,默认500失败
         /// </summary>
-        public int Code { get; set; } = 200;
+        public int Code { get; set; } = 500;
 
         /// <summary>
         ///返回字符串

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace jfYu.Core.Data
+namespace jfYu.Core.Common.Pagination
 {
 
     public class PagedModel<T>

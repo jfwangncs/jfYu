@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace jfYu.Core.Data
+namespace jfYu.Core.Common.Pagination
 {
 
     public class QueryModel

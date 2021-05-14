@@ -2,9 +2,9 @@
 
   <PropertyGroup>
 
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <LangVersion>8.0</LangVersion>
-    <Version>1.1.20</Version>
+    <Version>1.1.21</Version>
     <Authors>jfwang</Authors>
     <Description>Separation of reading and writing</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -14,11 +14,11 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.4" />
-    <PackageReference Include="Mysql.Data.EntityFrameworkCore" Version="8.0.20" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.5" />
+    <PackageReference Include="MySql.EntityFrameworkCore" Version="5.0.3" />
   </ItemGroup>
 
   <ItemGroup>

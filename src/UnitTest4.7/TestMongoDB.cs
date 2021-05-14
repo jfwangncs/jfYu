@@ -1,11 +1,11 @@
-﻿using jfYu.Core.Common.Configurations;
+﻿using Autofac;
+using jfYu.Core.Common.Configurations;
+using jfYu.Core.Common.Pagination;
 using jfYu.Core.MongoDB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
-using jfYu.Core.Data;
-using Autofac;
 
 namespace UnitTest4._7.MongoDB
 {

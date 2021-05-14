@@ -1,6 +1,6 @@
 using Autofac;
 using jfYu.Core.Common.Configurations;
-using jfYu.Core.Data;
+using jfYu.Core.Common.Pagination;
 using jfYu.Core.MongoDB;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;

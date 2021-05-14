@@ -39,7 +39,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-   <Reference Include="Autofac, Version=6.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+    <Reference Include="Autofac, Version=6.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
       <HintPath>..\packages\Autofac.6.0.0\lib\netstandard2.0\Autofac.dll</HintPath>
     </Reference>
     <Reference Include="AutoMapper, Version=10.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
@@ -157,10 +157,6 @@
     <ProjectReference Include="..\jfYu.Core\jfYu.Core.CPlatform\jfYu.Core.CPlatform.csproj">
       <Project>{55c1ddc7-9516-4a08-8026-c36b204618d2}</Project>
       <Name>jfYu.Core.CPlatform</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\jfYu.Core\jfYu.Core.Data\jfYu.Core.Data.csproj">
-      <Project>{1e4083a1-f498-4307-a817-1af163fc654d}</Project>
-      <Name>jfYu.Core.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\jfYu.Core\jfYu.Core.EMail\jfYu.Core.EMail.csproj">
       <Project>{8f2ded08-0b61-4cfa-b74b-45257553b1a2}</Project>
