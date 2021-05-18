@@ -62,10 +62,10 @@ namespace jfYu.Core.Data
             //注册MasterDBContext
             var masterOptBuilder = new DbContextOptionsBuilder<T>();
             if (config.DatabaseType.Equals(DatabaseType.SqlServer))
-                masterOptBuilder.UseLazyLoadingProxies().UseSqlServer(config.MasterConnectionString);
+                masterOptBuilder.UseSqlServer(config.MasterConnectionString);
             else if (config.DatabaseType.Equals(DatabaseType.Mysql))
-                masterOptBuilder.UseLazyLoadingProxies().UseMySQL(config.MasterConnectionString);
-            services.RegisterType<T>().AsSelf().InstancePerLifetimeScope().WithParameter("options", masterOptBuilder.Options).Named<T>("MasterContext");
+                masterOptBuilder.UseMySQL(config.MasterConnectionString);
+            services.RegisterType<T>().AsSelf().InstancePerDependency().WithParameter("options", masterOptBuilder.Options).Named<T>("MasterContext");
 
             //注册SalveDBContext  
             int slaveCount = config.SlaveConnectionStrings.Count;
@@ -76,26 +76,31 @@ namespace jfYu.Core.Data
                     var SlaveOptBuilder = new DbContextOptionsBuilder<T>();
                     string SlaveConnectionString = config.SlaveConnectionStrings[i].ConnectionString;
                     if (config.DatabaseType.Equals(DatabaseType.SqlServer))
-                        SlaveOptBuilder.UseLazyLoadingProxies().UseSqlServer(SlaveConnectionString);
+                        SlaveOptBuilder.UseSqlServer(SlaveConnectionString);
                     else if (config.DatabaseType.Equals(DatabaseType.Mysql))
-                        SlaveOptBuilder.UseLazyLoadingProxies().UseMySQL(SlaveConnectionString);
-                    services.RegisterType<T>().AsSelf().InstancePerLifetimeScope().WithParameter("options", SlaveOptBuilder.Options).Named<T>($"SlaveContext{i + 1}");
+                        SlaveOptBuilder.UseMySQL(SlaveConnectionString);
+                    services.RegisterType<T>().AsSelf().InstancePerDependency().WithParameter("options", SlaveOptBuilder.Options).Named<T>($"SlaveContext{i + 1}");
                 }
             }
 
-            Random r = new Random();
-            var mParaVal = new Func<ParameterInfo, IComponentContext, object>((p, c) => c.ResolveNamed<T>("MasterContext"));
-            var salveContexts = new List<Func<ParameterInfo, IComponentContext, object>>();
-            for (int j = 0; j < slaveCount; j++)
-            {
-                string slaveContextName = $"SlaveContext{j + 1}";
-                salveContexts.Add(new Func<ParameterInfo, IComponentContext, object>((p, c) => c.ResolveNamed<T>(slaveContextName)));
-            }
+            var master = new Func<ParameterInfo, IComponentContext, object>((p, c) => c.ResolveNamed<T>("MasterContext"));
+            var salves = new Func<ParameterInfo, IComponentContext, object>((p, c) =>
+             {
+                 var salves = new List<T>();
+                 for (int j = 0; j < slaveCount; j++)
+                 {
+                     string slaveContextName = $"SlaveContext{j + 1}";
+                     salves.Add(c.ResolveNamed<T>(slaveContextName));
+                 }
+                 return salves;
+             });
 
             services.RegisterType<DbContextService<T>>()
-                .WithParameter((p, c) => p.Name == "MasterContext", mParaVal)
-                .WithParameter((p, c) => p.Name == "SalveContext", slaveCount <= 0 ? mParaVal : salveContexts[r.Next(0, slaveCount)])
+                .WithParameter((p, c) => p.Name == "Master", master)
+                .WithParameter((p, c) => p.Name == "Salves", salves)
+                .WithParameter("configuration", config)
                 .AsImplementedInterfaces().InstancePerLifetimeScope();
         }
+
     }
 }

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net461</TargetFrameworks>
     <LangVersion>8.0</LangVersion>
-    <Version>1.1.10</Version>
+    <Version>1.1.9</Version>
     <Authors>jfwang</Authors>
     <Description>Jfyu Core Common Components</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
