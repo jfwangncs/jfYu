@@ -27,7 +27,7 @@ namespace xUnitTestCore.NLog
             PLogger._logger.Trace("x2");
 
             var containerBuilder1 = new ContainerBuilder();
-            containerBuilder1.AddNLog("nLog.config", AppConfig.GetSection("ConnectionStrings:MasterConnectionString").Value);
+            containerBuilder1.AddNLog("nLog.config", AppConfig.Configuration.GetSection("ConnectionStrings:MasterConnectionString").Value);
             containerBuilder1.RegisterType<SampleClassWithConstructorDependency>();
             containerBuilder1.RegisterType<SampleClassWithPropertiesAutowired>().PropertiesAutowired();
             var _container1 = containerBuilder1.Build();

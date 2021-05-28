@@ -24,7 +24,7 @@ namespace xUnitTestCore
              .AddConfigurationFile("appsettings.json", optional: true, reloadOnChange: true);
             var Configuration = builder.Build();
 
-            var mq = new RabbitMQService(AppConfig.GetSection("RabbitMQConnectionString")?.Value);
+            var mq = new RabbitMQService(AppConfig.Configuration.GetSection("RabbitMQConnectionString")?.Value);
             var con = new ContainerBuilder();
             con.AddRabbitMQService();
             var icon = con.Build();

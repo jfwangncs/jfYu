@@ -4,6 +4,8 @@ using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace jfYu.Core.Redis
 {
@@ -23,7 +25,7 @@ namespace jfYu.Core.Redis
         {
             try
             {
-                RedisConfiguration = AppConfig.GetSection("Redis").GetBindData<RedisConfiguration>();
+                RedisConfiguration = AppConfig.Configuration.GetSection("Redis").Get<RedisConfiguration>();
                 var configurationOptions = new ConfigurationOptions()
                 {
                     Password = RedisConfiguration.Password,

@@ -1,5 +1,6 @@
 ﻿using jfYu.Core.Common.Configurations;
 using jfYu.Core.Common.Utilities;
+using Microsoft.Extensions.Configuration;
 using NLog;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -33,7 +34,7 @@ namespace jfYu.Core.RabbitMQ
         {
             try
             {
-                RabbitMQConf = AppConfig.GetSection("RabbitMQ")?.GetBindData<RabbitMQEndPoint>();
+                RabbitMQConf = AppConfig.Configuration.GetSection("RabbitMQ")?.Get<RabbitMQEndPoint>();
                 var factory = new ConnectionFactory//创建连接工厂对象
                 {
                     HostName = RabbitMQConf.HostName,

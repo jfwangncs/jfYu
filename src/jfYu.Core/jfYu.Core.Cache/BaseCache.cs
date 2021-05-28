@@ -1,9 +1,4 @@
-﻿using jfYu.Core.Common.Configurations;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace jfYu.Core.Cache
+﻿namespace jfYu.Core.Cache
 {
     public abstract class BaseCache
     {

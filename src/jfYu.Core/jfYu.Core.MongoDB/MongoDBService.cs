@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace jfYu.Core.MongoDB
 {
@@ -18,7 +19,7 @@ namespace jfYu.Core.MongoDB
         {
             try
             {
-                var MongoDBConfig = AppConfig.GetSection("MongoDB").GetBindData<MongoDBConfig>();
+                var MongoDBConfig = AppConfig.Configuration.GetSection("MongoDB").Get<MongoDBConfig>();
                 if (string.IsNullOrEmpty(MongoDBConfig.MongoUrl) || string.IsNullOrEmpty(MongoDBConfig.DbName))
                 {
                     throw new Exception("未找到mongodb相关配置数据");

@@ -27,7 +27,7 @@ namespace UnitTest4._7.NLog
 
 
             var containerBuilder1 = new ContainerBuilder();
-            containerBuilder1.AddNLog("nLog.config", AppConfig.GetSection("ConnectionStrings:MasterConnectionString").Value);
+            containerBuilder1.AddNLog("nLog.config", AppConfig.Configuration.GetSection("ConnectionStrings:MasterConnectionString").Value);
 
             var _container1 = containerBuilder1.Build();
             var logger2 = _container1.Resolve<ILogger>();

@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using jfYu.Core.Common.Configurations;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -19,7 +20,7 @@ namespace jfYu.Core.Data
             DatabaseConfiguration Config = new DatabaseConfiguration();
             try
             {
-                Config = AppConfig.GetSection("ConnectionStrings").GetBindData<DatabaseConfiguration>();
+                Config = AppConfig.Configuration.GetSection("ConnectionStrings").Get<DatabaseConfiguration>();
 
             }
             catch (Exception ex)
@@ -96,10 +97,10 @@ namespace jfYu.Core.Data
              });
 
             services.RegisterType<DbContextService<T>>()
-                .WithParameter((p, c) => p.Name == "Master", master)
-                .WithParameter((p, c) => p.Name == "Salves", salves)
+                .WithParameter((p, c) => p.Name == "master", master)
+                .WithParameter((p, c) => p.Name == "salves", salves)
                 .WithParameter("configuration", config)
-                .AsImplementedInterfaces().InstancePerLifetimeScope();
+                .AsImplementedInterfaces().InstancePerDependency();
         }
 
     }

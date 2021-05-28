@@ -1,5 +1,4 @@
-﻿using jfYu.Core.Common.Configurations;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,7 +10,6 @@ namespace jfYu.Core.Cache
     public class MemoryCacheService : BaseCache, ICache
     {
         protected IMemoryCache MemoryCache;
-
 
         public MemoryCacheService(IMemoryCache cache, CacheConfig cacheConfig) : base(cacheConfig)
         {

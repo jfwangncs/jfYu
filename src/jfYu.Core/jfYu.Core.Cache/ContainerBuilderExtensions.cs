@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using jfYu.Core.Common.Configurations;
 using Microsoft.Extensions.Caching.Memory;
-using System;
+using Microsoft.Extensions.Configuration;
 
 namespace jfYu.Core.Cache
 {
@@ -14,7 +14,8 @@ namespace jfYu.Core.Cache
         /// <param name="services"></param>
         public static void AddCache(this ContainerBuilder services)
         {
-            var cacheConfig = AppConfig.GetSection("Cache")?.GetBindData<CacheConfig>() ?? new CacheConfig();
+            
+            var cacheConfig = AppConfig.Configuration.GetSection("Cache")?.Get<CacheConfig>() ?? new CacheConfig();
             switch (cacheConfig.Type)
             {
                 case CacheType.Redis:
@@ -35,7 +36,7 @@ namespace jfYu.Core.Cache
         /// <param name="services"></param>
         public static void AddCacheAsProperties(this ContainerBuilder services)
         {
-            var cacheConfig = AppConfig.GetSection("Cache")?.GetBindData<CacheConfig>() ?? new CacheConfig();
+            var cacheConfig = AppConfig.Configuration.GetSection("Cache")?.Get<CacheConfig>() ?? new CacheConfig();
             switch (cacheConfig.Type)
             {
                 case CacheType.Redis:

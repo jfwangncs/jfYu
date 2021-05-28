@@ -18,10 +18,10 @@ var Configuration = builder.Build();
 
 //绑定到类
 EmailConfiguration Config = new EmailConfiguration();
-Config=AppConfig.GetSection("Email").GetBindData<EmailConfiguration>();
+Config=AppConfig.Configuration.GetSection("Email").GetBindData<EmailConfiguration>();
 
 //直接获取值
-var address=AppConfig.GetSection("Email").GetSection("Address").Value;
+var address=AppConfig.Configuration.GetSection("Email").GetSection("Address").Value;
 
 ```
 
@@ -142,7 +142,7 @@ IOC注入
 ```
   var config = new ConfigurationBuilder().AddConfigurationFile("SqlServer.json", true, true);
   containerBuilder.AddNLog("nLog.config");
-  containerBuilder1.AddNLog("nLog.config", AppConfig.GetSection("ConnectionStrings:MasterConnectionString").Value);\\带插入数据库的日志
+  containerBuilder1.AddNLog("nLog.config", AppConfig.Configuration.GetSection("ConnectionStrings:MasterConnectionString").Value);\\带插入数据库的日志
 
 ```
 

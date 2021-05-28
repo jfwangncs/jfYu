@@ -48,6 +48,7 @@ namespace xUnitTestCore.Cache
             var builder = new ConfigurationBuilder()
               .AddConfigurationFile("CacheRedis.json", optional: true, reloadOnChange: true);
             _ = builder.Build();
+
             ContainerBuilder.AddCache();
             ContainerBuilder.AddCacheAsProperties();
             ContainerBuilder.RegisterType<CacheConstructorClass>().AsSelf();

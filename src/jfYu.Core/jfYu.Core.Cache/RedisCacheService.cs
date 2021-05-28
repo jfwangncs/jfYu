@@ -3,10 +3,9 @@ using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace jfYu.Core.Cache
 {
@@ -22,7 +21,7 @@ namespace jfYu.Core.Cache
             try
             {
                 CacheType = CacheType.Redis;
-                RedisConfiguration = AppConfig.GetSection("Redis").GetBindData<RedisConfiguration>();
+                RedisConfiguration = AppConfig.Configuration.GetSection("Redis").Get<RedisConfiguration>();
                 var configurationOptions = new ConfigurationOptions()
                 {
                     Password = RedisConfiguration.Password,

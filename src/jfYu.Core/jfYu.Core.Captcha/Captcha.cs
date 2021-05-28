@@ -1,4 +1,5 @@
 ﻿using jfYu.Core.Common.Configurations;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -15,7 +16,7 @@ namespace jfYu.Core.Captcha
             //读取配置文件
             try
             {
-                CaptchaConfig = AppConfig.GetSection("Captcha")?.GetBindData<CaptchaConfig>() ?? new CaptchaConfig()
+                CaptchaConfig = AppConfig.Configuration.GetSection("Captcha")?.Get<CaptchaConfig>() ?? new CaptchaConfig()
                 {
                     FontColors = new Color[] {
                         Color.FromArgb(44, 62, 80),Color.FromArgb(192, 57, 43),Color.FromArgb(22, 160, 133),

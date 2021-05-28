@@ -12,12 +12,9 @@ namespace xUnitTestCore.Common
         [Fact]
         public void TestJson()
         {
-            var builder = new ConfigurationBuilder()
-            .AddConfigurationFile("CacheRedis.json", optional: true, reloadOnChange: true)
-            .AddConfigurationFile("Captcha.json", optional: true, reloadOnChange: true);
-            _ = builder.Build();
-            Assert.Equal("2", AppConfig.GetSection("Captcha:Length").Value);
-            Assert.Equal("Redis", AppConfig.GetSection("Cache:Type").Value);
+            new ConfigurationBuilder().AddConfigurationFiles();
+            Assert.Equal("2", AppConfig.Configuration["Captcha:Length"]);
+            Assert.Equal("Redis", AppConfig.Configuration["Cache:Type"]);
         }
     }
 

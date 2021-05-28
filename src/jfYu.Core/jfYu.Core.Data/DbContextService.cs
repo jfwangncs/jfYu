@@ -14,60 +14,67 @@ namespace jfYu.Core.Data
         public T Master { get; }
 
         /// <summary>
-        /// 丛数据库
+        /// 从数据库
         /// </summary>
         public T Slave { get; }
 
+        /// <summary>
+        /// 从数据库集
+        /// </summary>
         public List<T> Slaves { get; }
 
-        public DbContextService(T Master, List<T> Salves, DatabaseConfiguration configuration)
+        public DbContextService(T master, List<T> salves, DatabaseConfiguration configuration)
         {
-            this.Master = Master;
+            Master = master;
 
-            this.Slaves = Salves;
+            Slaves = salves;
 
             Random r = new Random();
-            if (Salves.Count <= 0)
+
+            if (salves.Count <= 0)
             {
-                this.Slave = Master;
+                Slave = Master;
             }
-            else if (Salves.Count == 1)
+            else if (salves.Count == 1)
             {
-                this.Slave = Salves[0];
+                Slave = salves[0];
             }
             else
             {
-                var num = r.Next(0, Salves.Count);
-                this.Slave = Salves[num];
-                var end = num;
-                var front = num;
-                try
+                var num = r.Next(0, salves.Count);
+                Slave = salves[num];
+                if (configuration.SlaveCheck)
                 {
-                    //正向查找
-                    while (this.Slave == null || !this.Slave.Database.CanConnect())
+                    var end = num;
+                    var front = num;
+                    try
                     {
-                        this.Slave = null;
-                        end += 1;
-                        if (end >= Salves.Count)
-                            break;
-                        else
-                            this.Slave = Salves[end];
+                        //正向查找
+                        while (Slave == null || !Slave.Database.CanConnect())
+                        {
+                            Slave = null;
+                            end += 1;
+                            if (end >= salves.Count)
+                                break;
+                            else
+                                Slave = salves[end];
+                        }
+                        while (Slave == null || !Slave.Database.CanConnect())
+                        {
+                            Slave = null;
+                            front -= 1;
+                            if (front < 1)
+                                break;
+                            else
+                                Slave = salves[front];
+                        }
+                        if (Slave == null)
+                            Slave = Master;
                     }
-                    while (this.Slave == null || !this.Slave.Database.CanConnect())
+                    catch (Exception)
                     {
-                        this.Slave = null;
-                        front -= 1;
-                        if (front < 1)
-                            break;
-                        else
-                            this.Slave = Salves[front];
-                    }
-                    if (this.Slave == null)
-                        this.Slave = Master;
-                }
-                catch (Exception)
-                {
 
+                    }
                 }
             }
         }

@@ -1,5 +1,6 @@
 ﻿using jfYu.Core.Common.Configurations;
 using MailKit.Net.Smtp;
+using Microsoft.Extensions.Configuration;
 using MimeKit;
 #if NETSTANDARD20
 using Microsoft.Extensions.Configuration;
@@ -16,7 +17,7 @@ namespace jfYu.Core.EMail
         {
             try
             {
-                Config = AppConfig.GetSection("Email").GetBindData<EmailConfiguration>();
+                Config = AppConfig.Configuration.GetSection("Email").Get<EmailConfiguration>();
             }
             catch (System.Exception ex)
             {

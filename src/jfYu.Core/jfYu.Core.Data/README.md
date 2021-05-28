@@ -14,6 +14,7 @@ Install-Package jfYu.Core.Data
  "ConnectionStrings": {
     "DatabaseType": "SqlServer", //MySql  
     "MasterConnectionString": "Data Source = 127.0.0.1,9004; database = dbtest; User Id = sa; Password = 123456;",
+    "SlaveCheck": false,
     "SlaveConnectionStrings": [
       {
         "ConnectionString": "Data Source = 127.0.0.1,9005; database = dbtest; User Id = sa; Password = 123456;",

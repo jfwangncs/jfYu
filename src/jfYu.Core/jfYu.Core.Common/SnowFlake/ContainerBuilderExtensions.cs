@@ -16,8 +16,8 @@ namespace jfYu.Core.Common.SnowFlake
             int DataCenterId = 1;
             try
             {
-                WorkerId = int.Parse(AppConfig.GetSection("WorkerId")?.Value);
-                DataCenterId = int.Parse(AppConfig.GetSection("DataCenterId")?.Value);
+                WorkerId = int.Parse(AppConfig.Configuration.GetSection("WorkerId")?.Value);
+                DataCenterId = int.Parse(AppConfig.Configuration.GetSection("DataCenterId")?.Value);
             }
             catch (System.Exception)
             {
@@ -35,8 +35,8 @@ namespace jfYu.Core.Common.SnowFlake
             int DataCenterId = 1;
             try
             {
-                WorkerId = int.Parse(AppConfig.GetSection("WorkerId")?.Value);
-                DataCenterId = int.Parse(AppConfig.GetSection("DataCenterId")?.Value);
+                WorkerId = int.Parse(AppConfig.Configuration.GetSection("WorkerId")?.Value);
+                DataCenterId = int.Parse(AppConfig.Configuration.GetSection("DataCenterId")?.Value);
             }
             catch (System.Exception)
             {
