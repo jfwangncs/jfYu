@@ -168,7 +168,7 @@ namespace jfYu.Core.Configuration
         /// <summary>
         /// 排序的配置文件前缀
         /// </summary>
-        private static readonly string[] excludeJsonPrefixs = new[] { "appsettings", "bundleconfig", "compilerconfig" };
+        private static readonly string[] excludeJsonPrefixs = new[] { "bundleconfig", "compilerconfig" };
 
         /// <summary>
         /// 检查是否受排除的配置文件
