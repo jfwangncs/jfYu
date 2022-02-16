@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+
+    <TargetFrameworks>net6.0</TargetFrameworks>
+    <LangVersion>10.0</LangVersion>
+    <Version>1.1.21</Version>
+    <Authors>jfwang</Authors>
+    <Description>Separation of reading and writing</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.3.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.2" />
+    <PackageReference Include="MySql.EntityFrameworkCore" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\jfYu.Core.Common\jfYu.Core.Common.csproj" />
+    <ProjectReference Include="..\jfYu.Core.Configuration\jfYu.Core.Configuration.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,11 @@
+﻿{
+  "Email": {
+    "MailServer": "smtp.aliyun.com",
+    "MailServerUsername": "MailServerUsername",
+    "MailServerPassword": "MailServerPassword",
+    "SenderEmail": "jfwangncs@aliyun.com",
+    "SenderName": "xxx",
+    "AdminSenderEmail": "xxx",
+    "Port": 465
+  }
+}

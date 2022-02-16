@@ -1,0 +1,13 @@
+﻿{
+  "ConnectionStrings": {
+    "DatabaseType": "SqlServer", //MySql  
+    "MasterConnectionString": "Data Source = xxxx,31443; database = dbtest; User Id = sa; Password = xxxxx;",
+    "SlaveConnectionStrings": [
+      {
+        "DatabaseType": "MySql", //MySql  
+        "ConnectionString": "server=xxxxx;userid=root;pwd=xxxxx;port=1333;database=dbtest;",
+        "Weight": 2
+      }
+    ]
+  }
+}

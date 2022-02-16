@@ -1,0 +1,6 @@
+﻿{
+  "Cache": {
+    "Type": "Memory", //缓存类型Memory,Redis
+    "KeySuffix": "" //缓存key前缀
+  }
+}

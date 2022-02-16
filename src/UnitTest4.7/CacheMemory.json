@@ -1,0 +1,13 @@
+﻿{
+  "Cache": {
+    "Type": "Memory", //缓存类型Memory,Redis
+    "KeySuffix": "" //缓存key前缀
+  },
+  "Redis": {
+    "Host": "Host", //地址
+    "Port": "Port", //端口
+    "Password": "Password", //密码
+    "Timeout": "5000", //超时时间（毫秒） 默认5秒
+    "DbIndex": "15" //数据库 默认为0
+  }
+}
