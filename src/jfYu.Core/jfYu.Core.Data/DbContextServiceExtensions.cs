@@ -65,7 +65,7 @@ namespace jfYu.Core.Data
             if (config.DatabaseType.Equals(DatabaseType.SqlServer))
                 masterOptBuilder.UseSqlServer(config.MasterConnectionString);
             else if (config.DatabaseType.Equals(DatabaseType.Mysql))
-                masterOptBuilder.UseMySQL(config.MasterConnectionString);
+                masterOptBuilder.UseMySql(ServerVersion.AutoDetect(config.MasterConnectionString));
             services.RegisterType<T>().AsSelf().InstancePerDependency().WithParameter("options", masterOptBuilder.Options).Named<T>("MasterContext");
 
             //注册SalveDBContext  
@@ -79,7 +79,7 @@ namespace jfYu.Core.Data
                     if (config.SlaveConnectionStrings[i].DatabaseType.Equals(DatabaseType.SqlServer))
                         SlaveOptBuilder.UseSqlServer(SlaveConnectionString);
                     else if (config.SlaveConnectionStrings[i].DatabaseType.Equals(DatabaseType.Mysql))
-                        SlaveOptBuilder.UseMySQL(SlaveConnectionString);
+                        SlaveOptBuilder.UseMySql(ServerVersion.AutoDetect(config.MasterConnectionString));
                     services.RegisterType<T>().AsSelf().InstancePerDependency().WithParameter("options", SlaveOptBuilder.Options).Named<T>($"SlaveContext{i + 1}");
                 }
             }

@@ -127,6 +127,7 @@ Install-Package jfYu.Core.Data
                 throw new InvalidOperationException("The connection string was not set in the 'EFCORETOOLSDB' environment variable.");
             var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
             optionsBuilder.UseSqlServer(connectionString);
+            //optionsBuilder.UseMySql(ServerVersion.AutoDetect(connectionString));
             return new DataContext(optionsBuilder.Options);
         }
     }
