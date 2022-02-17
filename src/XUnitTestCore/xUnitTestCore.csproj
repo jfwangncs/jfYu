@@ -34,7 +34,6 @@
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Captcha\jfYu.Core.Captcha.csproj" />
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Common\jfYu.Core.Common.csproj" />
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Configuration\jfYu.Core.Configuration.csproj" />
-		<ProjectReference Include="..\jfYu.Core\jfYu.Core.CPlatform\jfYu.Core.CPlatform.csproj" />
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Data\jfYu.Core.Data.csproj" />
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.EMail\jfYu.Core.EMail.csproj" />
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Excel\jfYu.Core.Excel.csproj" />

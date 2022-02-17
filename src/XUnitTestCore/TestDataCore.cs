@@ -1,11 +1,9 @@
 using Autofac;
 using jfYu.Core.Configuration;
-using jfYu.Core.CPlatform;
 using jfYu.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using NPOI.HSSF.Record.Chart;
 using System.Linq;
 using Xunit;
 

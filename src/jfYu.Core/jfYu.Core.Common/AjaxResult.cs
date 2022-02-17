@@ -15,6 +15,11 @@ namespace jfYu.Core.Common
         public string Message { get; set; } = "";
 
         /// <summary>
+        ///数据
+        /// </summary>
+        public object Data { get; set; }
+
+        /// <summary>
         /// 返回错误集合
         /// </summary>
         public List<KeyValuePair<string, string>> Errors { get; set; } = new List<KeyValuePair<string, string>>();
