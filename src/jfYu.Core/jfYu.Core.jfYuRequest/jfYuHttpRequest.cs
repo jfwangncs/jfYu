@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.jfYuRequest
 {
-    public class jfYuRequest : jfYuBaseRequest, IjfYuRequest
+    public class jfYuHttpRequest : jfYuBaseRequest, IjfYuRequest
     {
-        public jfYuRequest(string url) : base(url)
+        public jfYuHttpRequest(string url) : base(url)
         {
         }
 
@@ -198,7 +198,7 @@ namespace jfYu.Core.jfYuRequest
                     else if (response.StatusCode == HttpStatusCode.Moved)
                     {
                         string newUrl = response.Headers.GetValues("Location")[0];
-                        jfYuRequest x = new jfYuRequest($"{newUrl}");
+                        jfYuHttpRequest x = new jfYuHttpRequest($"{newUrl}");
                         SetCookies = x.SetCookies;
                         return x.GetHtml();
                     }
@@ -247,7 +247,7 @@ namespace jfYu.Core.jfYuRequest
                     else if (response.StatusCode == HttpStatusCode.Moved)
                     {
                         string newUrl = response.Headers.GetValues("Location")[0];
-                        jfYuRequest x = new jfYuRequest($"{newUrl}");
+                        jfYuHttpRequest x = new jfYuHttpRequest($"{newUrl}");
                         SetCookies = x.SetCookies;
                         return await x.GetHtmlAsync();
                     }
@@ -358,7 +358,7 @@ namespace jfYu.Core.jfYuRequest
             else if (response.StatusCode == HttpStatusCode.Moved)
             {
                 string newUrl = response.Headers.GetValues("Location")[0];
-                jfYuRequest x = new jfYuRequest($"{newUrl}");
+                jfYuHttpRequest x = new jfYuHttpRequest($"{newUrl}");
                 return x.GetFile(path, setProgress);
             }
             else
@@ -445,7 +445,7 @@ namespace jfYu.Core.jfYuRequest
             else if (response.StatusCode == HttpStatusCode.Moved)
             {
                 string newUrl = response.Headers.GetValues("Location")[0];
-                jfYuRequest x = new jfYuRequest($"{newUrl}");
+                jfYuHttpRequest x = new jfYuHttpRequest($"{newUrl}");
                 return await x.GetFileAsync(path, setProgress);
             }
             else
@@ -529,7 +529,7 @@ namespace jfYu.Core.jfYuRequest
             else if (response.StatusCode == HttpStatusCode.Moved)
             {
                 string newUrl = response.Headers.GetValues("Location")[0];
-                jfYuRequest x = new jfYuRequest($"{newUrl}");
+                jfYuHttpRequest x = new jfYuHttpRequest($"{newUrl}");
                 return x.GetFile(setProgress);
             }
             else
@@ -611,7 +611,7 @@ namespace jfYu.Core.jfYuRequest
             else if (response.StatusCode == HttpStatusCode.Moved)
             {
                 string newUrl = response.Headers.GetValues("Location")[0];
-                jfYuRequest x = new jfYuRequest($"{newUrl}");
+                jfYuHttpRequest x = new jfYuHttpRequest($"{newUrl}");
                 return await x.GetFileAsync(setProgress);
             }
             else

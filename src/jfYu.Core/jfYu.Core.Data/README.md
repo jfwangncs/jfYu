@@ -122,9 +122,9 @@ Install-Package jfYu.Core.Data
     {
         public DataContext CreateDbContext(string[] args)
         {
-            var connectionString = Environment.GetEnvironmentVariable("EFCORETOOLSDB");
+            var connectionString = Environment.GetEnvironmentVariable("EFConString");
             if (string.IsNullOrEmpty(connectionString))
-                throw new InvalidOperationException("The connection string was not set in the 'EFCORETOOLSDB' environment variable.");
+                throw new InvalidOperationException("The connection string was not set in the 'EFConString' environment variable.");
             var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
             optionsBuilder.UseSqlServer(connectionString);
             //optionsBuilder.UseMySql(ServerVersion.AutoDetect(connectionString));
@@ -135,11 +135,11 @@ Install-Package jfYu.Core.Data
 迁移数据,在控制台或者cmd命令行下执行
 ```
 //配置迁移数据库连接字符串
-$env:EFCORETOOLSDB="Data Source = xxx; database = test; User Id = sa; Password = xxx;";
+$env:EFConString="Data Source = xxx; database = test; User Id = sa; Password = xxx;";
 //新建迁移
 dotnet ef migrations add init
 //应用迁移(也可在代码中进行迁移)
-dotnet ef migrations database update
+dotnet ef  database update
 
 ```
 

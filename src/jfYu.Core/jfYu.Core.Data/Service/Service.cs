@@ -224,7 +224,7 @@ namespace jfYu.Core.Data
         {
             try
             {
-                var _id = long.Parse(id);
+                var _id = Guid.Parse(id);
                 return Slave.Set<T>().Any(q => q.Id.Equals(id));
             }
             catch (Exception)
@@ -250,7 +250,7 @@ namespace jfYu.Core.Data
         {
             try
             {
-                var _id = long.Parse(id);
+                var _id = Guid.Parse(id);
                 return await Slave.Set<T>().AnyAsync(q => q.Id.Equals(id));
             }
             catch (Exception)
@@ -278,7 +278,7 @@ namespace jfYu.Core.Data
         {
             try
             {
-                var _id = long.Parse(id);
+                var _id = Guid.Parse(id);
                 return Slave.Set<T>().FirstOrDefault(q => q.Id.Equals(_id));
             }
             catch (Exception)
@@ -296,7 +296,7 @@ namespace jfYu.Core.Data
         {
             try
             {
-                var _id = long.Parse(id);
+                var _id = Guid.Parse(id);
                 return await Slave.Set<T>().FirstOrDefaultAsync(q => q.Id.Equals(_id));
             }
             catch (Exception)

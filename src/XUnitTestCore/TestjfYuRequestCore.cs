@@ -11,7 +11,7 @@ namespace xUnitTestCore.Request
 
         public void TestHtml()
         {
-            jfYuRequest jfYu = new jfYuRequest("https://b2b.10086.cn/b2b/main/listVendorNotice.html?noticeType=2")
+            jfYuHttpRequest jfYu = new jfYuHttpRequest("https://b2b.10086.cn/b2b/main/listVendorNotice.html?noticeType=2")
             {
                 Method = jfYuRequestMethod.Get
             };
@@ -35,7 +35,7 @@ namespace xUnitTestCore.Request
         [Fact]
         public void TestFile()
         {
-            jfYuRequest jfYu = new jfYuRequest("https://img.nga.178.com/attachments/mon_201904/11/-7da9Q5-dgq4ZgT3cSzk-qo.jpg");
+            jfYuHttpRequest jfYu = new jfYuHttpRequest("https://img.nga.178.com/attachments/mon_201904/11/-7da9Q5-dgq4ZgT3cSzk-qo.jpg");
 
             jfYu.GetFile("requestest/2.jpg");
             jfYu.GetFile("requestest/3.jpg");

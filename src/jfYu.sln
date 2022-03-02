@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jfYu.Core.Cache", "jfYu.Cor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jfYu.Core.Configuration", "jfYu.Core\jfYu.Core.Configuration\jfYu.Core.Configuration.csproj", "{8DEC9089-4B0F-4EEA-AEDC-6592349E3990}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jfYu.Core.Wechat", "jfYu.Core\jfYu.Core.Wechat\jfYu.Core.Wechat.csproj", "{C08C58A9-0D36-49E6-85B2-32705ED33E09}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{8DEC9089-4B0F-4EEA-AEDC-6592349E3990}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DEC9089-4B0F-4EEA-AEDC-6592349E3990}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8DEC9089-4B0F-4EEA-AEDC-6592349E3990}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C08C58A9-0D36-49E6-85B2-32705ED33E09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C08C58A9-0D36-49E6-85B2-32705ED33E09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C08C58A9-0D36-49E6-85B2-32705ED33E09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C08C58A9-0D36-49E6-85B2-32705ED33E09}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
