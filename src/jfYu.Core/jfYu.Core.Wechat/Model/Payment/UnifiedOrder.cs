@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace jfYu.Core.Wechat.Model.Payment
-{
+{    
     public class UnifiedOrder
     {
         /// <summary>

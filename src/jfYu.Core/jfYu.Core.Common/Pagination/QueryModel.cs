@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace jfYu.Core.Common.Pagination
 {
@@ -22,7 +21,7 @@ namespace jfYu.Core.Common.Pagination
         ///搜索关键字
         /// </summary>
         [DisplayName("搜索关键字")]
-        public String Key { get; set; } = "";
+        public string Key { get; set; } = "";
 
     }
 }

@@ -8,6 +8,20 @@ namespace jfYu.Core.Data
 {
     public interface IService<T> where T : BaseEntity
     {
+        /// <summary>
+        /// 新增/修改
+        /// </summary>
+        /// <param name="entity">数据</param>
+        /// <returns>是否成功</returns>
+        bool AddOrUpdate(T entity);
+
+        /// <summary>
+        /// 新增/修改
+        /// </summary>
+        /// <param name="entity">数据</param>
+        /// <returns>是否成功</returns>
+        Task<bool> AddOrUpdateAsync(T entity);
+
         #region 新增
         /// <summary>
         /// 新增

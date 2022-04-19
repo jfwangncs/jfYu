@@ -21,7 +21,7 @@ namespace jfYu.Core.Common.Pagination
             int totalCount = source.Count();
             int totalPages = (int)Math.Ceiling((decimal)totalCount / parm.PageSize);
             await Task.Delay(1);
-            return new PagedModel<T>() { TotalPages = totalPages, Parm = parm, List = list, FirstDigit = startNum, LastDigit = endNum, TotalCount = totalCount };
+            return new PagedModel<T>() { TotalPages = totalPages, Parm = parm, List = list ?? new System.Collections.Generic.List<T>(), FirstDigit = startNum, LastDigit = endNum, TotalCount = totalCount };
 
         }
         public static PagedModel<T> ToPaging<T, Q>(this IQueryable<T> source, Q parm) where Q : QueryModel

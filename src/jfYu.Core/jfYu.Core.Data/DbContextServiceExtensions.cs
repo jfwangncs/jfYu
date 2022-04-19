@@ -66,7 +66,7 @@ namespace jfYu.Core.Data
                 masterOptBuilder.UseSqlServer(config.MasterConnectionString);
             else if (config.DatabaseType.Equals(DatabaseType.Mysql))
                 masterOptBuilder.UseMySql(config.MasterConnectionString,ServerVersion.AutoDetect(config.MasterConnectionString)).EnableDetailedErrors();
-            services.RegisterType<T>().AsSelf().InstancePerDependency().WithParameter("options", masterOptBuilder.Options).Named<T>("MasterContext");
+            services.RegisterType<T>().AsSelf().InstancePerLifetimeScope().WithParameter("options", masterOptBuilder.Options).Named<T>("MasterContext");
 
             //注册SalveDBContext  
             int slaveCount = config.SlaveConnectionStrings.Count;
@@ -100,7 +100,7 @@ namespace jfYu.Core.Data
                 .WithParameter((p, c) => p.Name == "master", master)
                 .WithParameter((p, c) => p.Name == "salves", salves)
                 .WithParameter("configuration", config)
-                .AsImplementedInterfaces().InstancePerDependency();
+                .AsImplementedInterfaces().InstancePerLifetimeScope();
         }
 
     }

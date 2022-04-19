@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace jfYu.Core.jfYuRequest
@@ -74,6 +77,8 @@ namespace jfYu.Core.jfYuRequest
         /// 自定义header头
         /// </summary>
         public Dictionary<string, string> CustomHeader { get; set; } = new Dictionary<string, string>();
+
+        public X509Certificate2 Cert = null;
         #endregion
 
         #region 方法     
@@ -82,11 +87,36 @@ namespace jfYu.Core.jfYuRequest
         /// </summary>  
         protected string GetParaStr()
         {
-            string p = "";
-            foreach (var item in Para)
-                p += $"{item.Key}={item.Value}&";
-            p += RawPara;
-            return p;
+            try
+            {
+                if (this.ContentType == "application/json")
+                {
+                    if (!string.IsNullOrEmpty(RawPara))
+                    {
+                        var RawParaDic = RawPara.Split('&');
+                        foreach (var item in RawParaDic)
+                        {
+                            var r = item.Split('=');
+                            Para.Add(r[0], r[1]);
+                        }
+                    }
+                    return JsonConvert.SerializeObject(Para);
+                }
+                else
+                {
+                    string p = "";
+                    foreach (var item in Para)
+                        p += $"{item.Key}={item.Value}&";
+                    p = p.Trim('&') + RawPara;
+                    return p;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
         }
         #endregion
     }

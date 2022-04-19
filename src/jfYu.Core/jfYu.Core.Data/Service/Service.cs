@@ -18,7 +18,7 @@ namespace jfYu.Core.Data
         public Q Slave { get; }
 
         public List<Q> Slaves { get; }
-     
+
         public Service(IDbContextService<Q> contextService)
         {
 
@@ -26,6 +26,22 @@ namespace jfYu.Core.Data
             Slave = contextService.Slave;
             Slaves = contextService.Slaves;
         }
+        public virtual bool AddOrUpdate(T entity)
+        {
+            if (entity.Id == Guid.Empty || string.IsNullOrEmpty(entity.Id.ToString()))
+                return Add(entity);
+            else
+                return Update(entity);
+        }
+
+        public virtual async Task<bool> AddOrUpdateAsync(T entity)
+        {
+            if (entity.Id == Guid.Empty || string.IsNullOrEmpty(entity.Id.ToString()))
+                return await AddAsync(entity);
+            else
+                return await UpdateAsync(entity);
+        }
+
         public virtual bool Add(T entity)
         {
             entity.Id = Guid.NewGuid();

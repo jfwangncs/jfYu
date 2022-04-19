@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -83,7 +84,7 @@ namespace jfYu.Core.jfYuRequest
                 else
                 {
                     Request.ContentType = ContentType == "" ? jfYuRequestContentType.XWWWFormUrlEncoded : ContentType;
-                    byte[] tempBuffer = Encoding.GetBytes(GetParaStr());//getParaStr即为发送的数据， 
+                    byte[] tempBuffer = Encoding.GetBytes(GetParaStr());
                     Request.ContentLength = tempBuffer.Length;
                     using Stream reqStream = Request.GetRequestStream();
                     reqStream.Write(tempBuffer, 0, tempBuffer.Length);
@@ -91,6 +92,8 @@ namespace jfYu.Core.jfYuRequest
                 }
             }
             Request.CookieContainer = this.Cookies;//加入cookie
+            if (Cert != null)
+                Request.ClientCertificates.Add(Cert);
             LoadHeader();
         }
         /// <summary>

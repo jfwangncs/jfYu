@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace jfYu.Core.Wechat.Model.Payment
+﻿namespace jfYu.Core.Wechat.Model.Payment
 {
     // <summary>
     /// 微信支付方式的类型定义，具体信息可以参考 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=4_2 定义的几种

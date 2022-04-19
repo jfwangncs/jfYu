@@ -87,6 +87,8 @@ namespace jfYu.Core.Wechat
             {
                 var res = new jfYuHttpRequest($"https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token={token.Token}");
                 res.Para.Add("code", code);
+                res.Method = jfYuRequestMethod.Post;
+                res.ContentType = "application/json";
                 return JsonConvert.DeserializeObject<WechatResult<PhoneInfo>>(res.GetHtml());
             }
             catch (Exception)
