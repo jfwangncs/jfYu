@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace jfYu.Core.Cache
 {
-    public class RedisCacheService : CacheBase, ICache
+    public class RedisCacheService : CacheBase, ICacheService
     {
 
         public RedisConfiguration RedisConfiguration { get; }
@@ -21,7 +21,11 @@ namespace jfYu.Core.Cache
             try
             {
                 CacheType = CacheType.Redis;
-                RedisConfiguration = AppConfig.Configuration.GetSection("Redis").Get<RedisConfiguration>();
+                RedisConfiguration = cacheConfig.RedisConfig ?? AppConfig.Configuration.GetSection("Redis").Get<RedisConfiguration>();
+                if (RedisConfiguration == null)
+                {
+                    throw new Exception($"找不到redis配置");
+                }
                 var configurationOptions = new ConfigurationOptions()
                 {
                     Password = RedisConfiguration.Password,
@@ -200,7 +204,7 @@ namespace jfYu.Core.Cache
             {
                 throw new ArgumentNullException(nameof(value));
             }
-            if (await HasAsync(key)&&IsNx)
+            if (await HasAsync(key) && IsNx)
                 return false;
             return await RedisCache.StringSetAsync(GetKey(key), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value)), TimeSpan.FromSeconds(seconds));
         }
@@ -246,7 +250,7 @@ namespace jfYu.Core.Cache
         /// <returns></returns>
         public IEnumerable<string> RemoveRange(IEnumerable<string> keys)
         {
-            List<string> FailKeys = new List<string>();
+            var failKeys = new List<string>();
             if (keys == null)
             {
                 throw new ArgumentNullException(nameof(keys));
@@ -254,9 +258,9 @@ namespace jfYu.Core.Cache
             foreach (var key in keys)
             {
                 if (!Remove(key))
-                    FailKeys.Add(key);
+                    failKeys.Add(key);
             }
-            return FailKeys;
+            return failKeys;
         }
 
         /// <summary>
@@ -266,7 +270,7 @@ namespace jfYu.Core.Cache
         /// <returns></returns>
         public async Task<IEnumerable<string>> RemoveRangeAsync(IEnumerable<string> keys)
         {
-            List<string> FailKeys = new List<string>();
+            var failKeys = new List<string>();
 
             if (keys == null)
             {
@@ -276,9 +280,9 @@ namespace jfYu.Core.Cache
             foreach (var key in keys)
             {
                 if (!await RemoveAsync(key))
-                    FailKeys.Add(key);
+                    failKeys.Add(key);
             }
-            return FailKeys;
+            return failKeys;
         }
 
         #endregion

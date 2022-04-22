@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net5.0;net6.0</TargetFrameworks>
     <LangVersion>10.0</LangVersion>
-    <Version>1.1.10</Version>
+    <Version>6.0.1</Version>
     <Authors>jfwang</Authors>
     <Description>Excel导入导出</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

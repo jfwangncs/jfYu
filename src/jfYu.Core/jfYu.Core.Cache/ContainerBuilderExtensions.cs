@@ -12,20 +12,20 @@ namespace jfYu.Core.Cache
         /// 注入
         /// </summary>
         /// <param name="services"></param>
-        public static void AddCache(this ContainerBuilder services)
+        public static void AddCache(this ContainerBuilder services, CacheConfig cacheConfig = null)
         {
-            
-            var cacheConfig = AppConfig.Configuration?.GetSection("Cache")?.Get<CacheConfig>() ?? new CacheConfig();
-            switch (cacheConfig.Type)
+
+            var config = cacheConfig ?? AppConfig.Configuration?.GetSection("Cache")?.Get<CacheConfig>() ?? new CacheConfig();
+            switch (config.Type)
             {
                 case CacheType.Redis:
-                    services.Register(q => new RedisCacheService(cacheConfig)).As<ICache>().SingleInstance();
+                    services.Register(q => new RedisCacheService(config)).As<ICacheService>().SingleInstance();
                     break;
                 case CacheType.Memory:
-                    services.Register(q => new MemoryCacheService(new MemoryCache(new MemoryCacheOptions()), cacheConfig)).As<ICache>().SingleInstance();
+                    services.Register(q => new MemoryCacheService(new MemoryCache(new MemoryCacheOptions()), config)).As<ICacheService>().SingleInstance();
                     break;
                 default:
-                    services.Register(q => new MemoryCacheService(new MemoryCache(new MemoryCacheOptions()), cacheConfig)).As<ICache>().SingleInstance();
+                    services.Register(q => new MemoryCacheService(new MemoryCache(new MemoryCacheOptions()), config)).As<ICacheService>().SingleInstance();
                     break;
             }
         }
@@ -34,19 +34,19 @@ namespace jfYu.Core.Cache
         /// 属性注入
         /// </summary>
         /// <param name="services"></param>
-        public static void AddCacheAsProperties(this ContainerBuilder services)
+        public static void AddCacheAsProperties(this ContainerBuilder services, CacheConfig cacheConfig = null)
         {
-            var cacheConfig = AppConfig.Configuration?.GetSection("Cache")?.Get<CacheConfig>() ?? new CacheConfig();
-            switch (cacheConfig.Type)
+            var config = cacheConfig ?? AppConfig.Configuration?.GetSection("Cache")?.Get<CacheConfig>() ?? new CacheConfig();
+            switch (config.Type)
             {
                 case CacheType.Redis:
-                    services.Register(q => new RedisCacheService(cacheConfig)).As<ICache>().SingleInstance();
+                    services.Register(q => new RedisCacheService(config)).As<ICacheService>().SingleInstance().PropertiesAutowired();
                     break;
                 case CacheType.Memory:
-                    services.Register(q => new MemoryCacheService(new MemoryCache(new MemoryCacheOptions()), cacheConfig)).As<ICache>().SingleInstance();
+                    services.Register(q => new MemoryCacheService(new MemoryCache(new MemoryCacheOptions()), config)).As<ICacheService>().SingleInstance().PropertiesAutowired();
                     break;
                 default:
-                    services.Register(q => new MemoryCacheService(new MemoryCache(new MemoryCacheOptions()), cacheConfig)).As<ICache>().SingleInstance();
+                    services.Register(q => new MemoryCacheService(new MemoryCache(new MemoryCacheOptions()), config)).As<ICacheService>().SingleInstance().PropertiesAutowired();
                     break;
             }
         }

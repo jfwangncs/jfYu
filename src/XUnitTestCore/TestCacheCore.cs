@@ -14,8 +14,8 @@ namespace xUnitTestCore.Cache
 
     public class CacheConstructorClass
     {
-        private ICache Cache;
-        public CacheConstructorClass(ICache cache)
+        private ICacheService Cache;
+        public CacheConstructorClass(ICacheService cache)
         {
             Cache = cache;
         }
@@ -28,7 +28,7 @@ namespace xUnitTestCore.Cache
 
     public class CachepPropertyCalss
     {
-        public ICache Cache { get; set; }
+        public ICacheService Cache { get; set; }
 
         public bool IsNull()
         {
@@ -37,10 +37,12 @@ namespace xUnitTestCore.Cache
     }
 
     [Collection("Cache")]
+
     public class TestCacheRedisCore
     {
-        ICache CacheService;
+        ICacheService CacheService;
         IContainer Container;
+        
         public TestCacheRedisCore()
         {
 
@@ -54,9 +56,10 @@ namespace xUnitTestCore.Cache
             ContainerBuilder.RegisterType<CacheConstructorClass>().AsSelf();
             ContainerBuilder.RegisterType<CachepPropertyCalss>().AsSelf().PropertiesAutowired();
             Container = ContainerBuilder.Build();
-            CacheService = Container.Resolve<ICache>();
+            CacheService = Container.Resolve<ICacheService>();
         }
-        [Fact]
+        [Trait("Env", "Development")]
+        [Fact]       
         public void TestIoc()
         {
 
@@ -68,6 +71,7 @@ namespace xUnitTestCore.Cache
             Assert.Equal(CacheType.Redis, CacheService.CacheType);
         }
 
+        [Trait("Env", "Development")]
         [Fact]
         public void TestHas()
         {
@@ -107,6 +111,7 @@ namespace xUnitTestCore.Cache
             CacheService.RemoveRange(new List<string> { "tk1", "tk2", "tk3", "tk4" });
         }
 
+        [Trait("Env", "Development")]
         [Fact]
         public void TestAdd()
         {
@@ -152,6 +157,7 @@ namespace xUnitTestCore.Cache
 
         }
 
+        [Trait("Env", "Development")]
         [Fact]
         public void TestRemove()
         {
@@ -181,6 +187,7 @@ namespace xUnitTestCore.Cache
             CacheService.RemoveRange(new List<string> { "tk1", "tk2", "tk3", "tk4", "tk5", "tk6", "tk7" });
         }
 
+        [Trait("Env", "Development")]
         [Fact]
         public void TestGet()
         {
@@ -263,6 +270,7 @@ namespace xUnitTestCore.Cache
             CacheService.RemoveRange(new List<string> { "tk1", "tk2", "tk3", "tk4", "tk5", "tk6" });
         }
 
+        [Trait("Env", "Development")]
         [Fact]
         public void TestReplace()
         {
@@ -324,7 +332,7 @@ namespace xUnitTestCore.Cache
     [Collection("Cache")]
     public class TestCacheMemoryCore
     {
-        ICache CacheService;
+        ICacheService CacheService;
         IContainer Container;
         public TestCacheMemoryCore()
         {
@@ -337,7 +345,7 @@ namespace xUnitTestCore.Cache
             ContainerBuilder.RegisterType<CacheConstructorClass>().AsSelf();
             ContainerBuilder.RegisterType<CachepPropertyCalss>().AsSelf().PropertiesAutowired();
             Container = ContainerBuilder.Build();
-            CacheService = Container.Resolve<ICache>();
+            CacheService = Container.Resolve<ICacheService>();
         }
 
         [Fact]
@@ -603,7 +611,7 @@ namespace xUnitTestCore.Cache
     [Collection("Cache")]
     public class TestCacheDefaultCore
     {
-        ICache CacheService;
+        ICacheService CacheService;
         IContainer Container;
         public TestCacheDefaultCore()
         {
@@ -613,7 +621,7 @@ namespace xUnitTestCore.Cache
             ContainerBuilder.RegisterType<CacheConstructorClass>().AsSelf();
             ContainerBuilder.RegisterType<CachepPropertyCalss>().AsSelf().PropertiesAutowired();
             Container = ContainerBuilder.Build();
-            CacheService = Container.Resolve<ICache>();
+            CacheService = Container.Resolve<ICacheService>();
         }
 
         [Fact]

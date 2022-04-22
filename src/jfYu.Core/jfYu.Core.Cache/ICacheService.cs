@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.Cache
 {
-    public interface ICache
+    public interface ICacheService
     {
         public CacheType CacheType { get; }
 
@@ -130,42 +130,42 @@ namespace jfYu.Core.Cache
         /// 获取缓存
         /// </summary>
         /// <param name="key">缓存Key</param>
-        /// <returns>是否成功</returns>
+        /// <returns>缓存数据</returns>
         T Get<T>(string key) where T : class;
 
         /// <summary>
         /// 获取缓存
         /// </summary>
         /// <param name="key">缓存Key</param>
-        /// <returns>是否成功</returns>
+        /// <returns>缓存数据</returns>
         Task<T> GetAsync<T>(string key) where T : class;
 
         /// <summary>
         /// 获取缓存
         /// </summary>
         /// <param name="key">缓存Key</param>
-        /// <returns>是否成功</returns>
+        /// <returns>缓存数据</returns>
         object Get(string key);
 
         /// <summary>
         /// 获取缓存
         /// </summary>
         /// <param name="key">缓存Key</param>
-        /// <returns>是否成功</returns>
+        /// <returns>缓存数据</returns>
         Task<object> GetAsync(string key);
 
         /// <summary>
         /// 获取缓存
         /// </summary>
         /// <param name="key">缓存Key</param>
-        /// <returns>是否成功</returns>
+        /// <returns>缓存数据</returns>
         string GetString(string key);
 
         /// <summary>
         /// 获取缓存
         /// </summary>
         /// <param name="key">缓存Key</param>
-        /// <returns>是否成功</returns>
+        /// <returns>缓存数据</returns>
         Task<string> GetStringAsync(string key);
 
 
@@ -173,7 +173,7 @@ namespace jfYu.Core.Cache
         /// 获取缓存
         /// </summary>
         /// <param name="key">缓存Key</param>
-        /// <returns>是否成功</returns>
+        /// <returns>缓存数据</returns>
         int GetInt(string key);
 
 
@@ -181,21 +181,21 @@ namespace jfYu.Core.Cache
         /// 获取缓存
         /// </summary>
         /// <param name="key">缓存Key</param>
-        /// <returns>是否成功</returns>
+        /// <returns>缓存数据</returns>
         Task<int> GetIntAsync(string key);
 
         /// <summary>
         /// 获取缓存集合
         /// </summary>
         /// <param name="keys">缓存Key集合</param>
-        /// <returns>是否成功</returns>
+        /// <returns>缓存数据</returns>
         IDictionary<string, object> GetRange(IEnumerable<string> keys);
 
         /// <summary>
         /// 获取缓存集合
         /// </summary>
         /// <param name="keys">缓存Key集合</param>
-        /// <returns>是否成功</returns>
+        /// <returns>缓存数据</returns>
         Task<IDictionary<string, object>> GetRangeAsync(IEnumerable<string> keys);
 
         #endregion

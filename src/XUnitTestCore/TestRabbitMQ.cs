@@ -18,6 +18,7 @@ namespace xUnitTestCore.RabbitMQ
     public class TestRabbitMQ
     {
         [Fact]
+        [Trait("Env", "Development")]
         public void RabbitMQ()
         {
             var builder = new ConfigurationBuilder()

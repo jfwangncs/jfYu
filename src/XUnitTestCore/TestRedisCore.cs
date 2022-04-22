@@ -19,6 +19,7 @@ namespace xUnitTestCore.Redis
     public class TestRedisCore
     {
         [Fact]
+        [Trait("Env", "Development")]
         public void TestSetString()
         {
             var ContainerBuilder = new ContainerBuilder();
@@ -57,6 +58,7 @@ namespace xUnitTestCore.Redis
 
 
         [Fact]
+        [Trait("Env", "Development")]
         public void TestSetModel()
         {
             var ContainerBuilder = new ContainerBuilder();

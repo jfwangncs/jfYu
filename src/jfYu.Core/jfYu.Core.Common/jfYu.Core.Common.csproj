@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net5;net6</TargetFrameworks>
     <LangVersion>10.0</LangVersion>
-    <Version>1.1.11</Version>
+    <Version>6.0.1</Version>
     <Authors>jfwang</Authors>
-    <Description>一般配置</Description>
+    <Description>Common function</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 

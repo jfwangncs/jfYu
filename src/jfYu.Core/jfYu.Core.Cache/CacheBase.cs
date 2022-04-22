@@ -3,6 +3,7 @@
     public abstract class CacheBase
     {
         public CacheType CacheType { get; protected set; }
+
         private readonly CacheConfig cacheConfig;
         public CacheBase(CacheConfig cacheConfig)
         {

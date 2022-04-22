@@ -31,12 +31,14 @@ namespace xUnitTestCore.MongoDBCore
         }
 
         [Fact]
+        [Trait("Env", "Development")]
         public void TestIoc()
         {
             Assert.NotNull(mongoDBService);
         }
 
         [Fact]
+        [Trait("Env", "Development")]
         public void TestAdd()
         {
 
@@ -82,6 +84,7 @@ namespace xUnitTestCore.MongoDBCore
         }
 
         [Fact]
+        [Trait("Env", "Development")]
         public void TestDelete()
         {
             Data d1 = new Data() { name = "ÐÕÃû1", age = "18", sex = "ÄÐ" };
@@ -122,6 +125,7 @@ namespace xUnitTestCore.MongoDBCore
         }
 
         [Fact]
+        [Trait("Env", "Development")]
         public void TestModify()
         {
             Data d1 = new Data() { name = "ÐÕÃû1", age = "18", sex = "ÄÐ" };
@@ -147,6 +151,7 @@ namespace xUnitTestCore.MongoDBCore
         }
 
         [Fact]
+        [Trait("Env", "Development")]
         public void TestUpdate()
         {
             Data d1 = new Data() { name = "ÐÕÃû1", age = "18", sex = "ÄÐ" };
@@ -176,6 +181,7 @@ namespace xUnitTestCore.MongoDBCore
         }
 
         [Fact]
+        [Trait("Env", "Development")]
         public void TestQueryList()
         {
             Data d1 = new Data() { name = "ÐÕÃû1", age = "18", sex = "ÄÐ" };
@@ -200,6 +206,7 @@ namespace xUnitTestCore.MongoDBCore
         }
 
         [Fact]
+        [Trait("Env", "Development")]
         public void TestPaging()
         {
             Data d1 = new Data() { name = "ÐÕÃû1", age = "18", sex = "ÄÐ" };

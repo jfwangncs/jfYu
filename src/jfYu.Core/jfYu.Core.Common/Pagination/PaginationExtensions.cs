@@ -27,7 +27,7 @@ namespace jfYu.Core.Common.Pagination
         public static PagedModel<T> ToPaging<T, Q>(this IQueryable<T> source, Q parm) where Q : QueryModel
         {
             if (source == null)
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(source));
             int totalCount = source.Count();
             var list = source.Skip(parm.PageSize * (parm.PageIndex - 1)).Take(parm.PageSize).ToList();
             int totalPages = (int)Math.Ceiling((decimal)totalCount / parm.PageSize);

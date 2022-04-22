@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.Cache
 {
-    public class MemoryCacheService : CacheBase, ICache
+    public class MemoryCacheService : CacheBase, ICacheService
     {
         protected IMemoryCache MemoryCache;
 
@@ -59,7 +59,7 @@ namespace jfYu.Core.Cache
             {
                 throw new ArgumentNullException(nameof(value));
             }
-            if (Has(key)&& IsNx)
+            if (Has(key) && IsNx)
                 return false;
             MemoryCache.Set(GetKey(key), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value)));
             return Has(key);
@@ -82,7 +82,7 @@ namespace jfYu.Core.Cache
             {
                 throw new ArgumentNullException(nameof(value));
             }
-            if (await HasAsync(key)&& IsNx)
+            if (await HasAsync(key) && IsNx)
                 return false;
             await Task.FromResult(MemoryCache.Set(GetKey(key), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value))));
             return await HasAsync(key);
@@ -106,7 +106,7 @@ namespace jfYu.Core.Cache
             {
                 throw new ArgumentNullException(nameof(value));
             }
-            if (Has(key)&& IsNx)
+            if (Has(key) && IsNx)
                 return false;
             MemoryCache.Set(GetKey(key), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value)), new MemoryCacheEntryOptions().SetAbsoluteExpiration(expiration));
 
@@ -132,7 +132,7 @@ namespace jfYu.Core.Cache
             {
                 throw new ArgumentNullException(nameof(value));
             }
-            if (await HasAsync(key)&& IsNx)
+            if (await HasAsync(key) && IsNx)
                 return false;
             await Task.FromResult(MemoryCache.Set(GetKey(key), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value)), new MemoryCacheEntryOptions().SetAbsoluteExpiration(expiration)));
 
@@ -158,7 +158,7 @@ namespace jfYu.Core.Cache
             {
                 throw new ArgumentNullException(nameof(value));
             }
-            if (Has(key)&& IsNx)
+            if (Has(key) && IsNx)
                 return false;
             MemoryCache.Set(GetKey(key), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value)), new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(seconds)));
             return Has(key);
@@ -182,7 +182,7 @@ namespace jfYu.Core.Cache
             {
                 throw new ArgumentNullException(nameof(value));
             }
-            if (await HasAsync(key)&& IsNx)
+            if (await HasAsync(key) && IsNx)
                 return false;
             await Task.FromResult(MemoryCache.Set(GetKey(key), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value)), new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(seconds))));
             return await HasAsync(key);
@@ -234,7 +234,7 @@ namespace jfYu.Core.Cache
         /// <returns></returns>
         public IEnumerable<string> RemoveRange(IEnumerable<string> keys)
         {
-            List<string> FailKeys = new List<string>();
+            var failKeys = new List<string>();
             if (keys == null)
             {
                 throw new ArgumentNullException(nameof(keys));
@@ -242,9 +242,9 @@ namespace jfYu.Core.Cache
             foreach (var item in keys)
             {
                 if (!Has(item) || !Remove(item))
-                    FailKeys.Add(item);
+                    failKeys.Add(item);
             }
-            return FailKeys;
+            return failKeys;
         }
 
         /// <summary>
@@ -254,7 +254,7 @@ namespace jfYu.Core.Cache
         /// <returns></returns>
         public async Task<IEnumerable<string>> RemoveRangeAsync(IEnumerable<string> keys)
         {
-            List<string> FailKeys = new List<string>();
+            var failKeys = new List<string>();
             if (keys == null)
             {
                 throw new ArgumentNullException(nameof(keys));
@@ -262,9 +262,9 @@ namespace jfYu.Core.Cache
             foreach (var item in keys)
             {
                 if (!await HasAsync(item) || !await RemoveAsync(item))
-                    FailKeys.Add(item);
+                    failKeys.Add(item);
             }
-            return FailKeys;
+            return failKeys;
         }
 
         #endregion

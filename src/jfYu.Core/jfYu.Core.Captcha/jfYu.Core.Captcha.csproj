@@ -3,9 +3,9 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net461;net5.0;net6.0</TargetFrameworks>
 		<LangVersion>10.0</LangVersion>
-		<Version>1.1.6</Version>
+		<Version>6.0.1</Version>
 		<Authors>jfwang</Authors>
-		<Description>验证码图片创建</Description>
+		<Description>Generate captcha</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
 

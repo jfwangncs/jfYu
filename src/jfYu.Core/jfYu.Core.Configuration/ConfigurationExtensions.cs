@@ -132,7 +132,7 @@ namespace jfYu.Core.Configuration
                     continue;
                 }
 
-                config.AddJsonFile(jsonFile, optional: true, reloadOnChange: true);
+                //config.AddJsonFile(jsonFile, optional: true, reloadOnChange: true);
             }
 
             // 配置带环境的配置文件

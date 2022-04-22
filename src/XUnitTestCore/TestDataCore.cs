@@ -53,6 +53,7 @@ namespace xUnitTestCore.Data
     public class TestDataCore
     {
         [Fact]
+        [Trait("Env", "Development")]
         public void TestData()
         {
             var containerBuilder = new ContainerBuilder();

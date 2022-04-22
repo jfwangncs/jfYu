@@ -311,6 +311,7 @@ namespace xUnitTestCore.Excel
                 };
             excel.ToExcel(reader, "exceltest/dtreader.xlsx", dir);
             conn.Dispose();
+            SqliteConnection.ClearAllPools();
             Assert.True(File.Exists("exceltest/dtreader.xlsx"));
             var dtsource = excel.GetDataTable("exceltest/dtreader.xlsx");
             var dtsourceH = excel.GetDataTable("exceltest/dtreader.xlsx", 0);
@@ -367,6 +368,7 @@ namespace xUnitTestCore.Excel
             var excel = cb.Build().Resolve<JfYuExcel>();
             excel.ToExcel(reader, "exceltest/reader.xlsx");
             conn.Dispose();
+            SqliteConnection.ClearAllPools();
             Assert.True(File.Exists("exceltest/reader.xlsx"));
             var dtsource = excel.GetDataTable("exceltest/reader.xlsx");
             var dtsourceH = excel.GetDataTable("exceltest/reader.xlsx", 0);

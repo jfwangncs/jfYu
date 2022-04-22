@@ -3,7 +3,7 @@
     public class PaymentConfig
     {
         /// <summary>
-        /// 小程序appid
+        /// appid
         /// </summary>
         public string AppId { get; set; }
 

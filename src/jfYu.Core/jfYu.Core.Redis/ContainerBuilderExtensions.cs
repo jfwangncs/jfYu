@@ -11,7 +11,7 @@ namespace jfYu.Core.Redis
         /// <param name="services"></param>
         public static void AddRedisService(this ContainerBuilder services)
         {
-            services.Register(q => new RedisService()).As<RedisService>();
+            services.Register(q => new RedisService()).As<RedisService>().InstancePerLifetimeScope();
         }
     }
 }

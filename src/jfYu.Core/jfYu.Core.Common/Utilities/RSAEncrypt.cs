@@ -17,22 +17,20 @@ namespace jfYu.Core.Common.Utilities
         /// </summary>
         public void GenerateKeys(string path)
         {
-            using (var rsa = new RSACryptoServiceProvider(RsaKeySize))
+            using var rsa = new RSACryptoServiceProvider(RsaKeySize);
+            try
             {
-                try
-                {
-                    // 获取私钥和公钥。
-                    var publicKey = rsa.ToXmlString(false);
-                    var privateKey = rsa.ToXmlString(true);
+                // 获取私钥和公钥。
+                var publicKey = rsa.ToXmlString(false);
+                var privateKey = rsa.ToXmlString(true);
 
-                    // 保存到磁盘
-                    File.WriteAllText(Path.Combine(path, publicKeyFileName), publicKey);
-                    File.WriteAllText(Path.Combine(path, privateKeyFileName), privateKey);
-                }
-                finally
-                {
-                    rsa.PersistKeyInCsp = false;
-                }
+                // 保存到磁盘
+                File.WriteAllText(Path.Combine(path, publicKeyFileName), publicKey);
+                File.WriteAllText(Path.Combine(path, privateKeyFileName), privateKey);
+            }
+            finally
+            {
+                rsa.PersistKeyInCsp = false;
             }
         }
 
