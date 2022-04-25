@@ -79,7 +79,7 @@ namespace jfYu.Core.Configuration
         }
 
         /// <summary>
-        /// 添加配置文件
+        /// 添加配置文件,appsetting.json和appsetting.{environment}.json中具有相同Key，则使用appsetting.json中数据
         /// </summary>
         /// <param name="config"></param>
         /// <param name="env"></param>
@@ -132,7 +132,7 @@ namespace jfYu.Core.Configuration
                     continue;
                 }
 
-                //config.AddJsonFile(jsonFile, optional: true, reloadOnChange: true);
+                config.AddJsonFile(jsonFile, optional: true, reloadOnChange: true);
             }
 
             // 配置带环境的配置文件
@@ -146,18 +146,16 @@ namespace jfYu.Core.Configuration
                 .Union(
                     Directory.GetFiles(Directory.GetCurrentDirectory(), "*.json", SearchOption.TopDirectoryOnly)
                 )
-                .Where(u => CheckIncludeDefaultSettings(Path.GetFileName(u)) && !ignoreConfigurationFiles.Contains(Path.GetFileName(u)) && !runtimeJsonSuffixs.Any(j => u.EndsWith(j)));
+                .Where(u => CheckIncludeDefaultSettings(Path.GetFileName(u)) && !ignoreConfigurationFiles.Contains(Path.GetFileName(u)) && !runtimeJsonSuffixs.Any(j => u.EndsWith(j)))
+                .OrderBy(u => u);
 
             if (!jsonFiles.Any()) return;
 
-            var envFiles = new List<string>();
             // 自动加载配置文件
             foreach (var jsonFile in jsonFiles)
             {
                 config.AddJsonFile(jsonFile, optional: true, reloadOnChange: true);
             }
-            // 配置带环境的配置文件
-            envFiles.ForEach(u => config.AddJsonFile(u, optional: true, reloadOnChange: true));
         }
 
         ///<summary>
