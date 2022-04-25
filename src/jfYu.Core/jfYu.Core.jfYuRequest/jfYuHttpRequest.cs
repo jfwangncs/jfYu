@@ -124,9 +124,9 @@ namespace jfYu.Core.jfYuRequest
                     Request.Headers.Add(item.Key, item.Value);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
 
         }

@@ -169,10 +169,10 @@ namespace jfYu.Core.RabbitMQ
                     //确认该消息已被消费
                     channel.BasicAck(ea.DeliveryTag, false);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     channel.BasicReject(ea.DeliveryTag, true);
-                    throw ex;
+                    throw;
                 };
 
             };
@@ -212,10 +212,10 @@ namespace jfYu.Core.RabbitMQ
                     //确认该消息已被消费
                     channel.BasicAck(ea.DeliveryTag, false);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     channel.BasicReject(ea.DeliveryTag, true);
-                    throw ex;
+                    throw;
                 }
 
             };

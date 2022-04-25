@@ -79,10 +79,10 @@ namespace jfYu.Core.jfYuRequest
                     Request.DefaultRequestHeaders.Add(item.Key, item.Value);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
-                throw ex;
+                throw;
             }
 
         }

@@ -68,7 +68,7 @@ namespace jfYu.Core.Wechat
                 res.RawPara = $"appid={Config.AppId}&secret={Config.Secret}&grant_type=client_credential";
                 return JsonConvert.DeserializeObject<AccessToken>(res.GetHtml());
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }

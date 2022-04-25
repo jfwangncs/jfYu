@@ -167,7 +167,7 @@ namespace jfYu.Core.Wechat
                 var xe = (XmlElement)xn;
                 obj.Add(xe.Name, xe.InnerText);
             }
-            return JsonConvert.DeserializeObject<NotifyResult>(JsonConvert.SerializeObject(obj));           
+            return await Task.FromResult(JsonConvert.DeserializeObject<NotifyResult>(JsonConvert.SerializeObject(obj)));
 
         }
         public async Task<RefundResult> RefundAsync(string orderNo, string outRefundNo, int totalFee, int refundFee)
