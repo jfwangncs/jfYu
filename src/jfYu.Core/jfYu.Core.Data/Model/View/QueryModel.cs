@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace jfYu.Core.Common.Pagination
+namespace jfYu.Core.Data.Model.View
 {
 
     public class QueryModel

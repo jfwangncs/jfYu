@@ -7,7 +7,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 
-namespace jfYu.Core.Data
+namespace jfYu.Core.Data.Extension
 {
     public static class EntityFrameworkCoreExtension
     {

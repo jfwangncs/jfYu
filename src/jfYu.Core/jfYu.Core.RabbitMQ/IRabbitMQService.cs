@@ -1,14 +1,10 @@
-﻿using NLog;
-using System;
+﻿using System;
 
 namespace jfYu.Core.RabbitMQ
 {
     public interface IRabbitMQService
     {
-        /// <summary>
-        /// 日志
-        /// </summary>
-        ILogger Logger { get; set; }
+      
 
 
         /// <summary>

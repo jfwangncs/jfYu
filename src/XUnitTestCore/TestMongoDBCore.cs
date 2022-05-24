@@ -1,6 +1,6 @@
 using Autofac;
 using jfYu.Core.Configuration;
-using jfYu.Core.Common.Pagination;
+using jfYu.Core.Data.Extension;
 using jfYu.Core.MongoDB;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
@@ -218,8 +218,8 @@ namespace xUnitTestCore.MongoDBCore
 
             mongoDBService.InsertBatch(new List<Data>() { d1, d2, d3, d4, d5 });
 
-            var lc = mongoDBService.QueryCollection<Data>(q => q.sex == "Å®").ToPaging(new QueryModel() { PageIndex = 1, PageSize = 2 });
-            var lc1 = mongoDBService.QueryCollectionAsync<Data>().Result.ToPaging(new QueryModel() { PageIndex = 1, PageSize = 2 });
+            var lc = mongoDBService.QueryCollection<Data>(q => q.sex == "Å®").ToPaged(1, 2);
+            var lc1 = mongoDBService.QueryCollectionAsync<Data>().Result.ToPaged(1,2);
             Assert.Equal(2, lc.TotalPages);
             Assert.Equal(3, lc1.TotalPages);
             mongoDBService.Delete<Data>(mongoDBService.QueryOne<Data>(q => q.name == "ÐÕÃû1").Id.ToString());

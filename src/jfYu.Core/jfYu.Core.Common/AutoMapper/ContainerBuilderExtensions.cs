@@ -1,7 +1,5 @@
 ﻿using Autofac;
 using AutoMapper;
-using NLog;
-using NLog.Targets;
 using System;
 
 namespace jfYu.Core.Common.AutoMapper

@@ -1,6 +1,7 @@
 using Autofac;
 using jfYu.Core.Configuration;
 using jfYu.Core.Data;
+using jfYu.Core.Data.Extension;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;

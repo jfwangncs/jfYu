@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace jfYu.Core.Data
+namespace jfYu.Core.Data.Extension
 {
     public static class DbContextServiceExtensions
     {

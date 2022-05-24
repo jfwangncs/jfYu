@@ -1,7 +1,6 @@
-﻿using jfYu.Core.Configuration;
-using jfYu.Core.Common.Utilities;
+﻿using jfYu.Core.Common.Utilities;
+using jfYu.Core.Configuration;
 using Microsoft.Extensions.Configuration;
-using NLog;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
@@ -13,12 +12,7 @@ namespace jfYu.Core.RabbitMQ
 {
 
     public class RabbitMQService : IRabbitMQService
-    {
-
-        /// <summary>
-        /// 日志
-        /// </summary>
-        public ILogger Logger { get; set; }
+    {        
 
         /// <summary>
         /// MQ连接
@@ -48,10 +42,9 @@ namespace jfYu.Core.RabbitMQ
                 };
                 Con = factory.CreateConnection();//创建连接对象
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Logger?.Error($"无法连接RabbitMQ:{ex.Message}-{ex.StackTrace}-{Serializer.Serialize(RabbitMQConf)}");
-                throw new Exception($"无法连接RabbitMQ:{ex.Message}-{ex.StackTrace}");
+                throw;
             }
 
         }
@@ -66,10 +59,9 @@ namespace jfYu.Core.RabbitMQ
                 };
                 Con = factory.CreateConnection();//创建连接对象
             }
-            catch (Exception ex)
-            {
-                Logger?.Error(ex, $"无法连接RabbitMQ:{connstr}");
-                throw new Exception($"无法连接RabbitMQ:{ex.Message}-{ex.StackTrace}");
+            catch (Exception)
+            {                
+                throw;
             }
 
         }

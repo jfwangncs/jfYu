@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net5.0;net6.0</TargetFrameworks>
     <LangVersion>10.0</LangVersion>
-    <Version>6.0.1</Version>
+    <Version>6.0.2</Version>
     <Authors>jfwang</Authors>
     <Description>Common function</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -11,7 +11,6 @@
 
   <ItemGroup>   
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Nlog" Version="4.7.13" />
     <PackageReference Include="Autofac" Version="6.3.0" />
     <PackageReference Include="AutoMapper" Version="10.1.1" />
   </ItemGroup>
