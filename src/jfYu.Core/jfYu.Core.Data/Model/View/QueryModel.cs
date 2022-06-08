@@ -15,7 +15,7 @@ namespace jfYu.Core.Data.Model.View
         /// 页面尺寸
         /// </summary>
         [DisplayName("页面尺寸")]
-        public int PageSize { get; set; } = 8;
+        public int PageSize { get; set; } = 20;
 
         /// <summary>
         ///搜索关键字
