@@ -341,9 +341,9 @@ namespace xUnitTestCore.Cache
               .AddConfigurationFile("CacheMemory.json", optional: true, reloadOnChange: true);
             _ = builder.Build();
             ContainerBuilder.AddCache();
-            //ContainerBuilder.AddCacheAsProperties();
+            ContainerBuilder.AddCacheAsProperties();
             ContainerBuilder.RegisterType<CacheConstructorClass>().AsSelf();
-            //ContainerBuilder.RegisterType<CachepPropertyCalss>().AsSelf().PropertiesAutowired();
+            ContainerBuilder.RegisterType<CachepPropertyCalss>().AsSelf().PropertiesAutowired();
             Container = ContainerBuilder.Build();
             CacheService = Container.Resolve<ICacheService>();
         }
