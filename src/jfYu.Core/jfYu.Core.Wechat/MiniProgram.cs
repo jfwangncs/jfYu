@@ -46,6 +46,7 @@ namespace jfYu.Core.Wechat
             try
             {
                 var res = new jfYuHttpRequest("https://api.weixin.qq.com/sns/jscode2session");
+                res.Timeout = 30;
                 res.RawPara = $"appid={Config.AppId}&secret={Config.Secret}&js_code={code}&grant_type=authorization_code";
                 return JsonConvert.DeserializeObject<WechatSession>(res.GetHtml());
             }
@@ -65,6 +66,7 @@ namespace jfYu.Core.Wechat
             try
             {
                 var res = new jfYuHttpRequest("https://api.weixin.qq.com/cgi-bin/token");
+                res.Timeout = 30;
                 res.RawPara = $"appid={Config.AppId}&secret={Config.Secret}&grant_type=client_credential";
                 return JsonConvert.DeserializeObject<AccessToken>(res.GetHtml());
             }
@@ -86,6 +88,7 @@ namespace jfYu.Core.Wechat
             try
             {
                 var res = new jfYuHttpRequest($"https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token={token.Token}");
+                res.Timeout = 30;
                 res.Para.Add("code", code);
                 res.Method = jfYuRequestMethod.Post;
                 res.ContentType = "application/json";

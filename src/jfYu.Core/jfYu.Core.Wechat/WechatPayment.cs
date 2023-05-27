@@ -73,6 +73,7 @@ namespace jfYu.Core.Wechat
             order.Sign = GetSign(dic);
             var xml = JsonConvert.DeserializeXmlNode(JsonConvert.SerializeObject(order, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }), "xml").InnerXml;
             var res = new jfYuHttpRequest("https://api.mch.weixin.qq.com/pay/unifiedorder");
+            res.Timeout = 30;
             res.Method = jfYuRequestMethod.Post;
             res.RawPara = xml;
             var html = await res.GetHtmlAsync();
@@ -106,6 +107,7 @@ namespace jfYu.Core.Wechat
             dic.Add("sign", sign);
             var xml = JsonConvert.DeserializeXmlNode(JsonConvert.SerializeObject(dic, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }), "xml").InnerXml;
             var res = new jfYuHttpRequest("https://api.mch.weixin.qq.com/pay/orderquery");
+            res.Timeout = 30;
             res.Method = jfYuRequestMethod.Post;
             res.RawPara = xml;
             var html = await res.GetHtmlAsync();
@@ -139,6 +141,7 @@ namespace jfYu.Core.Wechat
             dic.Add("sign", sign);
             var xml = JsonConvert.DeserializeXmlNode(JsonConvert.SerializeObject(dic, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }), "xml").InnerXml;
             var res = new jfYuHttpRequest("https://api.mch.weixin.qq.com/pay/orderquery");
+            res.Timeout = 30;
             res.Method = jfYuRequestMethod.Post;
             res.RawPara = xml;
             var html = await res.GetHtmlAsync();
@@ -185,6 +188,7 @@ namespace jfYu.Core.Wechat
             dic.Add("sign", sign);
             var xml = JsonConvert.DeserializeXmlNode(JsonConvert.SerializeObject(dic, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }), "xml").InnerXml;
             var res = new jfYuHttpRequest("https://api.mch.weixin.qq.com/secapi/pay/refund");
+            res.Timeout = 30;
             res.Method = jfYuRequestMethod.Post;
             res.RawPara = xml;
             X509Certificate2 cert = new X509Certificate2(AppContext.BaseDirectory + Config.CertPath, Config.MchID);

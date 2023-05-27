@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net461;net5.0;net6.0</TargetFrameworks>
 		<LangVersion>10.0</LangVersion>
-		<Version>6.0.1</Version>
+		<Version>6.0.2</Version>
 		<Authors>jfwang</Authors>
 		<Description>wechat tools</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
