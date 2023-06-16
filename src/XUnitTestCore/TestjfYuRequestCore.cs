@@ -13,7 +13,8 @@ namespace xUnitTestCore.Request
         {
             jfYuHttpRequest jfYu = new jfYuHttpRequest("https://b2b.10086.cn/b2b/main/listVendorNotice.html?noticeType=2")
             {
-                Method = jfYuRequestMethod.Get
+                Method = jfYuRequestMethod.Get,
+                Timeout = 60
             };
             jfYu.RequestHeader.Host = "https://b2b.10086.cn";
             var x = jfYu.GetHtml();
@@ -24,7 +25,8 @@ namespace xUnitTestCore.Request
 
             var jfYu1 = new jfYuHttpClient("https://b2b.10086.cn/b2b/main/listVendorNotice.html?noticeType=2")
             {
-                Method = jfYuRequestMethod.Get
+                Method = jfYuRequestMethod.Get,
+                Timeout = 60
             };
             jfYu.RequestHeader.Host = "https://b2b.10086.cn";
             var x1 = jfYu.GetHtml();
