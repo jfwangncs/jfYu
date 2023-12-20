@@ -1,24 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;netstandard2.1;net461;net5.0;net6.0</TargetFrameworks>
-		<LangVersion>10.0</LangVersion>
-		<Version>6.0.1</Version>
+		<TargetFrameworks>netstandard2.0;netstandard2.1;net462;net6.0;net7.0;net8.0</TargetFrameworks>
+		<LangVersion>12.0</LangVersion>
+		<Version>8.0.1</Version>
 		<Authors>jfwang</Authors>
-		<Description>CacheService</Description>
+		<Description>Cache</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
-
 	<ItemGroup>
-		<PackageReference Include="Autofac" Version="6.3.0" />
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-		<PackageReference Include="StackExchange.Redis" Version="2.2.4" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\jfYu.Core.Configuration\jfYu.Core.Configuration.csproj" />
-	</ItemGroup>
-
-
 </Project>

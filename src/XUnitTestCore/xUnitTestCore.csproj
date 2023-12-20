@@ -1,93 +1,38 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
-
+		<TargetFramework>net8.0</TargetFramework>
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="C:\Users\admin\.nuget\packages\microsoft.net.compilers\1.0.0\build\..\tools\**" />
+	  <Compile Remove="TestAutoMapper.cs" />
+	  <Compile Remove="TestCaptchaCore.cs" />
+	  <Compile Remove="TestConfigCore.cs" />
+	  <Compile Remove="TestDataCore.cs" />
+	  <Compile Remove="TestExcleCore.cs" />
+	  <Compile Remove="TestjfYuRequestCore.cs" />
+	  <Compile Remove="TestMongoDBCore.cs" />
+	  <Compile Remove="TestRabbitMQ.cs" />
+	  <Compile Remove="TestRedisCore.cs" />
+	  <Compile Remove="TestWordCore.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.10" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.10">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.10">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
-		<PackageReference Include="StackExchange.Redis" Version="2.2.88" />
-		<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.2.0" />
-		<PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.10" />
-		<PackageReference Include="xunit" Version="2.4.0" />
-		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+	  <None Remove="Email.json" />
+	  <None Remove="MongoDB.json" />
+	  <None Remove="nLog.config" />
+	  <None Remove="SqlServer.json" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Captcha\jfYu.Core.Captcha.csproj" />
-		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Wechat\jfYu.Core.Wechat.csproj" />
+		<PackageReference Include="xunit" Version="2.6.3" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.5.5" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />	
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Cache\jfYu.Core.Cache.csproj" />
-		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Common\jfYu.Core.Common.csproj" />
-		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Configuration\jfYu.Core.Configuration.csproj" />
-		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Data\jfYu.Core.Data.csproj" />
-		<ProjectReference Include="..\jfYu.Core\jfYu.Core.EMail\jfYu.Core.EMail.csproj" />
-		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Excel\jfYu.Core.Excel.csproj" />
-		<ProjectReference Include="..\jfYu.Core\jfYu.Core.jfYuRequest\jfYu.Core.jfYuRequest.csproj" />
-		<ProjectReference Include="..\jfYu.Core\jfYu.Core.MongoDB\jfYu.Core.MongoDB.csproj" />
-		<ProjectReference Include="..\jfYu.Core\jfYu.Core.RabbitMQ\jfYu.Core.RabbitMQ.csproj" />
-		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Redis\jfYu.Core.Redis.csproj" />
-		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Word\jfYu.Core.Word.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="CacheMemory.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="CacheRedis.Development.json">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="CacheRedis.json">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="Wechat.Production.json">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="RabbitMQ.Production.json">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="CacheRedis.Production.json">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="CacheRedis.Production.json">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="Email.Production.json">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="MongoDB.Production.json">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="MongoDB.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="Email.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="SqlServer.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="Captcha.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="nLog.config">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
 	</ItemGroup>
 
 </Project>

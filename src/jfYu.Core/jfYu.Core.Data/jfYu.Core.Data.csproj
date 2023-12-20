@@ -2,9 +2,9 @@
 
 	<PropertyGroup>
 
-		<TargetFrameworks>net6.0</TargetFrameworks>
-		<LangVersion>10.0</LangVersion>
-		<Version>6.0.4</Version>
+		<TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+		<LangVersion>12.0</LangVersion>
+		<Version>8.0.1</Version>
 		<Authors>jfwang</Authors>
 		<Description>Separation of reading and writing</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -13,12 +13,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Autofac" Version="6.3.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.10" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.10" />		
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.10" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.10" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.10" />
+		<PackageReference Include="Autofac" Version="7.1.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.25" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.25" />		
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.25" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.25" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.25" />
 		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.2" />
 	</ItemGroup>
 

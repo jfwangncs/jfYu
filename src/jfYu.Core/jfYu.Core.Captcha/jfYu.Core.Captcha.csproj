@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;netstandard2.1;net461;net5.0;net6.0</TargetFrameworks>
-		<LangVersion>10.0</LangVersion>
-		<Version>6.0.1</Version>
+		<TargetFrameworks>netstandard2.0;netstandard2.1;net461;net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
+		<LangVersion>12.0</LangVersion>
+		<Version>8.0.1</Version>
 		<Authors>jfwang</Authors>
 		<Description>Generate captcha</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Autofac" Version="6.3.0" />
+		<PackageReference Include="Autofac" Version="7.1.0" />
 		<PackageReference Include="System.Drawing.Common" Version="5.0.0" />
 		<PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
 	</ItemGroup>

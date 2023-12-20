@@ -164,8 +164,8 @@ namespace jfYu.Core.Word
             //页面边距
             m_SectPr.pgMar.left = (ulong)800;//左边距
             m_SectPr.pgMar.right = (ulong)800;//右边距
-            m_SectPr.pgMar.top = "850";//上边距
-            m_SectPr.pgMar.bottom = "850";//下边距
+            m_SectPr.pgMar.top = (ulong)850;//上边距
+            m_SectPr.pgMar.bottom = (ulong)850;//下边距
             return doc;
         }
     }

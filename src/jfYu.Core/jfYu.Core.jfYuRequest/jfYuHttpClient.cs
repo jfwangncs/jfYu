@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net;
-#if NETSTANDARD21 || NETSTANDARD20||NET5_0||NET6_0
+#if NETSTANDARD21 || NETSTANDARD20||NET5_0||NET6_0||NET7_0||NET8_0
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.jfYuRequest
 {
-#if NETSTANDARD21||NETSTANDARD20||NET5_0||NET6_0
+#if NETSTANDARD21||NETSTANDARD20||NET5_0||NET6_0||NET7_0||NET8_0
     public class jfYuHttpClient : jfYuBaseRequest, IjfYuRequest
     {
         public jfYuHttpClient(string url) : base(url)

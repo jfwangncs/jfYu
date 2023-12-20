@@ -22,6 +22,8 @@ namespace xUnitTestCore.Redis
         [Trait("Env", "Development")]
         public void TestSetString()
         {
+            var builder = WebApplication.CreateBuilder(args);
+
             var ContainerBuilder = new ContainerBuilder();
             var builder = new ConfigurationBuilder().AddConfigurationFile("CacheRedis.Production.json");
             builder.Build();

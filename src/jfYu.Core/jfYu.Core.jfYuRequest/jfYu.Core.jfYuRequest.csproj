@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net5.0;net6.0</TargetFrameworks>
-    <LangVersion>10.0</LangVersion>
-    <Version>6.0.1</Version>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
+    <LangVersion>12.0</LangVersion>
+    <Version>8.0.1</Version>
     <Authors>jfwang</Authors>
     <Description>HttpRequest Helper</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -26,7 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="brotli.net" Version="2.0.4.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="brotli.net" Version="2.1.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 </Project>
