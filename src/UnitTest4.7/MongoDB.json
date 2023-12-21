@@ -1,6 +1,0 @@
-﻿{
-  "MongoDB": {
-    "MongoUrl": "mongodb+srv://user:pwd@xxxx.azure.mongodb.net/admin",
-    "DbName": "nba"
-  }
-}

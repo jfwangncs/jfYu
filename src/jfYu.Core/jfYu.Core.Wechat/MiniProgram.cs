@@ -1,35 +1,27 @@
-﻿using jfYu.Core.Configuration;
-using jfYu.Core.jfYuRequest;
-using jfYu.Core.Wechat.Model;
-using Microsoft.Extensions.Configuration;
+﻿using jfYu.Core.Wechat.Model;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace jfYu.Core.Wechat
 {
     public class MiniProgram
     {
-        public WechatConfig Config { get; }
-        public MiniProgram()
+        private readonly string LoginUrl = "sns/jscode2session";
+        private readonly string GetTokenUrl = "cgi-bin/token";
+        private readonly string GetPhonenUrl = "wxa/business/getuserphonenumber";
+        private readonly ILogger<MiniProgram> _logger;
+        private WechatConfig _config;
+        private readonly IHttpClientFactory _httpClientFactory;
+        public MiniProgram(WechatConfig config, IHttpClientFactory httpClientFactory, ILogger<MiniProgram> logger)
         {
-            //读取配置文件
-            try
-            {
-                Config = AppConfig.Configuration?.GetSection("Wechat")?.Get<WechatConfig>();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("读取配置文件出错", ex);
-            }
+            _config = config;
+            _httpClientFactory = httpClientFactory;
+            _logger = logger;
         }
-        public MiniProgram(WechatConfig config)
-        {
-            if (config == null)
-                throw new Exception("配置为空");
-            Config = config;
-        }
-
-        #region 方法
 
         /// <summary>
         /// 获取sessionid openid
@@ -37,7 +29,7 @@ namespace jfYu.Core.Wechat
         /// <param name="code">code</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public WechatSession Auth(string code)
+        public async Task<WechatSession> LoginAsync(string code)
         {
             if (string.IsNullOrEmpty(code))
             {
@@ -45,14 +37,21 @@ namespace jfYu.Core.Wechat
             }
             try
             {
-                var res = new jfYuHttpRequest("https://api.weixin.qq.com/sns/jscode2session");
-                res.Timeout = 30;
-                res.RawPara = $"appid={Config.AppId}&secret={Config.Secret}&js_code={code}&grant_type=authorization_code";
-                return JsonConvert.DeserializeObject<WechatSession>(res.GetHtml());
+                _logger.LogInformation($"login start,code:{code}");
+                var httpClient = _httpClientFactory.CreateClient(Constant.Mini);
+                var httpResponseMessage = await httpClient.GetAsync($"{LoginUrl}?appid={_config.AppId}&secret={_config.Secret}&js_code={code}&grant_type=authorization_code");
+                var result = await httpResponseMessage.Content.ReadAsStringAsync();
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return JsonConvert.DeserializeObject<WechatSession>(result);
+                }
+                _logger.LogError($"login failed,code:{code},response:{result},status:{httpResponseMessage.StatusCode}");
+                return null;
             }
             catch (Exception ex)
             {
-                return new WechatSession() { Code = "-1", Msg = ex.Message };
+                _logger.LogError($"login failed,code:{code},error:{ex.Message}");
+                return new WechatSession() { Code = ErrorCode.Failed, Msg = ex.Message };
             }
         }
 
@@ -60,19 +59,26 @@ namespace jfYu.Core.Wechat
         /// 获取小程序全局唯一后台接口调用凭据
         /// </summary>
         /// <returns></returns>
-        public AccessToken GetToken()
+        public async Task<AccessToken> GetTokenAsync()
         {
-
             try
             {
-                var res = new jfYuHttpRequest("https://api.weixin.qq.com/cgi-bin/token");
-                res.Timeout = 30;
-                res.RawPara = $"appid={Config.AppId}&secret={Config.Secret}&grant_type=client_credential";
-                return JsonConvert.DeserializeObject<AccessToken>(res.GetHtml());
+                _logger.LogInformation($"get token start");
+                var httpClient = _httpClientFactory.CreateClient(Constant.Mini);
+                var httpResponseMessage = await httpClient.GetAsync($"{GetTokenUrl}?appid={_config.AppId}&secret={_config.Secret}&grant_type=client_credential");
+
+                var result = await httpResponseMessage.Content.ReadAsStringAsync();
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return JsonConvert.DeserializeObject<AccessToken>(result);
+                }
+                _logger.LogError($"get token failed,response:{result},status:{httpResponseMessage.StatusCode}");
+                return null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                _logger.LogError($"get token failed,error:{ex.Message}");
+                return null;
             }
         }
 
@@ -82,25 +88,31 @@ namespace jfYu.Core.Wechat
         /// <param name="code">手机号获取凭证</param>
         /// <returns></returns>
 
-        public WechatResult<PhoneInfo> GetPhone(string code)
+        public async Task<WechatResult<PhoneInfo>> GetPhoneAsync(string code)
         {
-            var token = GetToken();
+
             try
             {
-                var res = new jfYuHttpRequest($"https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token={token.Token}");
-                res.Timeout = 30;
-                res.Para.Add("code", code);
-                res.Method = jfYuRequestMethod.Post;
-                res.ContentType = "application/json";
-                return JsonConvert.DeserializeObject<WechatResult<PhoneInfo>>(res.GetHtml());
+                _logger.LogInformation($"get phone start");
+                var token = await GetTokenAsync();
+                var content = new StringContent(JsonConvert.SerializeObject(new { code }), Encoding.UTF8, "application/json");
+
+                var httpClient = _httpClientFactory.CreateClient(Constant.Mini);
+                var httpResponseMessage = await httpClient.PostAsync($"{GetPhonenUrl}?access_token={token.Token}", content);
+                var result = await httpResponseMessage.Content.ReadAsStringAsync();
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return JsonConvert.DeserializeObject<WechatResult<PhoneInfo>>(result);
+                }
+
+                _logger.LogError($"get phone failed,response:{result},status:{httpResponseMessage.StatusCode}");
+                return null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                _logger.LogError($"get phone failed,error:{ex.Message}");
+                return null;
             }
-
         }
-        #endregion
     }
 }

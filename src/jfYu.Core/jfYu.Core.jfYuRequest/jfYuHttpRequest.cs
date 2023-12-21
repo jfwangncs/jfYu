@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -34,7 +33,6 @@ namespace jfYu.Core.jfYuRequest
                 Request = (HttpWebRequest)WebRequest.Create(GetParaStr() == "" ? Url : Url + "?" + GetParaStr());
                 Request.Method = "GET";
                 Request.ContentType = ContentType == "" ? jfYuRequestContentType.TextHtml : ContentType;
-                Request.CookieContainer = this.Cookies;//加入cookie
             }
             else
             {
@@ -99,7 +97,7 @@ namespace jfYu.Core.jfYuRequest
         /// <summary>
         /// 加载header头
         /// </summary>
-        protected void LoadHeader()
+        private void LoadHeader()
         {
             try
             {
@@ -145,21 +143,18 @@ namespace jfYu.Core.jfYuRequest
                         using GZipStream stream = new GZipStream(response.GetResponseStream(), CompressionMode.Decompress);
                         using StreamReader reader = new StreamReader(stream, this.Encoding);
                         responseBody = reader.ReadToEnd();
-                        responseBody = responseBody.Replace("\0", "");
                     }
                     else if (response.ContentEncoding.ToLower().Contains("deflate"))
                     {
                         using DeflateStream stream = new DeflateStream(response.GetResponseStream(), CompressionMode.Decompress);
                         using StreamReader reader = new StreamReader(stream, this.Encoding);
                         responseBody = reader.ReadToEnd();
-                        responseBody = responseBody.Replace("\0", "");
                     }
                     else if (response.ContentEncoding.ToLower().Contains("br") || response.ContentEncoding.ToLower().Contains("brotli"))
                     {
                         using Brotli.BrotliStream stream = new Brotli.BrotliStream(response.GetResponseStream(), CompressionMode.Decompress);
                         using StreamReader reader = new StreamReader(stream, this.Encoding);
                         responseBody = reader.ReadToEnd();
-                        responseBody = responseBody.Replace("\0", "");
                     }
                 }
                 else
@@ -167,7 +162,6 @@ namespace jfYu.Core.jfYuRequest
                     using Stream stream = response.GetResponseStream();
                     using StreamReader reader = new StreamReader(stream, this.Encoding);
                     responseBody = reader.ReadToEnd();
-                    responseBody = responseBody.Replace("\0", "");
                 }
 
             }
@@ -177,65 +171,16 @@ namespace jfYu.Core.jfYuRequest
                 using Stream stream = response.GetResponseStream();
                 using StreamReader reader = new StreamReader(stream, this.Encoding);
                 responseBody = reader.ReadToEnd();
-                responseBody = responseBody.Replace("\0", "");
             }
+            responseBody = responseBody.Replace("\0", "");
             return responseBody;
         }
-
+       
         /// <summary>
         /// 获取网页内容
         /// </summary>
         /// <returns>网页内容</returns>
-        public string GetHtml()
-        {
-            string html = "";
-            for (int i = 1; i <= Repetitions; i++)
-            {
-                Init();
-                try
-                {
-                    using var response = (HttpWebResponse)Request.GetResponse();
-                    StatusCode = response.StatusCode;
-                    if (response != null && response.StatusCode == HttpStatusCode.OK)
-                        html = GetResponseBody(response);
-                    else if (response.StatusCode == HttpStatusCode.Moved)
-                    {
-                        string newUrl = response.Headers.GetValues("Location")[0];
-                        jfYuHttpRequest x = new jfYuHttpRequest($"{newUrl}");
-                        SetCookies = x.SetCookies;
-                        return x.GetHtml();
-                    }
-                    else
-                        return "";
-                    SetCookies = response.Cookies;
-                    response.Close();
-                    break;
-                }
-                catch (WebException e)
-                {
-                    if (e.Response != null)
-                        StatusCode = ((HttpWebResponse)e.Response).StatusCode;
-                    if (i >= Repetitions)
-                        throw new Exception($"重复请求失败,地址:{Request.RequestUri},参数:{GetParaStr()},错误信息:{e.Message}", e);
-                    else
-                        Task.Delay(5000).Wait();
-                }
-                catch (Exception ex)
-                {
-                    if (i >= Repetitions)
-                        throw new Exception($"重复请求失败,地址:{Request.RequestUri},参数:{GetParaStr()},错误信息:{ex.Message}", ex);
-                    else
-                        Task.Delay(5000).Wait();
-                }
-            }
-            return html;
-        }
-
-        /// <summary>
-        /// 获取网页内容
-        /// </summary>
-        /// <returns>网页内容</returns>
-        public async Task<string> GetHtmlAsync()
+        public async Task<string> SendAsync()
         {
             string html = "";
             for (int i = 1; i <= Repetitions; i++)
@@ -252,7 +197,7 @@ namespace jfYu.Core.jfYuRequest
                         string newUrl = response.Headers.GetValues("Location")[0];
                         jfYuHttpRequest x = new jfYuHttpRequest($"{newUrl}");
                         SetCookies = x.SetCookies;
-                        return await x.GetHtmlAsync();
+                        return await x.SendAsync();
                     }
                     else
                         return "";
@@ -280,95 +225,8 @@ namespace jfYu.Core.jfYuRequest
             }
             return html;
         }
-
-        public bool GetFile(string path, Action<decimal, decimal, decimal> setProgress = null)
-        {
-            Init();
-            HttpWebResponse response;
-            try
-            {
-                response = (HttpWebResponse)Request.GetResponse();
-                StatusCode = response.StatusCode;
-            }
-            catch (WebException e)
-            {
-                StatusCode = ((HttpWebResponse)e.Response).StatusCode;
-                return false;
-            }
-
-            if (response != null && response.StatusCode == HttpStatusCode.OK)
-            {
-                using Stream responseStream = response.GetResponseStream();
-                SetCookies = response.Cookies;
-                //文件大小
-                var FileSize = decimal.Parse(response.ContentLength.ToString());
-                //下载进度
-                decimal Progress = 0M;
-                //下载速度KB/s
-                decimal Speed = 0M;
-                //剩余时间/秒
-                decimal Remain = 0;
-                //下载文件块大小，后期可通过此次进行速度限制
-                byte[] buffer = new byte[4096];
-                try
-                {
-                    Directory.CreateDirectory(Path.GetDirectoryName(path));
-                    using (FileStream fs = File.Create(path))
-                    {
-                        //开启计时
-                        long LastSaveSize = 0;
-                        var t = new System.Timers.Timer(1000)
-                        {
-                            AutoReset = true,
-                            Enabled = true
-                        };
-                        t.Elapsed += (s, e) =>
-                        {
-                            LastSaveSize = fs.Length;
-                            setProgress?.Invoke(Progress, Speed, Remain);
-                        };
-                        t.Start();
-                        int bytesRead;
-                        do
-                        {
-                            bytesRead = responseStream.Read(buffer, 0, buffer.Length);
-                            fs.Write(buffer, 0, bytesRead);
-                            if (setProgress != null)
-                            {
-                                //计算进度
-                                Progress = fs.Length / FileSize * 100;
-                                //计算速度
-                                Speed = (decimal)(fs.Length - LastSaveSize) / 1024;
-                                //剩余时间
-                                Remain = (FileSize - fs.Length) / ((Speed == 0 ? 1 : Speed) * 1024);
-                            }
-                        }
-                        while (bytesRead > 0);
-                        fs.Flush();
-                        t.Stop();
-                        setProgress?.Invoke(100M, 0M, 0M);
-                    }
-                    if (File.Exists(path) && (new FileInfo(path).Length == FileSize || FileSize < 0))
-                        return true;
-                    else
-                        return false;
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("下载文件出错", ex);
-                }
-            }
-            else if (response.StatusCode == HttpStatusCode.Moved)
-            {
-                string newUrl = response.Headers.GetValues("Location")[0];
-                jfYuHttpRequest x = new jfYuHttpRequest($"{newUrl}");
-                return x.GetFile(path, setProgress);
-            }
-            else
-                return false;
-        }
-
-        public async Task<bool> GetFileAsync(string path, Action<decimal, decimal, decimal> setProgress = null)
+     
+        public async Task<bool> DownloadFileAsync(string path, Action<decimal, decimal, decimal> setProgress = null)
         {
             Init();
             HttpWebResponse response;
@@ -449,97 +307,13 @@ namespace jfYu.Core.jfYuRequest
             {
                 string newUrl = response.Headers.GetValues("Location")[0];
                 jfYuHttpRequest x = new jfYuHttpRequest($"{newUrl}");
-                return await x.GetFileAsync(path, setProgress);
+                return await x.DownloadFileAsync(path, setProgress);
             }
             else
                 return false;
-        }
+        }     
 
-        public MemoryStream GetFile(Action<decimal, decimal, decimal> setProgress = null)
-        {
-
-            Init();
-            HttpWebResponse response;
-            try
-            {
-                response = (HttpWebResponse)Request.GetResponse();
-                StatusCode = response.StatusCode;
-            }
-            catch (WebException e)
-            {
-                StatusCode = ((HttpWebResponse)e.Response).StatusCode;
-                return null;
-            }
-
-            if (response != null && response.StatusCode == HttpStatusCode.OK)
-            {
-                using Stream responseStream = response.GetResponseStream();
-                SetCookies = response.Cookies;
-                //文件大小
-                var FileSize = decimal.Parse(response.ContentLength.ToString());
-                //下载进度
-                decimal Progress = 0M;
-                //下载速度KB/s
-                decimal Speed = 0M;
-                //剩余时间/秒
-                decimal Remain = 0;
-                //下载文件块大小，后期可通过此次进行速度限制
-                byte[] buffer = new byte[4096];
-                try
-                {
-                    MemoryStream fs = new MemoryStream();
-                    //开启计时
-                    long LastSaveSize = 0;
-                    var t = new System.Timers.Timer(1000)
-                    {
-                        AutoReset = true,
-                        Enabled = true
-                    };
-                    t.Elapsed += (s, e) =>
-                    {
-                        LastSaveSize = fs.Length;
-                        setProgress?.Invoke(Progress, Speed, Remain);
-                    };
-                    t.Start();
-                    int bytesRead;
-                    do
-                    {
-                        bytesRead = responseStream.Read(buffer, 0, buffer.Length);
-                        fs.Write(buffer, 0, bytesRead);
-                        if (setProgress != null)
-                        {
-                            //计算进度
-                            Progress = fs.Length / FileSize * 100;
-                            //计算速度
-                            Speed = (decimal)(fs.Length - LastSaveSize) / 1024;
-                            //剩余时间
-                            Remain = (FileSize - fs.Length) / ((Speed == 0 ? 1 : Speed) * 1024);
-                        }
-                    }
-                    while (bytesRead > 0);
-                    fs.Flush();
-                    t.Stop();
-                    setProgress?.Invoke(100M, 0M, 0M);
-                    fs.Position = 0;
-                    return fs;
-
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("下载文件出错", ex);
-                }
-            }
-            else if (response.StatusCode == HttpStatusCode.Moved)
-            {
-                string newUrl = response.Headers.GetValues("Location")[0];
-                jfYuHttpRequest x = new jfYuHttpRequest($"{newUrl}");
-                return x.GetFile(setProgress);
-            }
-            else
-                return null;
-        }
-
-        public async Task<MemoryStream> GetFileAsync(Action<decimal, decimal, decimal> setProgress = null)
+        public async Task<MemoryStream> DownloadFileAsync(Action<decimal, decimal, decimal> setProgress = null)
         {
             Init();
             HttpWebResponse response;

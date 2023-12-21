@@ -1,4 +1,9 @@
-﻿using Autofac;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Net.Http;
+using System.Runtime.ConstrainedExecution;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 
 namespace jfYu.Core.Wechat
 {
@@ -10,35 +15,14 @@ namespace jfYu.Core.Wechat
         /// 小程序
         /// </summary>
         /// <param name="services"></param>
-        public static void AddMiniProgram(this ContainerBuilder services)
+        public static void AddMiniProgram(this IServiceCollection services)
         {
-            services.Register(q => new MiniProgram()).SingleInstance();
-        }
-        /// <summary>
-        /// 小程序
-        /// </summary>
-        /// <param name="services"></param>
-        public static void AddMiniProgramAsProperties(this ContainerBuilder services)
-        {
-            services.Register(q => new MiniProgram()).SingleInstance().PropertiesAutowired();
-        }
-
-        /// <summary>
-        /// 小程序
-        /// </summary>
-        /// <param name="services"></param>
-        public static void AddMiniProgram(this ContainerBuilder services, WechatConfig captchaConfig)
-        {
-            services.Register(q => new MiniProgram(captchaConfig)).SingleInstance();
-        }
-
-        /// <summary>
-        /// 小程序
-        /// </summary>
-        /// <param name="services"></param>
-        public static void AddMiniProgramAsProperties(this ContainerBuilder services, WechatConfig captchaConfig)
-        {
-            services.Register(q => new MiniProgram(captchaConfig)).SingleInstance().PropertiesAutowired();
+            services.AddSingleton<MiniProgram>();
+            services.AddHttpClient<HttpClient>(Constant.Mini, q =>
+            {
+                q.BaseAddress = new Uri("https://api.weixin.qq.com/");
+                q.Timeout = TimeSpan.FromSeconds(30);
+            });
         }
 
         #endregion
@@ -48,36 +32,29 @@ namespace jfYu.Core.Wechat
         /// 支付
         /// </summary>
         /// <param name="services"></param>
-        public static void AddWechatPayment(this ContainerBuilder services)
+        public static void AddWechatPayment(this IServiceCollection services, PaymentConfig config)
         {
-            services.Register(q => new WechatPayment()).SingleInstance();
-        }
-        /// <summary>
-        /// 支付
-        /// </summary>
-        /// <param name="services"></param>
-        public static void AddWechatPaymentAsProperties(this ContainerBuilder services)
-        {
-            services.Register(q => new WechatPayment()).SingleInstance().PropertiesAutowired();
+            services.AddSingleton<WechatPayment>();
+            services.AddHttpClient<HttpClient>(Constant.Payment, q =>
+            {
+                q.BaseAddress = new Uri("https://api.mch.weixin.qq.com/");
+                q.Timeout = TimeSpan.FromSeconds(30);
+            }).ConfigurePrimaryHttpMessageHandler(q =>
+            {
+                var handler = new HttpClientHandler()
+                {
+                    ClientCertificateOptions = ClientCertificateOption.Manual,
+                    SslProtocols = SslProtocols.Tls12,
+                };
+                var cert = new X509Certificate2(AppContext.BaseDirectory + config.CertPath, config.MchID, X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
+                handler.ClientCertificates.Add(cert);
+                handler.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls;
+                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+
+                return handler;
+            });
         }
 
-        /// <summary>
-        /// 支付
-        /// </summary>
-        /// <param name="services"></param>
-        public static void AddWechatPayment(this ContainerBuilder services, PaymentConfig config)
-        {
-            services.Register(q => new WechatPayment(config)).SingleInstance();
-        }
-
-        /// <summary>
-        /// 支付
-        /// </summary>
-        /// <param name="services"></param>
-        public static void AddWechatPaymentAsProperties(this ContainerBuilder services, PaymentConfig config)
-        {
-            services.Register(q => new WechatPayment(config)).SingleInstance().PropertiesAutowired();
-        } 
         #endregion
     }
 }

@@ -7,34 +7,14 @@ using Xunit;
 
 namespace xUnitTestCore.Cache
 {
-
-    public class CacheConstructorClass
-    {
-        private CacheService Cache;
-        public CacheConstructorClass(CacheService cache)
-        {
-            Cache = cache;
-        }
-
-        public bool IsNull()
-        {
-            return Cache == null;
-        }
-    }
-
     [Collection("Cache")]
-    public class TestCacheMemoryCore
-    { 
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task TestAdd(bool isRedisCache)
+    public class TestCache
+    {
+        [Fact]
+        public async Task TestAdd()
         {
             var services = new ServiceCollection();
-            if (isRedisCache)
-                services.AddCacheService(true, "");
-            else
-                services.AddCacheService();
+            services.AddCacheService();
             var serviceProvider = services.BuildServiceProvider();
             var _cacheService = serviceProvider.GetService<CacheService>();
 
@@ -70,16 +50,11 @@ namespace xUnitTestCore.Cache
             await _cacheService.RemoveAllAsync();
         }
 
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task TestRemove(bool isRedisCache)
+        [Fact]
+        public async Task TestRemove()
         {
             var services = new ServiceCollection();
-            if (isRedisCache)
-                services.AddCacheService(true, "zgd-redis-aspnet-session.zhss7k.ng.0001.apse1.cache.amazonaws.com");
-            else
-                services.AddCacheService();
+            services.AddCacheService();
             var serviceProvider = services.BuildServiceProvider();
             var _cacheService = serviceProvider.GetService<CacheService>();
 
@@ -103,16 +78,11 @@ namespace xUnitTestCore.Cache
             Assert.Null(await _cacheService.GetAsync("tk4"));
         }
 
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task TestGet(bool isRedisCache)
+        [Fact]
+        public async Task TestGet()
         {
             var services = new ServiceCollection();
-            if (isRedisCache)
-                services.AddCacheService(true, "zgd-redis-aspnet-session.zhss7k.ng.0001.apse1.cache.amazonaws.com");
-            else
-                services.AddCacheService();
+            services.AddCacheService();
             var serviceProvider = services.BuildServiceProvider();
             var _cacheService = serviceProvider.GetService<CacheService>();
 

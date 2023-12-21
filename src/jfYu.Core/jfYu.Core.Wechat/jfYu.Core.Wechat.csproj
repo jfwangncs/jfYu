@@ -1,18 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;netstandard2.1;net461;net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;netstandard2.1;net462;net6.0;net7.0;net8.0</TargetFrameworks>
 		<LangVersion>12.0</LangVersion>
 		<Version>8.0.1</Version>
 		<Authors>jfwang</Authors>
 		<Description>wechat tools</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
-	<ItemGroup>
+	<ItemGroup> 
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="Autofac" Version="7.1.0" />
 	</ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\jfYu.Core.Common\jfYu.Core.Common.csproj" />
-	</ItemGroup>
+
 
 </Project>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Net;
 #if NETSTANDARD21 || NETSTANDARD20||NET5_0||NET6_0||NET7_0||NET8_0
@@ -42,7 +41,7 @@ namespace jfYu.Core.jfYuRequest
                 //设置代理服务器IP，伪装请求地址 
                 proxyHttpClientHandler.Proxy = Proxy;
                 proxyHttpClientHandler.UseProxy = true;
-            }
+            }            
             Request = new HttpClient(proxyHttpClientHandler);
             //_request.MaxResponseContentBufferSize = 256000; 去掉 默认2GB
             LoadHeader();
@@ -140,7 +139,7 @@ namespace jfYu.Core.jfYuRequest
         /// 获取网页内容
         /// </summary>
         /// <returns>网页内容</returns>
-        public async Task<string> GetHtmlAsync()
+        public async Task<string> SendAsync()
         {
             string html = "";
             for (int i = 1; i <= Repetitions; i++)
@@ -265,7 +264,7 @@ namespace jfYu.Core.jfYuRequest
         /// 下载文件
         /// </summary>
         /// <param name="path">保存地址</param>
-        public async Task<bool> GetFileAsync(string path, Action<decimal, decimal, decimal> setProgress = null)
+        public async Task<bool> DownloadFileAsync(string path, Action<decimal, decimal, decimal> setProgress = null)
         {
             Init();
             using var response = await Request.GetAsync(GetParaStr() == "" ? Url : Url + "?" + GetParaStr(), HttpCompletionOption.ResponseHeadersRead);
