@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,14 +15,13 @@ namespace jfYu.Core.Cache
             _cache = cache;
         }
 
-        #region 添加缓存
+        #region add cache
         /// <summary>
-        /// 添加缓存
+        /// add
         /// </summary>
-        /// <param name="key">缓存Key</param>
-        /// <param name="value">缓存Value</param>
-        /// <param name="expiration">过期时间</param> 
-        /// <returns>是否成功</returns>
+        /// <param name="key">Key</param>
+        /// <param name="value">Value</param>
+        /// <param name="expiration">expiretime,default:now add 1 min.</param>  
         public async Task AddAsync<T>(string key, T value, DateTime? expiration)
         {
             if (string.IsNullOrEmpty(key))
@@ -40,12 +38,11 @@ namespace jfYu.Core.Cache
         }
 
         /// <summary>
-        /// 添加缓存
+        /// add
         /// </summary>
-        /// <param name="key">缓存Key</param>
-        /// <param name="value">缓存Value</param>
-        /// <param name="seconds">过期秒数 默认60秒</param> 
-        /// <returns>是否成功</returns>
+        /// <param name="key">Key</param>
+        /// <param name="value">Value</param>
+        /// <param name="seconds">expire seconds,default:60s</param> 
         public async Task AddAsync<T>(string key, T value, int seconds = 60)
         {
             if (string.IsNullOrEmpty(key))
@@ -61,13 +58,12 @@ namespace jfYu.Core.Cache
 
         #endregion
 
-        #region 删除缓存
+        #region remove cache
 
         /// <summary>
-        /// 删除缓存
+        /// remove
         /// </summary>
-        /// <param name="key">缓存Key</param>
-        /// <returns></returns>
+        /// <param name="key">key</param> 
         public async Task RemoveAsync(string key)
         {
             if (key == null)
@@ -77,10 +73,8 @@ namespace jfYu.Core.Cache
         }
 
         /// <summary>
-        /// 批量删除缓存
-        /// </summary>
-        /// <param name="key">缓存Key集合</param>
-        /// <returns></returns>
+        /// remove all 
+        /// </summary> 
         public async Task RemoveAllAsync()
         {
             foreach (var key in _keys)
@@ -93,13 +87,14 @@ namespace jfYu.Core.Cache
 
         #endregion
 
-        #region 获取缓存
+        #region get cache
 
         /// <summary>
-        /// 获取缓存
+        /// get
         /// </summary>
-        /// <param name="key">缓存Key</param>
-        /// <returns></returns>
+        /// <typeparam name="T">type</typeparam>
+        /// <param name="key">key</param>
+        /// <returns>value</returns> 
         public async Task<T> GetAsync<T>(string key) where T : class
         {
             if (key == null)
@@ -114,10 +109,10 @@ namespace jfYu.Core.Cache
         }
 
         /// <summary>
-        /// 获取缓存
+        /// get
         /// </summary>
-        /// <param name="key">缓存Key</param>
-        /// <returns></returns>
+        /// <param name="key">key</param>
+        /// <returns>int value</returns> 
         public async Task<int> GetIntAsync(string key)
         {
             if (key == null)
@@ -132,10 +127,10 @@ namespace jfYu.Core.Cache
         }
 
         /// <summary>
-        /// 获取缓存
+        /// get
         /// </summary>
-        /// <param name="key">缓存Key</param>
-        /// <returns></returns>
+        /// <param name="key">Key</param>
+        /// <returns>string value</returns>
         public async Task<string> GetAsync(string key)
         {
             if (key == null)

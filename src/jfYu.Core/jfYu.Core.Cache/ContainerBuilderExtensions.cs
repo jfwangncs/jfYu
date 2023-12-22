@@ -8,15 +8,15 @@ namespace jfYu.Core.Cache
     public static class ContainerBuilderExtensions
     {
         /// <summary>
-        /// 注入
+        /// injection
         /// </summary>
         /// <param name="services"></param>
-        public static void AddCacheService(this IServiceCollection services, bool isRedis = false, string redisConnstr = "")
+        public static void AddCacheService(this IServiceCollection services, string redisConnstr = "")
         {
-            if (isRedis)
-                services.AddStackExchangeRedisCache(options => { options.Configuration = redisConnstr; });
-            else
+            if (string.IsNullOrEmpty(redisConnstr))
                 services.AddDistributedMemoryCache();
+            else
+                services.AddStackExchangeRedisCache(options => { options.Configuration = redisConnstr; });
 
             services.AddScoped<CacheService>();
         }
