@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jfYu.Core.Cache", "jfYu.Cor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xUnitTestCore", "XUnitTestCore\xUnitTestCore.csproj", "{CBBEB5DD-542C-4898-8565-C43D8ED95B89}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jfYu.Core.Office", "jfYu.Core\jfYu.Core.Office\jfYu.Core.Office.csproj", "{353B915B-C636-4BD7-A43D-6B40A3081761}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{CBBEB5DD-542C-4898-8565-C43D8ED95B89}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBBEB5DD-542C-4898-8565-C43D8ED95B89}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBBEB5DD-542C-4898-8565-C43D8ED95B89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{353B915B-C636-4BD7-A43D-6B40A3081761}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{353B915B-C636-4BD7-A43D-6B40A3081761}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{353B915B-C636-4BD7-A43D-6B40A3081761}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{353B915B-C636-4BD7-A43D-6B40A3081761}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

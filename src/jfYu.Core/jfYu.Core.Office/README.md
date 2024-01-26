@@ -1,7 +1,7 @@
 
 ### <a href="#Excel">Excel工具</a>
 ```
-1、支持普通导出、按模板导出、自由操作Excel、导入。
+1、支持导出、导入、自由操作Excel。
 2、数据源支持List,Datatable、IQueryable、DbDataReader。
 3、自动识别表头，如带Model的导出，并且Model字段标记有DisplayName则自动识别为表头，也可自行设置表头。
 4、使用SXSSF导出方式，降低内存占用量。支持海量数据导出，使用超过100w数据自动分Sheet
@@ -18,10 +18,7 @@ Install-Package jfYu.Core.Excel
 ```
 
 //IOC注入
-var container = new ContainerBuilder();
-container.AddJfYuExcel();  
-//解析
-var excel = container.Build().Resolve<JfYuExcel>();
+builder.Services.AddJfYuExcel();  
 
 //list导出
 var source = new List<ExcelTest>();
@@ -53,17 +50,16 @@ excel.ToExcel(reader, "exceltest/dtreader.xlsx", dir);
 excel.ToExcel<ExcelTest>(reader, "exceltest/reader.xlsx");//带model
 
 //自由操作Excel
-var workbook = excel.Getworkbook();
-excel.CreateSheetAndHeader(workbook, new List<string>() { "name", "age", "Address" });
-excel.CreateSheetAndHeader(workbook, new List<string>() { "name", "age", "Address" });
-excel.Save(workbook, "exceltest/new.xlsx");
+var workbook = excel.CreateWorkbook();
+workbook.CreateSheetWithTitles<ExcelTest>();
+  var dir = new Dictionary<string, string>
+                {
+                    { "Age", "年龄" }
+                };
+workbook.CreateSheetWithTitles(dir);
+workbook.Save(workbook, "exceltest/new.xlsx");
 
-//模板导出
-var source = new List<ExcelTest>();
-source.Add(new ExcelTest() { name = "A", age = 18, Address = "地址1" });
-source.Add(new ExcelTest() { name = "B", age = 19, Address = "地址2" });
-source.Add(new ExcelTest() { name = "C", age = 20, Address = "地址3" });
-excel.ToExcelByTemplate(source, "exceltest/new.xlsx", "exceltest/tmp1.xlsx", 0);
+ 
 
 //excel导入
 var dtsourceH = excel.ToDataTable("exceltest/tmp2.xlsx", 0, 1);

@@ -1,6 +1,4 @@
-using Autofac;
-using jfYu.Core.Excel;
-using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.DependencyInjection;
 using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
@@ -9,14 +7,18 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using Xunit;
+using jfYu.Core.Office;
+using jfYu.Core.Office.Excel;
+using Microsoft.Data.Sqlite;
 
 namespace xUnitTestCore.Excel
 {
+    #region Model
     public class ExcelTest
     {
-        public string name { get; set; }
+        public string Name { get; set; }
 
-        public int age { get; set; }
+        public int Age { get; set; }
 
         [DisplayName("地址")]
         public string Address { get; set; }
@@ -24,9 +26,9 @@ namespace xUnitTestCore.Excel
 
     public class ExcelTestNoDisplayName
     {
-        public string name { get; set; }
+        public string Name { get; set; }
 
-        public int age { get; set; }
+        public int Age { get; set; }
 
         public string Address { get; set; }
     }
@@ -34,9 +36,9 @@ namespace xUnitTestCore.Excel
 
     public class ExcelTestMore
     {
-        public string name { get; set; }
+        public string Name { get; set; }
 
-        public int age { get; set; }
+        public int Age { get; set; }
         public string Address { get; set; }
 
         public string Phone { get; set; }
@@ -46,103 +48,110 @@ namespace xUnitTestCore.Excel
 
     public class ExcelTestLess
     {
-        public string name { get; set; }
+        public string Name { get; set; }
 
-        public int age { get; set; }
+        public int Age { get; set; }
     }
+    #endregion
+
     public class TestExcleCore
-    {      
+    {
 
         #region 基础测试
         [Fact]
         public void TestExcle()
         {
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
-            Assert.NotNull(excel);
+            var services = new ServiceCollection();
+            services.AddJfYuExcel();
+            var serviceProvider = services.BuildServiceProvider();
+            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
+            Assert.NotNull(_jfYuExcel);
         }
 
         [Fact]
 
         public void TestCreateExcel()
         {
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
-            var workbook = excel.CreateWorkbook();
-            excel.CreateSheetAndHeader(workbook, new List<string>() { "name", "age", "Address" });
-            excel.CreateSheetAndHeader(workbook, new List<string>() { "name", "age", "Address" });
-            excel.Save(workbook, "exceltest/new.xlsx");
+            var services = new ServiceCollection();
+            services.AddJfYuExcel();
+            var serviceProvider = services.BuildServiceProvider();
+            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
+
+            var workbook = _jfYuExcel.CreateWorkbook();
+            workbook.CreateSheetWithTitles<ExcelTestNoDisplayName>();
+            workbook.CreateSheetWithTitles<ExcelTest>();
+            workbook.Save("exceltest/new.xlsx");
             Assert.True(File.Exists("exceltest/new.xlsx"));
-            var dtsource = excel.GetDataTable("exceltest/new.xlsx");
-            var dtsourceH = excel.GetDataTable("exceltest/new.xlsx", 0);
-            Assert.True(dtsource.Rows.Count == 0);
-            Assert.True(dtsourceH.Rows.Count == 1);
-            Assert.True(dtsourceH.Rows[0][0].ToString() == "name");
-            Assert.True(dtsourceH.Rows[0][1].ToString() == "age");
-            Assert.True(dtsourceH.Rows[0][2].ToString() == "Address");
+            var dtsource = _jfYuExcel.GetDataTable("exceltest/new.xlsx");
+            var dtsourceH = _jfYuExcel.GetDataTable("exceltest/new.xlsx", 0);
+            Assert.Equal(0, dtsource.Rows.Count);
+            Assert.Equal(1, dtsourceH.Rows.Count);
+            Assert.Equal("Name", dtsourceH.Rows[0][0].ToString());
+            Assert.Equal("Age", dtsourceH.Rows[0][1].ToString());
+            Assert.Equal("Address", dtsourceH.Rows[0][2].ToString());
+
+            dtsourceH = _jfYuExcel.GetDataTable("exceltest/new.xlsx", 0, 1);
+            Assert.Equal("Name", dtsourceH.Rows[0][0].ToString());
+            Assert.Equal("Age", dtsourceH.Rows[0][1].ToString());
+            Assert.Equal("地址", dtsourceH.Rows[0][2].ToString());
             File.Delete("exceltest/new.xlsx");
 
         }
         #endregion
 
         #region 基本导出
+
         [Fact]
-        public void TestModelExportWithoutHeader()
+        public void TestCSVExport()
         {
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
-            var source = new List<ExcelTest>();
-            source.Add(new ExcelTest() { name = "A", age = 18, Address = "地址1" });
-            source.Add(new ExcelTest() { name = "B", age = 19, Address = "地址2" });
-            source.Add(new ExcelTest() { name = "C", age = 20, Address = "地址3" });
-            excel.ToExcel(source, "exceltest/source.xlsx");
-            Assert.True(File.Exists("exceltest/source.xlsx"));
-            var dtsource = excel.GetDataTable("exceltest/source.xlsx");
-            var dtsourceH = excel.GetDataTable("exceltest/source.xlsx", 0);
-            Assert.True(dtsource.Rows.Count == 3);
-            Assert.True(dtsourceH.Rows.Count == 4);
-            Assert.True(dtsourceH.Rows[0][0].ToString() == "name");
-            Assert.True(dtsourceH.Rows[0][1].ToString() == "age");
-            Assert.True(dtsourceH.Rows[0][2].ToString() == "地址");
-            var pops = typeof(ExcelTest).GetProperties();
-            for (int i = 0; i < source.Count; i++)
+            var services = new ServiceCollection();
+            services.AddJfYuExcel();
+            var serviceProvider = services.BuildServiceProvider();
+            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
+
+            var source = new List<ExcelTest>
             {
-                for (int j = 0; j < pops.Length; j++)
-                {
-                    Assert.True(dtsource.Rows[i][j].ToString() == pops[j].GetValue(source[i]).ToString());
-                }
-            }
-            File.Delete("exceltest/source.xlsx");
+                new() { Name = "A", Age = 18, Address = "地址1" },
+                new() { Name = "B", Age = 19, Address = "地址2" },
+                new() { Name = "C", Age = 20, Address = "地址3" }
+            };
 
-
+            _jfYuExcel.ToCSV(source, "csv.csv");
+            Assert.True(File.Exists("csv.csv"));           
+            File.Delete("csv.csv");
         }
-
         [Fact]
-        public void TestModelExportWithHeader()
+        public void TestModelExport()
         {
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
-            var source = new List<ExcelTest>();
-            source.Add(new ExcelTest() { name = "A", age = 18, Address = "地址1" });
-            source.Add(new ExcelTest() { name = "B", age = 19, Address = "地址2" });
-            source.Add(new ExcelTest() { name = "C", age = 20, Address = "地址3" });
+            var services = new ServiceCollection();
+            services.AddJfYuExcel();
+            var serviceProvider = services.BuildServiceProvider();
+            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
+
+            var source = new List<ExcelTest>
+            {
+                new() { Name = "A", Age = 18, Address = "地址1" },
+                new() { Name = "B", Age = 19, Address = "地址2" },
+                new() { Name = "C", Age = 20, Address = "地址3" }
+            };
+
+            _jfYuExcel.ToExcel(source, "exceltest/source.xlsx");
+            Assert.True(File.Exists("exceltest/source.xlsx"));
             var dir = new Dictionary<string, string>
                 {
-                    { "age", "年龄" }
+                    { "Age", "年龄" }
                 };
-            excel.ToExcel(source, "exceltest/sourceh.xlsx", dir); ;
-            Assert.True(File.Exists("exceltest/sourceh.xlsx"));
-            var dtsource = excel.GetDataTable("exceltest/sourceh.xlsx");
-            var dtsourceH = excel.GetDataTable("exceltest/sourceh.xlsx", 0);
-            Assert.True(dtsource.Rows.Count == 3);
-            Assert.True(dtsourceH.Rows.Count == 4);
-            Assert.True(dtsourceH.Rows[0][0].ToString() == "name");
-            Assert.True(dtsourceH.Rows[0][1].ToString() == "年龄");
-            Assert.True(dtsourceH.Rows[0][2].ToString() == "地址");
+            _jfYuExcel.ToExcel(source, "exceltest/source1.xlsx", dir);
+            Assert.True(File.Exists("exceltest/source1.xlsx"));
+
+            var dtsource = _jfYuExcel.GetDataTable("exceltest/source.xlsx");
+            var dtsourceH = _jfYuExcel.GetDataTable("exceltest/source.xlsx", 0);
+
+            Assert.Equal(3, dtsource.Rows.Count);
+            Assert.Equal(4, dtsourceH.Rows.Count);
+            Assert.Equal("Name", dtsourceH.Rows[0][0].ToString());
+            Assert.Equal("Age", dtsourceH.Rows[0][1].ToString());
+
             var pops = typeof(ExcelTest).GetProperties();
             for (int i = 0; i < source.Count; i++)
             {
@@ -151,33 +160,55 @@ namespace xUnitTestCore.Excel
                     Assert.True(dtsource.Rows[i][j].ToString() == pops[j].GetValue(source[i]).ToString());
                 }
             }
-            File.Delete("exceltest/sourceh.xlsx");
+
+            var dtsource1 = _jfYuExcel.GetDataTable("exceltest/source1.xlsx");
+            var dtsource1H = _jfYuExcel.GetDataTable("exceltest/source1.xlsx", 0);
+
+            Assert.Equal(3, dtsource1.Rows.Count);
+            Assert.Equal(4, dtsource1H.Rows.Count);
+            Assert.Equal("年龄", dtsource1H.Rows[0][0].ToString());
+
+            for (int i = 0; i < source.Count; i++)
+            {
+                Assert.True(dtsource1.Rows[i][0].ToString() == pops.FirstOrDefault(q => q.Name == "Age").GetValue(source[i]).ToString());
+            }
+            File.Delete("exceltest/source.xlsx");
+            File.Delete("exceltest/source1.xlsx");
 
         }
 
         [Fact]
         public void TestQueryableExport()
         {
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
-            var source = new List<ExcelTest>();
-            source.Add(new ExcelTest() { name = "A", age = 18, Address = "地址1" });
-            source.Add(new ExcelTest() { name = "B", age = 19, Address = "地址2" });
-            source.Add(new ExcelTest() { name = "C", age = 20, Address = "地址3" });
+            var services = new ServiceCollection();
+            services.AddJfYuExcel();
+            var serviceProvider = services.BuildServiceProvider();
+            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
+            var source = new List<ExcelTest>
+            {
+                new() { Name = "A", Age = 18, Address = "地址1" },
+                new() { Name = "B", Age = 19, Address = "地址2" },
+                new() { Name = "C", Age = 20, Address = "地址3" }
+            };
+
+            _jfYuExcel.ToExcel(source.AsQueryable(), "exceltest/queryable.xlsx");
+            Assert.True(File.Exists("exceltest/queryable.xlsx"));
+
             var dir = new Dictionary<string, string>
                 {
-                    { "age", "年龄" }
+                    { "Age", "年龄" }
                 };
-            excel.ToExcel(source.AsQueryable(), "exceltest/queryable.xlsx", dir); ;
-            Assert.True(File.Exists("exceltest/queryable.xlsx"));
-            var dtsource = excel.GetDataTable("exceltest/queryable.xlsx");
-            var dtsourceH = excel.GetDataTable("exceltest/queryable.xlsx", 0);
-            Assert.True(dtsource.Rows.Count == 3);
-            Assert.True(dtsourceH.Rows.Count == 4);
-            Assert.True(dtsourceH.Rows[0][0].ToString() == "name");
-            Assert.True(dtsourceH.Rows[0][1].ToString() == "年龄");
-            Assert.True(dtsourceH.Rows[0][2].ToString() == "地址");
+            _jfYuExcel.ToExcel(source, "exceltest/queryable1.xlsx", dir);
+            Assert.True(File.Exists("exceltest/queryable1.xlsx"));
+
+
+            var dtsource = _jfYuExcel.GetDataTable("exceltest/queryable.xlsx");
+            var dtsourceH = _jfYuExcel.GetDataTable("exceltest/queryable.xlsx", 0);
+            Assert.Equal(3, dtsource.Rows.Count);
+            Assert.Equal(4, dtsourceH.Rows.Count);
+            Assert.Equal("Name", dtsourceH.Rows[0][0].ToString());
+            Assert.Equal("Age", dtsourceH.Rows[0][1].ToString());
+            Assert.Equal("地址", dtsourceH.Rows[0][2].ToString());
             var pops = typeof(ExcelTest).GetProperties();
             for (int i = 0; i < source.Count; i++)
             {
@@ -186,16 +217,31 @@ namespace xUnitTestCore.Excel
                     Assert.True(dtsource.Rows[i][j].ToString() == pops[j].GetValue(source[i]).ToString());
                 }
             }
+
+
+            var dtsource1 = _jfYuExcel.GetDataTable("exceltest/queryable1.xlsx");
+            var dtsource1H = _jfYuExcel.GetDataTable("exceltest/queryable1.xlsx", 0);
+            Assert.Equal(3, dtsource1.Rows.Count);
+            Assert.Equal(4, dtsource1H.Rows.Count);
+            Assert.Equal("年龄", dtsource1H.Rows[0][0].ToString());
+            for (int i = 0; i < source.Count; i++)
+            {
+                Assert.True(dtsource1.Rows[i][0].ToString() == pops.FirstOrDefault(q => q.Name == "Age").GetValue(source[i]).ToString());
+            }
+
             File.Delete("exceltest/queryable.xlsx");
+            File.Delete("exceltest/queryable1.xlsx");
 
         }
 
         [Fact]
-        public void TestDtExportWithHeader()
+        public void TestDtExport()
         {
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
+            var services = new ServiceCollection();
+            services.AddJfYuExcel();
+            var serviceProvider = services.BuildServiceProvider();
+            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
+
             var dt = new DataTable();
             dt.Columns.Add("id");
             dt.Columns.Add("name");
@@ -206,22 +252,27 @@ namespace xUnitTestCore.Excel
             dt.Rows.Add("3", "大的洼地", "女", "12");
             dt.Rows.Add("4", "dwadwadwad", "1", "12");
             dt.Rows.Add("5", "13213213", "0", "1465452");
+
+            _jfYuExcel.ToExcel(dt, "exceltest/dth.xlsx");
+            Assert.True(File.Exists("exceltest/dth.xlsx"));
+
             var dir = new Dictionary<string, string>
                 {
                     { "id", "编号" },
                     { "sex", "性别" },
                     { "age", "年龄" }
                 };
-            excel.ToExcel(dt, "exceltest/dth.xlsx", dir);
-            Assert.True(File.Exists("exceltest/dth.xlsx"));
-            var dtwoh = excel.GetDataTable("exceltest/dth.xlsx");
-            var dth = excel.GetDataTable("exceltest/dth.xlsx", 0);
-            Assert.True(dtwoh.Rows.Count == 5);
-            Assert.True(dth.Rows.Count == 6);
-            Assert.True(dth.Rows[0][0].ToString() == "编号");
-            Assert.True(dth.Rows[0][1].ToString() == "name");
-            Assert.True(dth.Rows[0][2].ToString() == "性别");
-            Assert.True(dth.Rows[0][3].ToString() == "年龄");
+            _jfYuExcel.ToExcel(dt, "exceltest/dth1.xlsx", dir);
+            Assert.True(File.Exists("exceltest/dth1.xlsx"));
+
+            var dtwoh = _jfYuExcel.GetDataTable("exceltest/dth.xlsx");
+            var dth = _jfYuExcel.GetDataTable("exceltest/dth.xlsx", 0);
+            Assert.Equal(5, dtwoh.Rows.Count);
+            Assert.Equal(6, dth.Rows.Count);
+            Assert.Equal("id", dth.Rows[0][0].ToString());
+            Assert.Equal("name", dth.Rows[0][1].ToString());
+            Assert.Equal("sex", dth.Rows[0][2].ToString());
+            Assert.Equal("age", dth.Rows[0][3].ToString());
             for (int i = 0; i < dt.Rows.Count; i++)
             {
                 for (int j = 0; j < dt.Columns.Count; j++)
@@ -229,71 +280,59 @@ namespace xUnitTestCore.Excel
                     Assert.True(dt.Rows[i][j].ToString() == dtwoh.Rows[i][j].ToString());
                 }
             }
+
+            var dtwoh1 = _jfYuExcel.GetDataTable("exceltest/dth1.xlsx");
+            var dth1 = _jfYuExcel.GetDataTable("exceltest/dth1.xlsx", 0);
+            Assert.Equal(5, dtwoh1.Rows.Count);
+            Assert.Equal(6, dth1.Rows.Count);
+            Assert.Equal("编号", dth1.Rows[0][0].ToString());
+            Assert.Equal("性别", dth1.Rows[0][1].ToString());
+            Assert.Equal("年龄", dth1.Rows[0][2].ToString());
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                for (int j = 0; j < dth1.Columns.Count; j++)
+                {
+                    var j1 = j;
+                    if (j == 1)
+                        j1 = 2;
+                    if (j == 2)
+                        j1 = 3;
+                    Assert.True(dt.Rows[i][j1].ToString() == dtwoh1.Rows[i][j].ToString());
+                }
+            }
+
             File.Delete("exceltest/dth.xlsx");
-
+            File.Delete("exceltest/dth1.xlsx");
         }
 
-        [Fact]
-        public void TestDtExportWithoutHeader()
-        {
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
-            var dt = new DataTable();
-            dt.Columns.Add("id");
-            dt.Columns.Add("name");
-            dt.Columns.Add("sex");
-            dt.Columns.Add("age");
-            dt.Rows.Add("1", "王", "男", "12");
-            dt.Rows.Add("2", "wang", "男", "1200000");
-            dt.Rows.Add("3", "大的洼地", "女", "12");
-            dt.Rows.Add("4", "dwadwadwad", "1", "12");
-            dt.Rows.Add("5", "13213213", "0", "1465452");
-
-            excel.ToExcel(dt, "exceltest/dtwoh.xlsx");
-            Assert.True(File.Exists("exceltest/dtwoh.xlsx"));
-            var dtwoh = excel.GetDataTable("exceltest/dtwoh.xlsx");
-            var dth = excel.GetDataTable("exceltest/dtwoh.xlsx", 0);
-            Assert.True(dtwoh.Rows.Count == 5);
-            Assert.True(dth.Rows.Count == 6);
-            Assert.True(dth.Rows[0][0].ToString() == "id");
-            Assert.True(dth.Rows[0][1].ToString() == "name");
-            Assert.True(dth.Rows[0][2].ToString() == "sex");
-            Assert.True(dth.Rows[0][3].ToString() == "age");
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                for (int j = 0; j < dt.Columns.Count; j++)
-                {
-                    Assert.True(dt.Rows[i][j].ToString() == dtwoh.Rows[i][j].ToString());
-                }
-            }
-            File.Delete("exceltest/dtwoh.xlsx");
-
-        }
 
         [Fact]
-        public void TestDbDataReaderExportWithHeader()
+        public void TestDbDataReaderExport()
         {
+            if (File.Exists("exceltest/tmp.db"))
+                File.Delete("exceltest/tmp.db");
             string datasource = "Data Source = exceltest/tmp.db";
 
             using var conn = new SqliteConnection(datasource);
             conn.Open();
             //创建表
-            SqliteCommand cmd = new SqliteCommand();
+            SqliteCommand cmd = new();
             string sql = "CREATE TABLE test(name varchar(20),age int,Address varchar(20) )";
             cmd.CommandText = sql;
             cmd.Connection = conn;
             cmd.ExecuteNonQuery();
 
-            var source = new List<ExcelTest>();
-            source.Add(new ExcelTest() { name = "A", age = 18, Address = "地址1" });
-            source.Add(new ExcelTest() { name = "B", age = 19, Address = "地址2" });
-            source.Add(new ExcelTest() { name = "C", age = 20, Address = "地址3" });
+            var source = new List<ExcelTest>
+            {
+                new() { Name = "A", Age = 18, Address = "地址1" },
+                new() { Name = "B", Age = 19, Address = "地址2" },
+                new() { Name = "C", Age = 20, Address = "地址3" }
+            };
 
             foreach (var item in source)
             {
                 //插入数据
-                sql = $"INSERT INTO test VALUES('{item.name}',{item.age},'{item.Address}')";
+                sql = $"INSERT INTO test VALUES('{item.Name}',{item.Age},'{item.Address}')";
                 cmd.CommandText = sql;
                 cmd.ExecuteNonQuery();
             }
@@ -302,24 +341,40 @@ namespace xUnitTestCore.Excel
             cmd.CommandText = sql;
             var reader = cmd.ExecuteReader();
 
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
-            var dir = new Dictionary<string, string>
-                {
-                    { "age", "年龄" }
-                };
-            excel.ToExcel(reader, "exceltest/dtreader.xlsx", dir);
+
+            var services = new ServiceCollection();
+            services.AddJfYuExcel();
+            var serviceProvider = services.BuildServiceProvider();
+            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
+
+            _jfYuExcel.ToExcel(reader, "exceltest/dtreader.xlsx", ExcelExtension.GetTitles<ExcelTest>());
             conn.Dispose();
             SqliteConnection.ClearAllPools();
             Assert.True(File.Exists("exceltest/dtreader.xlsx"));
-            var dtsource = excel.GetDataTable("exceltest/dtreader.xlsx");
-            var dtsourceH = excel.GetDataTable("exceltest/dtreader.xlsx", 0);
-            Assert.True(dtsource.Rows.Count == 3);
-            Assert.True(dtsourceH.Rows.Count == 4);
-            Assert.True(dtsourceH.Rows[0][0].ToString() == "name");
-            Assert.True(dtsourceH.Rows[0][1].ToString() == "年龄");
-            Assert.True(dtsourceH.Rows[0][2].ToString() == "Address");
+
+            conn.Open();
+            SqliteCommand cmd1 = new()
+            {
+                CommandText = sql,
+                Connection = conn
+            };
+            var reader1 = cmd1.ExecuteReader();
+            var dir = new Dictionary<string, string>
+                {
+                    { "Age", "年龄" }
+                };
+            _jfYuExcel.ToExcel(reader1, "exceltest/dtreader1.xlsx", dir);
+            Assert.True(File.Exists("exceltest/dtreader1.xlsx"));
+            conn.Dispose();
+            SqliteConnection.ClearAllPools();
+
+            var dtsource = _jfYuExcel.GetDataTable("exceltest/dtreader.xlsx");
+            var dtsourceH = _jfYuExcel.GetDataTable("exceltest/dtreader.xlsx", 0);
+            Assert.Equal(3, dtsource.Rows.Count);
+            Assert.Equal(4, dtsourceH.Rows.Count);
+            Assert.Equal("Name", dtsourceH.Rows[0][0].ToString());
+            Assert.Equal("Age", dtsourceH.Rows[0][1].ToString());
+            Assert.Equal("地址", dtsourceH.Rows[0][2].ToString());
             var pops = typeof(ExcelTest).GetProperties();
             for (int i = 0; i < source.Count; i++)
             {
@@ -328,272 +383,87 @@ namespace xUnitTestCore.Excel
                     Assert.True(dtsource.Rows[i][j].ToString() == pops[j].GetValue(source[i]).ToString());
                 }
             }
+
+
+            var dtsource1 = _jfYuExcel.GetDataTable("exceltest/dtreader1.xlsx");
+            var dtsource1H = _jfYuExcel.GetDataTable("exceltest/dtreader1.xlsx", 0);
+            Assert.Equal(3, dtsource1.Rows.Count);
+            Assert.Equal(4, dtsource1H.Rows.Count);
+            Assert.Equal("年龄", dtsource1H.Rows[0][0].ToString());
+            for (int i = 0; i < source.Count; i++)
+            {
+                Assert.True(dtsource1.Rows[i][0].ToString() == pops.FirstOrDefault(q => q.Name == "Age").GetValue(source[i]).ToString());
+            }
             File.Delete("exceltest/dtreader.xlsx");
+            File.Delete("exceltest/dtreader1.xlsx");
             File.Delete("exceltest/tmp.db");
 
         }
-
-        [Fact]
-        public void TestDbDataReaderExportWithOutHeader()
-        {
-            string datasource = "Data Source = exceltest/tmp1.db";
-            using var conn = new SqliteConnection(datasource);
-            conn.Open();
-            //创建表
-            SqliteCommand cmd = new SqliteCommand();
-            string sql = "CREATE TABLE test(name varchar(20),age int,Address varchar(20) )";
-            cmd.CommandText = sql;
-            cmd.Connection = conn;
-            cmd.ExecuteNonQuery();
-
-            var source = new List<ExcelTest>();
-            source.Add(new ExcelTest() { name = "A", age = 18, Address = "地址1" });
-            source.Add(new ExcelTest() { name = "B", age = 19, Address = "地址2" });
-            source.Add(new ExcelTest() { name = "C", age = 20, Address = "地址3" });
-
-            foreach (var item in source)
-            {
-                //插入数据
-                sql = $"INSERT INTO test VALUES('{item.name}',{item.age},'{item.Address}')";
-                cmd.CommandText = sql;
-                cmd.ExecuteNonQuery();
-            }
-
-            sql = "SELECT * FROM test";
-            cmd.CommandText = sql;
-            var reader = cmd.ExecuteReader();
-
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
-            excel.ToExcel(reader, "exceltest/reader.xlsx");
-            conn.Dispose();
-            SqliteConnection.ClearAllPools();
-            Assert.True(File.Exists("exceltest/reader.xlsx"));
-            var dtsource = excel.GetDataTable("exceltest/reader.xlsx");
-            var dtsourceH = excel.GetDataTable("exceltest/reader.xlsx", 0);
-            Assert.True(dtsource.Rows.Count == 3);
-            Assert.True(dtsourceH.Rows.Count == 4);
-            Assert.True(dtsourceH.Rows[0][0].ToString() == "name");
-            Assert.True(dtsourceH.Rows[0][1].ToString() == "age");
-            Assert.True(dtsourceH.Rows[0][2].ToString() == "Address");
-            var pops = typeof(ExcelTest).GetProperties();
-            for (int i = 0; i < source.Count; i++)
-            {
-                for (int j = 0; j < pops.Length; j++)
-                {
-                    Assert.True(dtsource.Rows[i][j].ToString() == pops[j].GetValue(source[i]).ToString());
-                }
-            }
-            File.Delete("exceltest/reader.xlsx");
-            File.Delete("exceltest/tmp1.db");
-
-        }
-
-        [Fact]
-        public void TestDbDataReaderTExport()
-        {
-            string datasource = "Data Source =:memory:";
-            using var conn = new SqliteConnection(datasource);
-            conn.Open();
-            //创建表
-            SqliteCommand cmd = new SqliteCommand();
-            string sql = "CREATE TABLE test(name varchar(20),age int,Address varchar(20) )";
-            cmd.CommandText = sql;
-            cmd.Connection = conn;
-            cmd.ExecuteNonQuery();
-
-            var source = new List<ExcelTest>();
-            source.Add(new ExcelTest() { name = "A", age = 18, Address = "地址1" });
-            source.Add(new ExcelTest() { name = "B", age = 19, Address = "地址2" });
-            source.Add(new ExcelTest() { name = "C", age = 20, Address = "地址3" });
-
-            foreach (var item in source)
-            {
-                //插入数据
-                sql = $"INSERT INTO test VALUES('{item.name}',{item.age},'{item.Address}')";
-                cmd.CommandText = sql;
-                cmd.ExecuteNonQuery();
-            }
-
-            sql = "SELECT * FROM test";
-            cmd.CommandText = sql;
-            var reader = cmd.ExecuteReader();
-
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
-            excel.ToExcel<ExcelTest>(reader, "exceltest/reader.xlsx");
-            Assert.True(File.Exists("exceltest/reader.xlsx"));
-            var dtsource = excel.GetDataTable("exceltest/reader.xlsx");
-            var dtsourceH = excel.GetDataTable("exceltest/reader.xlsx", 0);
-            Assert.True(dtsource.Rows.Count == 3);
-            Assert.True(dtsourceH.Rows.Count == 4);
-            Assert.True(dtsourceH.Rows[0][0].ToString() == "name");
-            Assert.True(dtsourceH.Rows[0][1].ToString() == "age");
-            Assert.True(dtsourceH.Rows[0][2].ToString() == "地址");
-            var pops = typeof(ExcelTest).GetProperties();
-            for (int i = 0; i < source.Count; i++)
-            {
-                for (int j = 0; j < pops.Length; j++)
-                {
-                    Assert.True(dtsource.Rows[i][j].ToString() == pops[j].GetValue(source[i]).ToString());
-                }
-            }
-            File.Delete("exceltest/reader.xlsx");
-
-        }
         #endregion
 
-        #region 模板导出
-
-        [Fact]
-
-        public void TestModelExportByTemplate()
-        {
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
-            Assert.Throws<FileNotFoundException>(() => excel.ToExcelByTemplate(null, "xxx", "exceltest/em.xlsx"));
-
-            var workbook = excel.CreateWorkbook("exceltest/new.xlsx");
-
-            excel.CreateSheetAndHeader(workbook, new List<string>() { "name", "age", "Address" });
-            excel.CreateSheetAndHeader(workbook, new List<string>() { "name", "age", "Address" });
-            excel.Save(workbook, "exceltest/new.xlsx");
-
-            var source = new List<ExcelTest>();
-            source.Add(new ExcelTest() { name = "A", age = 18, Address = "地址1" });
-            source.Add(new ExcelTest() { name = "B", age = 19, Address = "地址2" });
-            source.Add(new ExcelTest() { name = "C", age = 20, Address = "地址3" });
-
-            var source1 = new List<ExcelTest>();
-            source1.Add(new ExcelTest() { name = "A1", age = 18, Address = "地址11" });
-            source1.Add(new ExcelTest() { name = "B1", age = 19, Address = "地址12" });
-            source1.Add(new ExcelTest() { name = "C1", age = 20, Address = "地址13" });
-
-            excel.ToExcelByTemplate(source, "exceltest/new.xlsx", "exceltest/tmp1.xlsx", 0);
-            excel.ToExcelByTemplate(source1, "exceltest/tmp1.xlsx", "exceltest/tmp1.xlsx", 1);
-
-            var dtsource = excel.GetDataTable("exceltest/tmp1.xlsx", 0, 0);
-            var dtsourceH = excel.GetDataTable("exceltest/tmp1.xlsx", 0, 1);
-            Assert.True(dtsource.Rows.Count == 4);
-            Assert.True(dtsourceH.Rows.Count == 4);
-            var pops = typeof(ExcelTest).GetProperties();
-            for (int i = 1; i < source.Count; i++)
-            {
-                for (int j = 0; j < pops.Length; j++)
-                {
-                    Assert.True(dtsource.Rows[i][j].ToString() == pops[j].GetValue(source[i - 1]).ToString());
-                }
-            }
-
-            for (int i = 1; i < source.Count; i++)
-            {
-                for (int j = 0; j < pops.Length; j++)
-                {
-                    Assert.True(dtsourceH.Rows[i][j].ToString() == pops[j].GetValue(source1[i - 1]).ToString());
-                }
-            }
-            File.Delete("exceltest/tmp1.xlsx");
-            File.Delete("exceltest/new.xlsx");
-
-        }
-
-        [Fact]
-
-        public void TestDtExportByTemplate()
-        {
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
-            Assert.Throws<FileNotFoundException>(() => excel.ToExcelByTemplate(null, "xxx", "exceltest/em.xlsx"));
-
-            var dt = new DataTable();
-            dt.Columns.Add("id");
-            dt.Columns.Add("name");
-            dt.Columns.Add("sex");
-            dt.Columns.Add("age");
-            dt.Rows.Add("1", "王", "男", "12");
-            dt.Rows.Add("2", "wang", "男", "1200000");
-            dt.Rows.Add("3", "大的洼地", "女", "12");
-            dt.Rows.Add("4", "dwadwadwad", "1", "12");
-            dt.Rows.Add("5", "13213213", "0", "1465452");
-
-            var workbook = excel.CreateWorkbook();
-
-            excel.CreateSheetAndHeader(workbook, new List<string>() { "id", "name", "sex", "age" });
-            excel.CreateSheetAndHeader(workbook, new List<string>() { "id", "name", "sex", "age" });
-            excel.Save(workbook, "exceltest/new.xlsx");
-
-            excel.ToExcelByTemplate(dt, "exceltest/new.xlsx", "exceltest/tmp2.xlsx", 1);
-            var dtsourceH = excel.GetDataTable("exceltest/tmp2.xlsx", 0, 1);
-            Assert.True(dtsourceH.Rows.Count == 6);
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                for (int j = 0; j < dt.Columns.Count; j++)
-                {
-                    Assert.True(dt.Rows[i][j].ToString() == dtsourceH.Rows[i + 1][j].ToString());
-                }
-            }
-            File.Delete("exceltest/tmp2.xlsx");
-            File.Delete("exceltest/new.xlsx");
-
-        }
-        #endregion
 
         #region 导入
 
         [Fact]
         public void TestImportFileNotFound()
         {
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
-            Assert.Throws<FileNotFoundException>(() => excel.GetDataTable("exceltest/FileNotFound.xlsx"));
-            Assert.Throws<FileNotFoundException>(() => excel.GetList<ExcelTest>("exceltest/FileNotFound.xlsx"));
+            var services = new ServiceCollection();
+            services.AddJfYuExcel();
+            var serviceProvider = services.BuildServiceProvider();
+            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
+
+            Assert.Throws<FileNotFoundException>(() => _jfYuExcel.GetDataTable("exceltest/FileNotFound.xlsx"));
+            Assert.Throws<FileNotFoundException>(() => _jfYuExcel.GetList<ExcelTest>("exceltest/FileNotFound.xlsx"));
         }
 
         [Fact]
         public void TestImportErrorFile()
         {
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
+            var services = new ServiceCollection();
+            services.AddJfYuExcel();
+            var serviceProvider = services.BuildServiceProvider();
+            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
+
             var sw = File.CreateText("exceltest/2.txt");
             sw.Close();
-            Assert.Throws<Exception>(() => excel.GetDataTable("exceltest/2.txt"));
-            Assert.Throws<Exception>(() => excel.GetList<ExcelTest>("exceltest/2.txt"));
+            Assert.Throws<Exception>(() => _jfYuExcel.GetDataTable("exceltest/2.txt"));
+            Assert.Throws<Exception>(() => _jfYuExcel.GetList<ExcelTest>("exceltest/2.txt"));
             File.Delete("exceltest/2.txt");
         }
 
         [Fact]
         public void TestImportSteamNull()
         {
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
-            Assert.Throws<ArgumentNullException>(() => excel.GetDataTable((Stream)null));
-            Assert.Throws<ArgumentNullException>(() => excel.GetList<ExcelTest>((Stream)null));
+            var services = new ServiceCollection();
+            services.AddJfYuExcel();
+            var serviceProvider = services.BuildServiceProvider();
+            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
+
+            Assert.Throws<ArgumentNullException>(() => _jfYuExcel.GetDataTable((Stream)null));
+            Assert.Throws<ArgumentNullException>(() => _jfYuExcel.GetList<ExcelTest>((Stream)null));
         }
         [Fact]
         public void TestImporErrorSteam()
         {
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
+            var services = new ServiceCollection();
+            services.AddJfYuExcel();
+            var serviceProvider = services.BuildServiceProvider();
+            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
+
             var sw = File.CreateText("exceltest/1.txt").BaseStream;
-            Assert.Throws<Exception>(() => excel.GetDataTable(sw));
-            Assert.Throws<Exception>(() => excel.GetList<ExcelTest>(sw));
+            Assert.Throws<Exception>(() => _jfYuExcel.GetDataTable(sw));
+            Assert.Throws<Exception>(() => _jfYuExcel.GetList<ExcelTest>(sw));
             File.Delete("exceltest/1.txt");
         }
 
         [Fact]
         public void TestImportDataTableFile()
         {
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
+            var services = new ServiceCollection();
+            services.AddJfYuExcel();
+            var serviceProvider = services.BuildServiceProvider();
+            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
+
             var dt = new DataTable();
             dt.Columns.Add("id");
             dt.Columns.Add("name");
@@ -605,16 +475,16 @@ namespace xUnitTestCore.Excel
             dt.Rows.Add("4", "dwadwadwad", "1", "12");
             dt.Rows.Add("5", "13213213", "0", "1465452");
 
-            excel.ToExcel(dt, "exceltest/ImportDataTableFile.xlsx");
+            _jfYuExcel.ToExcel(dt, "exceltest/ImportDataTableFile.xlsx");
 
-            var dtwoh = excel.GetDataTable("exceltest/ImportDataTableFile.xlsx");
-            var dth = excel.GetDataTable("exceltest/ImportDataTableFile.xlsx", 0);
-            Assert.True(dtwoh.Rows.Count == 5);
-            Assert.True(dth.Rows.Count == 6);
-            Assert.True(dth.Rows[0][0].ToString() == "id");
-            Assert.True(dth.Rows[0][1].ToString() == "name");
-            Assert.True(dth.Rows[0][2].ToString() == "sex");
-            Assert.True(dth.Rows[0][3].ToString() == "age");
+            var dtwoh = _jfYuExcel.GetDataTable("exceltest/ImportDataTableFile.xlsx");
+            var dth = _jfYuExcel.GetDataTable("exceltest/ImportDataTableFile.xlsx", 0);
+            Assert.Equal(5, dtwoh.Rows.Count);
+            Assert.Equal(6, dth.Rows.Count);
+            Assert.Equal("id", dth.Rows[0][0].ToString());
+            Assert.Equal("name", dth.Rows[0][1].ToString());
+            Assert.Equal("sex", dth.Rows[0][2].ToString());
+            Assert.Equal("age", dth.Rows[0][3].ToString());
             for (int i = 0; i < dt.Rows.Count; i++)
             {
                 for (int j = 0; j < dt.Columns.Count; j++)
@@ -630,19 +500,22 @@ namespace xUnitTestCore.Excel
         //model刚好对应
         public void TestImportList()
         {
+            var services = new ServiceCollection();
+            services.AddJfYuExcel();
+            var serviceProvider = services.BuildServiceProvider();
+            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
 
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
-            var source = new List<ExcelTestNoDisplayName>();
-            source.Add(new ExcelTestNoDisplayName() { name = "A", age = 18, Address = "地址1" });
-            source.Add(new ExcelTestNoDisplayName() { name = "B", age = 19, Address = "地址2" });
-            source.Add(new ExcelTestNoDisplayName() { name = "C", age = 20, Address = "地址3" });
+            var source = new List<ExcelTestNoDisplayName>
+            {
+                new() { Name = "A", Age = 18, Address = "地址1" },
+                new() { Name = "B", Age = 19, Address = "地址2" },
+                new() { Name = "C", Age = 20, Address = "地址3" }
+            };
 
-            excel.ToExcel(source, "exceltest/ImportList.xlsx");
-            var dtsource = excel.GetList<ExcelTestNoDisplayName>("exceltest/ImportList.xlsx");
+            _jfYuExcel.ToExcel(source, "exceltest/ImportList.xlsx");
+            var dtsource = _jfYuExcel.GetList<ExcelTestNoDisplayName>("exceltest/ImportList.xlsx");
 
-            Assert.True(dtsource.Count == 3);
+            Assert.Equal(3, dtsource.Count);
 
             var pops = typeof(ExcelTestNoDisplayName).GetProperties();
             for (int i = 0; i < source.Count; i++)
@@ -660,30 +533,34 @@ namespace xUnitTestCore.Excel
         //model多字段处理
         public void TestImportListMoreFiled()
         {
+            var services = new ServiceCollection();
+            services.AddJfYuExcel();
+            var serviceProvider = services.BuildServiceProvider();
+            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
 
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
-            var source = new List<ExcelTestNoDisplayName>();
-            source.Add(new ExcelTestNoDisplayName() { name = "A", age = 18, Address = "地址1" });
-            source.Add(new ExcelTestNoDisplayName() { name = "B", age = 19, Address = "地址2" });
-            source.Add(new ExcelTestNoDisplayName() { name = "C", age = 20, Address = "地址3" });
+            var source = new List<ExcelTestNoDisplayName>
+            {
+                new() { Name = "A", Age = 18, Address = "地址1" },
+                new() { Name = "B", Age = 19, Address = "地址2" },
+                new() { Name = "C", Age = 20, Address = "地址3" }
+            };
 
-            excel.ToExcel(source, "exceltest/ImportListMoreFiled.xlsx");
-            var dtsource = excel.GetList<ExcelTestMore>("exceltest/ImportListMoreFiled.xlsx");
+            _jfYuExcel.ToExcel(source, "exceltest/ImportListMoreFiled.xlsx");
+            var dtsource = _jfYuExcel.GetList<ExcelTestMore>("exceltest/ImportListMoreFiled.xlsx");
 
-            Assert.True(dtsource.Count == 3);
+            Assert.Equal(3, dtsource.Count);
 
 
             for (int i = 0; i < source.Count; i++)
             {
-                Assert.True(dtsource[i].name == source[i].name);
-                Assert.True(dtsource[i].age == source[i].age);
+                Assert.True(dtsource[i].Name == source[i].Name);
+                Assert.True(dtsource[i].Age == source[i].Age);
                 Assert.True(dtsource[i].Address == source[i].Address);
 
                 Assert.Null(dtsource[i].Phone);
                 Assert.Null(dtsource[i].Num);
             }
+
             File.Delete("exceltest/ImportListMoreFiled.xlsx");
         }
 
@@ -691,24 +568,28 @@ namespace xUnitTestCore.Excel
         //model少字段处理
         public void TestImportListLessFiled()
         {
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
-            var source = new List<ExcelTestNoDisplayName>();
-            source.Add(new ExcelTestNoDisplayName() { name = "A", age = 18, Address = "地址1" });
-            source.Add(new ExcelTestNoDisplayName() { name = "B", age = 19, Address = "地址2" });
-            source.Add(new ExcelTestNoDisplayName() { name = "C", age = 20, Address = "地址3" });
+            var services = new ServiceCollection();
+            services.AddJfYuExcel();
+            var serviceProvider = services.BuildServiceProvider();
+            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
 
-            excel.ToExcel(source, "exceltest/ImportListLessFiled.xlsx");
-            var dtsource = excel.GetList<ExcelTestLess>("exceltest/ImportListLessFiled.xlsx");
+            var source = new List<ExcelTestNoDisplayName>
+            {
+                new() { Name = "A", Age = 18, Address = "地址1" },
+                new() { Name = "B", Age = 19, Address = "地址2" },
+                new() { Name = "C", Age = 20, Address = "地址3" }
+            };
 
-            Assert.True(dtsource.Count == 3);
+            _jfYuExcel.ToExcel(source, "exceltest/ImportListLessFiled.xlsx");
+            var dtsource = _jfYuExcel.GetList<ExcelTestLess>("exceltest/ImportListLessFiled.xlsx");
+
+            Assert.Equal(3, dtsource.Count);
 
 
             for (int i = 0; i < source.Count; i++)
             {
-                Assert.True(dtsource[i].name == source[i].name);
-                Assert.True(dtsource[i].age == source[i].age);
+                Assert.True(dtsource[i].Name == source[i].Name);
+                Assert.True(dtsource[i].Age == source[i].Age);
             }
             File.Delete("exceltest/ImportListLessFiled.xlsx");
         }
@@ -718,9 +599,11 @@ namespace xUnitTestCore.Excel
         [Fact]
         public void TestImportDataTableStream()
         {
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
+            var services = new ServiceCollection();
+            services.AddJfYuExcel();
+            var serviceProvider = services.BuildServiceProvider();
+            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
+
             var dt = new DataTable();
             dt.Columns.Add("id");
             dt.Columns.Add("name");
@@ -732,16 +615,16 @@ namespace xUnitTestCore.Excel
             dt.Rows.Add("4", "dwadwadwad", "1", "12");
             dt.Rows.Add("5", "13213213", "0", "1465452");
 
-            excel.ToExcel(dt, "exceltest/ImDtStream.xlsx");
+            _jfYuExcel.ToExcel(dt, "exceltest/ImDtStream.xlsx");
 
-            var dtwoh = excel.GetDataTable(File.Open("exceltest/ImDtStream.xlsx", FileMode.Open));
-            var dth = excel.GetDataTable(File.Open("exceltest/ImDtStream.xlsx", FileMode.Open), 0);
-            Assert.True(dtwoh.Rows.Count == 5);
-            Assert.True(dth.Rows.Count == 6);
-            Assert.True(dth.Rows[0][0].ToString() == "id");
-            Assert.True(dth.Rows[0][1].ToString() == "name");
-            Assert.True(dth.Rows[0][2].ToString() == "sex");
-            Assert.True(dth.Rows[0][3].ToString() == "age");
+            var dtwoh = _jfYuExcel.GetDataTable(File.Open("exceltest/ImDtStream.xlsx", FileMode.Open));
+            var dth = _jfYuExcel.GetDataTable(File.Open("exceltest/ImDtStream.xlsx", FileMode.Open), 0);
+            Assert.Equal(5, dtwoh.Rows.Count);
+            Assert.Equal(6, dth.Rows.Count);
+            Assert.Equal("id", dth.Rows[0][0].ToString());
+            Assert.Equal("name", dth.Rows[0][1].ToString());
+            Assert.Equal("sex", dth.Rows[0][2].ToString());
+            Assert.Equal("age", dth.Rows[0][3].ToString());
             for (int i = 0; i < dt.Rows.Count; i++)
             {
                 for (int j = 0; j < dt.Columns.Count; j++)
@@ -758,18 +641,22 @@ namespace xUnitTestCore.Excel
         public void TestImportListSteam()
         {
 
-            var cb = new ContainerBuilder();
-            cb.AddJfYuExcel();
-            var excel = cb.Build().Resolve<JfYuExcel>();
-            var source = new List<ExcelTestNoDisplayName>();
-            source.Add(new ExcelTestNoDisplayName() { name = "A", age = 18, Address = "地址1" });
-            source.Add(new ExcelTestNoDisplayName() { name = "B", age = 19, Address = "地址2" });
-            source.Add(new ExcelTestNoDisplayName() { name = "C", age = 20, Address = "地址3" });
+            var services = new ServiceCollection();
+            services.AddJfYuExcel();
+            var serviceProvider = services.BuildServiceProvider();
+            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
 
-            excel.ToExcel(source, "exceltest/ImListStream.xlsx");
-            var dtsource = excel.GetList<ExcelTestNoDisplayName>(File.Open("exceltest/ImListStream.xlsx", FileMode.Open));
+            var source = new List<ExcelTestNoDisplayName>
+            {
+                new() { Name = "A", Age = 18, Address = "地址1" },
+                new() { Name = "B", Age = 19, Address = "地址2" },
+                new() { Name = "C", Age = 20, Address = "地址3" }
+            };
 
-            Assert.True(dtsource.Count == 3);
+            _jfYuExcel.ToExcel(source, "exceltest/ImListStream.xlsx");
+            var dtsource = _jfYuExcel.GetList<ExcelTestNoDisplayName>(File.Open("exceltest/ImListStream.xlsx", FileMode.Open));
+
+            Assert.Equal(3, dtsource.Count);
 
             var pops = typeof(ExcelTestNoDisplayName).GetProperties();
             for (int i = 0; i < source.Count; i++)
@@ -780,9 +667,7 @@ namespace xUnitTestCore.Excel
                 }
             }
             File.Delete("exceltest/ImListStream.xlsx");
-
         }
-
 
         #endregion
     }

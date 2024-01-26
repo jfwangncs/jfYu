@@ -10,7 +10,6 @@
 	  <Compile Remove="TestCaptchaCore.cs" />
 	  <Compile Remove="TestConfigCore.cs" />
 	  <Compile Remove="TestDataCore.cs" />
-	  <Compile Remove="TestExcleCore.cs" />
 	  <Compile Remove="TestjfYuRequestCore.cs" />
 	  <Compile Remove="TestMongoDBCore.cs" />
 	  <Compile Remove="TestRabbitMQ.cs" />
@@ -26,6 +25,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.1" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
 		<PackageReference Include="xunit" Version="2.6.3" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.5.5" />
@@ -34,6 +34,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Cache\jfYu.Core.Cache.csproj" />
+		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Office\jfYu.Core.Office.csproj" />
 	</ItemGroup>
 
 </Project>

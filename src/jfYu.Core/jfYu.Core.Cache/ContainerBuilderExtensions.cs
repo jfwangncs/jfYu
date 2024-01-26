@@ -18,7 +18,7 @@ namespace jfYu.Core.Cache
             else
                 services.AddStackExchangeRedisCache(options => { options.Configuration = redisConnstr; });
 
-            services.AddScoped<CacheService>();
+            services.AddScoped<ICacheService,CacheService>();
         }
     }
 }

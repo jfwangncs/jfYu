@@ -6,14 +6,10 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.Cache
 {
-    public class CacheService
+    public class CacheService(IDistributedCache cache) : ICacheService
     {
-        private static readonly List<string> _keys = new List<string>();
-        private IDistributedCache _cache;
-        public CacheService(IDistributedCache cache)
-        {
-            _cache = cache;
-        }
+        private readonly List<string> _keys = [];
+        private readonly IDistributedCache _cache = cache;
 
         #region add cache
         /// <summary>
@@ -31,8 +27,10 @@ namespace jfYu.Core.Cache
             if (expiration == null)
                 expiration = DateTime.Now.AddMinutes(1);
             var response = JsonConvert.SerializeObject(value);
-            DistributedCacheEntryOptions cacheEntryOptions = new DistributedCacheEntryOptions();
-            cacheEntryOptions.AbsoluteExpiration = expiration.Value;
+            DistributedCacheEntryOptions cacheEntryOptions = new()
+            {
+                AbsoluteExpiration = expiration.Value
+            };
             await _cache.SetStringAsync(key, response, cacheEntryOptions);
             _keys.Add(key);
         }
@@ -50,7 +48,7 @@ namespace jfYu.Core.Cache
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
             var response = JsonConvert.SerializeObject(value);
-            DistributedCacheEntryOptions cacheEntryOptions = new DistributedCacheEntryOptions();
+            DistributedCacheEntryOptions cacheEntryOptions = new();
             cacheEntryOptions.SetSlidingExpiration(TimeSpan.FromSeconds(seconds));
             await _cache.SetStringAsync(key, response, cacheEntryOptions);
             _keys.Add(key);

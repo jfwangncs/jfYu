@@ -16,7 +16,7 @@ namespace xUnitTestCore.Cache
             var services = new ServiceCollection();
             services.AddCacheService();
             var serviceProvider = services.BuildServiceProvider();
-            var _cacheService = serviceProvider.GetService<CacheService>();
+            var _cacheService = serviceProvider.GetService<ICacheService>();
 
 
             await Assert.ThrowsAsync<ArgumentNullException>(async () => await _cacheService.AddAsync(null, "x"));
@@ -56,7 +56,7 @@ namespace xUnitTestCore.Cache
             var services = new ServiceCollection();
             services.AddCacheService();
             var serviceProvider = services.BuildServiceProvider();
-            var _cacheService = serviceProvider.GetService<CacheService>();
+            var _cacheService = serviceProvider.GetService<ICacheService>();
 
             await Assert.ThrowsAsync<ArgumentNullException>(async () => await _cacheService.RemoveAsync(null));
             await _cacheService.AddAsync("tk1", "tv1");
@@ -84,7 +84,7 @@ namespace xUnitTestCore.Cache
             var services = new ServiceCollection();
             services.AddCacheService();
             var serviceProvider = services.BuildServiceProvider();
-            var _cacheService = serviceProvider.GetService<CacheService>();
+            var _cacheService = serviceProvider.GetService<ICacheService>();
 
             await Assert.ThrowsAsync<ArgumentNullException>(async () => await _cacheService.GetAsync<TestModel>(null));
             await Assert.ThrowsAsync<ArgumentNullException>(async () => await _cacheService.GetAsync(null));
@@ -98,7 +98,7 @@ namespace xUnitTestCore.Cache
             await _cacheService.AddAsync("tk3", 1234);
             await _cacheService.AddAsync("tk4", 12345.7M);
             var t = new TestModel() { Id = 1, Name = "t1" };
-            var tl = new List<TestModel> { new TestModel() { Id = 2, Name = "t2" }, new TestModel() { Id = 3, Name = "t3" } };
+            var tl = new List<TestModel> { new() { Id = 2, Name = "t2" }, new() { Id = 3, Name = "t3" } };
             await _cacheService.AddAsync("tk5", t);
             await _cacheService.AddAsync("tk6", tl);
 
