@@ -17,16 +17,13 @@ namespace jfYu.Core.Office.Excel
         #region Excel          
 
         /// <summary>
-        /// 创建sheet和表头
+        /// create sheet With titles
         /// </summary>
-        /// <param name="workbook">工作簿</param>
-        /// <param name="cols">列</param>
-        /// <param name="titles">表头</param>
+        /// <param name="workbook">workbook</param> 
+        /// <param name="titles">titles</param>
         public static SXSSFSheet CreateSheetWithTitles(this IWorkbook workbook, Dictionary<string, string> titles)
         {
-            //创建sheet
             var sheet = workbook.CreateSheet();
-            //表头格式
             IRow headerRow = sheet.CreateRow(0);
             ICellStyle headStyle = workbook.CreateCellStyle();
             headStyle.Alignment = HorizontalAlignment.Center;
@@ -34,7 +31,6 @@ namespace jfYu.Core.Office.Excel
             font.FontHeightInPoints = 10;
             font.IsBold = true;
             headStyle.SetFont(font);
-            //设置表头 
             var i = 0;
             foreach (var item in titles)
             {
@@ -45,15 +41,13 @@ namespace jfYu.Core.Office.Excel
                 headerRow.GetCell(i).CellStyle = headStyle;
                 i++;
             }
-            return sheet as SXSSFSheet;
+            return (SXSSFSheet)sheet;
         }
 
         /// <summary>
-        /// 创建sheet和表头
+        /// create sheet
         /// </summary>
-        /// <param name="workbook">工作簿</param>
-        /// <param name="cols">列</param>
-        /// <param name="titles">表头</param>
+        /// <param name="workbook">workbook</param> 
         public static SXSSFSheet CreateSheetWithTitles<T>(this IWorkbook workbook)
         {
             var titles = GetTitles<T>();
@@ -61,10 +55,10 @@ namespace jfYu.Core.Office.Excel
         }
 
         /// <summary>
-        /// 保存excel
+        /// save
         /// </summary>
-        /// <param name="workbook">工作簿</param>
-        /// <param name="filePath">保存地址</param>
+        /// <param name="workbook">workbook</param>
+        /// <param name="filePath">file path</param>
         public static void Save(this IWorkbook workbook, string filePath)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -91,9 +85,9 @@ namespace jfYu.Core.Office.Excel
         #region 工具方法
 
         /// <summary>
-        /// 获取标题
+        /// get titles
         /// </summary>
-        /// <typeparam name="T">类</typeparam>
+        /// <typeparam name="T">model</typeparam>
         /// <returns></returns>
         public static Dictionary<string, string> GetTitles<T>()
         {
@@ -101,7 +95,7 @@ namespace jfYu.Core.Office.Excel
             var pops = typeof(T).GetProperties();
             for (int i = 0; i < pops.Length; i++)
             {
-                //获取displayname如无则字段名称
+                //get displayname if no get property's name
                 var colName = pops[i].GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? pops[i].Name;
                 titles.Add(pops[i].Name, colName);
             }
@@ -109,10 +103,10 @@ namespace jfYu.Core.Office.Excel
         }
 
         /// <summary>
-        /// 获取sheet数
+        /// get count of sheet
         /// </summary>
-        /// <param name="filePath">excel文件</param>
-        /// <returns>sheetnumber</returns>
+        /// <param name="filePath">excel file path</param>
+        /// <returns></returns>
         public static int GetSheetNumber(string filePath)
         {
 
@@ -123,9 +117,9 @@ namespace jfYu.Core.Office.Excel
                 if (!File.Exists(filePath))
                     return number;
                 using FileStream fs = File.OpenRead(filePath);
-                if (filePath.IndexOf(".xlsx") > 0) // 2007版本
+                if (filePath.IndexOf(".xlsx") > 0) // 2007 
                     return new XSSFWorkbook(fs).NumberOfSheets;
-                else if (filePath.IndexOf(".xls") > 0) // 2003版本
+                else if (filePath.IndexOf(".xls") > 0) // 2003
                     return new HSSFWorkbook(fs).NumberOfSheets;
             }
             catch (Exception)
@@ -136,10 +130,10 @@ namespace jfYu.Core.Office.Excel
         }
 
         /// <summary>
-        /// 获取sheet名称
+        /// get sheet name
         /// </summary>
-        /// <param name="outputFile">excel文件</param>
-        /// <returns>sheet集合</returns>
+        /// <param name="filePath">excel file path</param>
+        /// <returns></returns>
         public static List<string> GetSheetName(string filePath)
         {
 
@@ -150,10 +144,10 @@ namespace jfYu.Core.Office.Excel
                 if (!File.Exists(filePath))
                     return arrayList;
                 using FileStream fs = File.OpenRead(filePath);
-                IWorkbook workbook = null;
-                if (filePath.IndexOf(".xlsx") > 0) // 2007版本
+                IWorkbook? workbook = null;
+                if (filePath.IndexOf(".xlsx") > 0) // 2007
                     workbook = new XSSFWorkbook(fs);
-                else if (filePath.IndexOf(".xls") > 0) // 2003版本
+                else if (filePath.IndexOf(".xls") > 0) // 2003
                     workbook = new HSSFWorkbook(fs);
                 if (workbook != null)
                 {
@@ -169,17 +163,17 @@ namespace jfYu.Core.Office.Excel
         }
 
         /// <summary>
-        /// 验证Excel是否有数据
+        /// verify sheet have data or not
         /// </summary>
-        /// <param name="excelFileStream"></param>
+        /// <param name="filePath">excel file path</param>
         /// <returns></returns>
         public static bool HasData(string filePath)
         {
             using FileStream fs = File.OpenRead(filePath);
-            IWorkbook workbook = null;
-            if (filePath.IndexOf(".xlsx") > 0) // 2007版本
+            IWorkbook? workbook = null;
+            if (filePath.IndexOf(".xlsx") > 0) // 2007
                 workbook = new XSSFWorkbook(fs);
-            else if (filePath.IndexOf(".xls") > 0) // 2003版本
+            else if (filePath.IndexOf(".xls") > 0) // 2003
                 workbook = new HSSFWorkbook(fs);
             if (workbook != null)
             {
@@ -193,59 +187,73 @@ namespace jfYu.Core.Office.Excel
         }
 
         /// <summary>
-        /// 转化Model
+        /// to model
         /// </summary>
         /// <typeparam name="T">model</typeparam>
-        /// <param name="dt">数据源</param>
+        /// <param name="dt">datatable</param>
         /// <returns></returns>
         public static List<T> ToModel<T>(DataTable dt) where T : new()
         {
             List<T> list = [];
             foreach (DataRow r in dt.Rows)
             {
-                list.Add(ToModel<T>(r));
+                var data = ToModel<T>(r);
+                if (data != null)
+                    list.Add(data);
             }
             return list;
 
         }
 
         /// <summary>
-        /// 转化Model
+        /// to model
         /// </summary>
         /// <typeparam name="T">model</typeparam>
-        /// <param name="row">数据行</param>
+        /// <param name="row">data row</param>
         /// <returns></returns>
-        public static T ToModel<T>(DataRow row) where T : new()
+        public static T? ToModel<T>(DataRow row) where T : new()
         {
-            T item = (T)Activator.CreateInstance(typeof(T));
+            var obj = Activator.CreateInstance(typeof(T));
+            if (obj == null)
+                return default;
+            T item = (T)obj;
             // go through each column
             foreach (DataColumn c in row.Table.Columns)
             {
                 // find the property for the column
-                PropertyInfo p = typeof(T).GetProperty(c.ColumnName);
+                PropertyInfo? p = typeof(T)?.GetProperty(c.ColumnName);
                 try
                 { // if exists, set the value
-                    if (p != null && row[c] != DBNull.Value)
+                    if (p != null && row != null && c != null && row[c] != DBNull.Value && row[c] != null)
                     {
-                        if (p.PropertyType == typeof(int))
+
+                        string value = row[c].ToString() ?? "";
+                        if (value != null)
                         {
-                            p.SetValue(item, int.Parse(row[c].ToString()), null);
-                        }
-                        else if (p.PropertyType == typeof(long))
-                        {
-                            p.SetValue(item, long.Parse(row[c].ToString()), null);
-                        }
-                        else if (p.PropertyType == typeof(double))
-                        {
-                            p.SetValue(item, double.Parse(row[c].ToString()), null);
-                        }
-                        else if (p.PropertyType == typeof(decimal))
-                        {
-                            p.SetValue(item, decimal.Parse(row[c].ToString()), null);
-                        }
-                        else if (p.PropertyType == typeof(float))
-                        {
-                            p.SetValue(item, float.Parse(row[c].ToString()), null);
+                            if (p.PropertyType == typeof(int))
+                            {
+                                p.SetValue(item, int.Parse(value), null);
+                            }
+                            else if (p.PropertyType == typeof(long))
+                            {
+                                p.SetValue(item, long.Parse(value), null);
+                            }
+                            else if (p.PropertyType == typeof(double))
+                            {
+                                p.SetValue(item, double.Parse(value), null);
+                            }
+                            else if (p.PropertyType == typeof(decimal))
+                            {
+                                p.SetValue(item, decimal.Parse(value), null);
+                            }
+                            else if (p.PropertyType == typeof(float))
+                            {
+                                p.SetValue(item, float.Parse(value), null);
+                            }
+                            else
+                            {
+                                p.SetValue(item, row[c], null);
+                            }
                         }
                         else
                         {
@@ -253,16 +261,16 @@ namespace jfYu.Core.Office.Excel
                         }
                     }
                 }
-                catch (ArgumentException)
+                catch (ArgumentException ex)
                 {
-
-                    throw new Exception($"{p.Name}格式和数据库不一致,数据库格式{c.DataType.Name}，Model格式{p.PropertyType.Name}");
+                    throw new Exception($"convert {p?.Name} get error,db format:{c.DataType.Name}，model format:{p?.PropertyType.Name},errorMsg:{ex.Message}");
                 }
                 catch (Exception)
                 {
                     throw;
                 }
             }
+
             return item;
 
         }

@@ -16,50 +16,51 @@ namespace xUnitTestCore.Excel
     #region Model
     public class ExcelTest
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public int Age { get; set; }
 
         [DisplayName("地址")]
-        public string Address { get; set; }
+        public string? Address { get; set; }
     }
 
     public class ExcelTestNoDisplayName
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public int Age { get; set; }
 
-        public string Address { get; set; }
+        public string? Address { get; set; }
     }
 
 
     public class ExcelTestMore
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public int Age { get; set; }
-        public string Address { get; set; }
+        public string? Address { get; set; }
 
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
 
         public int? Num { get; set; }
     }
 
     public class ExcelTestLess
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public int Age { get; set; }
     }
     #endregion
 
-    public class TestExcleCore
+    public class ExcelTests(IJfYuExcel jfYuExcel)
     {
+        private readonly IJfYuExcel _jfYuExcel = jfYuExcel;
 
         #region 基础测试
         [Fact]
-        public void TestExcle()
+        public void IOCTest()
         {
             var services = new ServiceCollection();
             services.AddJfYuExcel();
@@ -70,13 +71,8 @@ namespace xUnitTestCore.Excel
 
         [Fact]
 
-        public void TestCreateExcel()
+        public void CreateTest()
         {
-            var services = new ServiceCollection();
-            services.AddJfYuExcel();
-            var serviceProvider = services.BuildServiceProvider();
-            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
-
             var workbook = _jfYuExcel.CreateWorkbook();
             workbook.CreateSheetWithTitles<ExcelTestNoDisplayName>();
             workbook.CreateSheetWithTitles<ExcelTest>();
@@ -102,13 +98,8 @@ namespace xUnitTestCore.Excel
         #region 基本导出
 
         [Fact]
-        public void TestCSVExport()
+        public void CSVExportTest()
         {
-            var services = new ServiceCollection();
-            services.AddJfYuExcel();
-            var serviceProvider = services.BuildServiceProvider();
-            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
-
             var source = new List<ExcelTest>
             {
                 new() { Name = "A", Age = 18, Address = "地址1" },
@@ -117,16 +108,12 @@ namespace xUnitTestCore.Excel
             };
 
             _jfYuExcel.ToCSV(source, "csv.csv");
-            Assert.True(File.Exists("csv.csv"));           
+            Assert.True(File.Exists("csv.csv"));
             File.Delete("csv.csv");
         }
         [Fact]
-        public void TestModelExport()
+        public void ModelExportTest()
         {
-            var services = new ServiceCollection();
-            services.AddJfYuExcel();
-            var serviceProvider = services.BuildServiceProvider();
-            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
 
             var source = new List<ExcelTest>
             {
@@ -157,7 +144,7 @@ namespace xUnitTestCore.Excel
             {
                 for (int j = 0; j < pops.Length; j++)
                 {
-                    Assert.True(dtsource.Rows[i][j].ToString() == pops[j].GetValue(source[i]).ToString());
+                    Assert.True(dtsource.Rows[i][j].ToString() == pops[j].GetValue(source[i])?.ToString());
                 }
             }
 
@@ -170,7 +157,7 @@ namespace xUnitTestCore.Excel
 
             for (int i = 0; i < source.Count; i++)
             {
-                Assert.True(dtsource1.Rows[i][0].ToString() == pops.FirstOrDefault(q => q.Name == "Age").GetValue(source[i]).ToString());
+                Assert.True(dtsource1.Rows[i][0].ToString() == pops.FirstOrDefault(q => q.Name == "Age")?.GetValue(source[i])?.ToString());
             }
             File.Delete("exceltest/source.xlsx");
             File.Delete("exceltest/source1.xlsx");
@@ -178,12 +165,8 @@ namespace xUnitTestCore.Excel
         }
 
         [Fact]
-        public void TestQueryableExport()
+        public void QueryableExportTest()
         {
-            var services = new ServiceCollection();
-            services.AddJfYuExcel();
-            var serviceProvider = services.BuildServiceProvider();
-            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
             var source = new List<ExcelTest>
             {
                 new() { Name = "A", Age = 18, Address = "地址1" },
@@ -214,7 +197,7 @@ namespace xUnitTestCore.Excel
             {
                 for (int j = 0; j < pops.Length; j++)
                 {
-                    Assert.True(dtsource.Rows[i][j].ToString() == pops[j].GetValue(source[i]).ToString());
+                    Assert.True(dtsource.Rows[i][j].ToString() == pops[j].GetValue(source[i])?.ToString());
                 }
             }
 
@@ -226,7 +209,7 @@ namespace xUnitTestCore.Excel
             Assert.Equal("年龄", dtsource1H.Rows[0][0].ToString());
             for (int i = 0; i < source.Count; i++)
             {
-                Assert.True(dtsource1.Rows[i][0].ToString() == pops.FirstOrDefault(q => q.Name == "Age").GetValue(source[i]).ToString());
+                Assert.True(dtsource1.Rows[i][0].ToString() == pops.FirstOrDefault(q => q.Name == "Age")?.GetValue(source[i])?.ToString());
             }
 
             File.Delete("exceltest/queryable.xlsx");
@@ -235,13 +218,8 @@ namespace xUnitTestCore.Excel
         }
 
         [Fact]
-        public void TestDtExport()
+        public void DtExportTest()
         {
-            var services = new ServiceCollection();
-            services.AddJfYuExcel();
-            var serviceProvider = services.BuildServiceProvider();
-            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
-
             var dt = new DataTable();
             dt.Columns.Add("id");
             dt.Columns.Add("name");
@@ -307,7 +285,7 @@ namespace xUnitTestCore.Excel
 
 
         [Fact]
-        public void TestDbDataReaderExport()
+        public void DbDataReaderExportTest()
         {
             if (File.Exists("exceltest/tmp.db"))
                 File.Delete("exceltest/tmp.db");
@@ -340,12 +318,6 @@ namespace xUnitTestCore.Excel
             sql = "SELECT * FROM test";
             cmd.CommandText = sql;
             var reader = cmd.ExecuteReader();
-
-
-            var services = new ServiceCollection();
-            services.AddJfYuExcel();
-            var serviceProvider = services.BuildServiceProvider();
-            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
 
             _jfYuExcel.ToExcel(reader, "exceltest/dtreader.xlsx", ExcelExtension.GetTitles<ExcelTest>());
             conn.Dispose();
@@ -380,7 +352,7 @@ namespace xUnitTestCore.Excel
             {
                 for (int j = 0; j < pops.Length; j++)
                 {
-                    Assert.True(dtsource.Rows[i][j].ToString() == pops[j].GetValue(source[i]).ToString());
+                    Assert.True(dtsource.Rows[i][j].ToString() == pops[j].GetValue(source[i])?.ToString());
                 }
             }
 
@@ -392,7 +364,7 @@ namespace xUnitTestCore.Excel
             Assert.Equal("年龄", dtsource1H.Rows[0][0].ToString());
             for (int i = 0; i < source.Count; i++)
             {
-                Assert.True(dtsource1.Rows[i][0].ToString() == pops.FirstOrDefault(q => q.Name == "Age").GetValue(source[i]).ToString());
+                Assert.True(dtsource1.Rows[i][0].ToString() == pops.FirstOrDefault(q => q.Name == "Age")?.GetValue(source[i])?.ToString());
             }
             File.Delete("exceltest/dtreader.xlsx");
             File.Delete("exceltest/dtreader1.xlsx");
@@ -405,25 +377,16 @@ namespace xUnitTestCore.Excel
         #region 导入
 
         [Fact]
-        public void TestImportFileNotFound()
+        public void ImportFileNotFoundTest()
         {
-            var services = new ServiceCollection();
-            services.AddJfYuExcel();
-            var serviceProvider = services.BuildServiceProvider();
-            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
 
             Assert.Throws<FileNotFoundException>(() => _jfYuExcel.GetDataTable("exceltest/FileNotFound.xlsx"));
             Assert.Throws<FileNotFoundException>(() => _jfYuExcel.GetList<ExcelTest>("exceltest/FileNotFound.xlsx"));
         }
 
         [Fact]
-        public void TestImportErrorFile()
+        public void ImportErrorFileTest()
         {
-            var services = new ServiceCollection();
-            services.AddJfYuExcel();
-            var serviceProvider = services.BuildServiceProvider();
-            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
-
             var sw = File.CreateText("exceltest/2.txt");
             sw.Close();
             Assert.Throws<Exception>(() => _jfYuExcel.GetDataTable("exceltest/2.txt"));
@@ -431,25 +394,17 @@ namespace xUnitTestCore.Excel
             File.Delete("exceltest/2.txt");
         }
 
-        [Fact]
-        public void TestImportSteamNull()
-        {
-            var services = new ServiceCollection();
-            services.AddJfYuExcel();
-            var serviceProvider = services.BuildServiceProvider();
-            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
+        [Theory]
+        [InlineData(null)]
 
-            Assert.Throws<ArgumentNullException>(() => _jfYuExcel.GetDataTable((Stream)null));
-            Assert.Throws<ArgumentNullException>(() => _jfYuExcel.GetList<ExcelTest>((Stream)null));
+        public void ImportSteamNullTest(Stream steam)
+        {
+            Assert.Throws<ArgumentNullException>(() => _jfYuExcel.GetDataTable(steam));
+            Assert.Throws<ArgumentNullException>(() => _jfYuExcel.GetList<ExcelTest>(steam));
         }
         [Fact]
-        public void TestImporErrorSteam()
+        public void ImporErrorSteamTest()
         {
-            var services = new ServiceCollection();
-            services.AddJfYuExcel();
-            var serviceProvider = services.BuildServiceProvider();
-            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
-
             var sw = File.CreateText("exceltest/1.txt").BaseStream;
             Assert.Throws<Exception>(() => _jfYuExcel.GetDataTable(sw));
             Assert.Throws<Exception>(() => _jfYuExcel.GetList<ExcelTest>(sw));
@@ -457,13 +412,8 @@ namespace xUnitTestCore.Excel
         }
 
         [Fact]
-        public void TestImportDataTableFile()
+        public void ImportDataTableFileTest()
         {
-            var services = new ServiceCollection();
-            services.AddJfYuExcel();
-            var serviceProvider = services.BuildServiceProvider();
-            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
-
             var dt = new DataTable();
             dt.Columns.Add("id");
             dt.Columns.Add("name");
@@ -498,13 +448,8 @@ namespace xUnitTestCore.Excel
 
         [Fact]
         //model刚好对应
-        public void TestImportList()
+        public void ImportListTest()
         {
-            var services = new ServiceCollection();
-            services.AddJfYuExcel();
-            var serviceProvider = services.BuildServiceProvider();
-            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
-
             var source = new List<ExcelTestNoDisplayName>
             {
                 new() { Name = "A", Age = 18, Address = "地址1" },
@@ -522,7 +467,7 @@ namespace xUnitTestCore.Excel
             {
                 for (int j = 0; j < pops.Length; j++)
                 {
-                    Assert.True(pops[j].GetValue(dtsource[i]).ToString() == pops[j].GetValue(source[i]).ToString());
+                    Assert.True(pops[j].GetValue(dtsource[i])?.ToString() == pops[j].GetValue(source[i])?.ToString());
                 }
             }
             File.Delete("exceltest/ImportList.xlsx");
@@ -531,13 +476,8 @@ namespace xUnitTestCore.Excel
 
         [Fact]
         //model多字段处理
-        public void TestImportListMoreFiled()
+        public void ImportListMoreFiledTest()
         {
-            var services = new ServiceCollection();
-            services.AddJfYuExcel();
-            var serviceProvider = services.BuildServiceProvider();
-            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
-
             var source = new List<ExcelTestNoDisplayName>
             {
                 new() { Name = "A", Age = 18, Address = "地址1" },
@@ -566,12 +506,8 @@ namespace xUnitTestCore.Excel
 
         [Fact]
         //model少字段处理
-        public void TestImportListLessFiled()
+        public void ImportListLessFiledTest()
         {
-            var services = new ServiceCollection();
-            services.AddJfYuExcel();
-            var serviceProvider = services.BuildServiceProvider();
-            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
 
             var source = new List<ExcelTestNoDisplayName>
             {
@@ -597,13 +533,8 @@ namespace xUnitTestCore.Excel
 
 
         [Fact]
-        public void TestImportDataTableStream()
+        public void ImportDataTableStreamTest()
         {
-            var services = new ServiceCollection();
-            services.AddJfYuExcel();
-            var serviceProvider = services.BuildServiceProvider();
-            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
-
             var dt = new DataTable();
             dt.Columns.Add("id");
             dt.Columns.Add("name");
@@ -638,13 +569,8 @@ namespace xUnitTestCore.Excel
 
         [Fact]
         //model刚好对应
-        public void TestImportListSteam()
+        public void ImportListSteamTest()
         {
-
-            var services = new ServiceCollection();
-            services.AddJfYuExcel();
-            var serviceProvider = services.BuildServiceProvider();
-            var _jfYuExcel = serviceProvider.GetService<IJfYuExcel>();
 
             var source = new List<ExcelTestNoDisplayName>
             {
@@ -663,7 +589,7 @@ namespace xUnitTestCore.Excel
             {
                 for (int j = 0; j < pops.Length; j++)
                 {
-                    Assert.True(pops[j].GetValue(dtsource[i]).ToString() == pops[j].GetValue(source[i]).ToString());
+                    Assert.True(pops[j].GetValue(dtsource[i])?.ToString() == pops[j].GetValue(source[i])?.ToString());
                 }
             }
             File.Delete("exceltest/ImListStream.xlsx");

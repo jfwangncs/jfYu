@@ -10,16 +10,8 @@ namespace jfYu.Core.Cache
         /// </summary>
         /// <param name="key">Key</param>
         /// <param name="value">Value</param>
-        /// <param name="seconds">expire seconds,default:60s</param> 
-        Task AddAsync<T>(string key, T value, int seconds = 60);
-
-        /// <summary>
-        /// add
-        /// </summary>
-        /// <param name="key">Key</param>
-        /// <param name="value">Value</param>
-        /// <param name="expiration">expiretime,default:now add 1 min.</param>  
-        Task AddAsync<T>(string key, T value, DateTime? expiration);
+        /// <param name="expiry">expire,default:1 min.</param>  
+        Task AddAsync<T>(string key, T value, TimeSpan? expiry = null);
 
         /// <summary>
         /// get
@@ -27,26 +19,21 @@ namespace jfYu.Core.Cache
         /// <typeparam name="T">type</typeparam>
         /// <param name="key">key</param>
         /// <returns>value</returns> 
-        Task<string> GetAsync(string key);
+        Task<string?> GetAsync(string key);
 
         /// <summary>
         /// get
         /// </summary>
         /// <param name="key">Key</param>
         /// <returns>string value</returns>
-        Task<T> GetAsync<T>(string key) where T : class;
+        Task<T?> GetAsync<T>(string key) where T : class;
 
         /// <summary>
         /// get
         /// </summary>
         /// <param name="key">key</param>
         /// <returns>int value</returns> 
-        Task<int> GetIntAsync(string key);
-
-        /// <summary>
-        /// remove all 
-        /// </summary> 
-        Task RemoveAllAsync();
+        Task<int?> GetIntAsync(string key);
 
         /// <summary>
         /// remove

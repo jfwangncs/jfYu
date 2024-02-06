@@ -4,38 +4,45 @@ namespace jfYu.Core.Redis
 {
     public class RedisConfiguration
     {
-
-        public List<RedisEndPoint> EndPoints { get; set; }
         /// <summary>
-        /// 密码
+        /// endpoints
+        /// </summary>
+        public List<RedisEndPoint> EndPoints { get; set; } = [];
+
+        /// <summary>
+        /// password
         /// </summary>
 
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
         /// <summary>
-        /// 数据库index
+        /// database index default:0
         /// </summary>
 
         public int DbIndex { get; set; } = 0;
 
         /// <summary>
-        /// 超时时间（毫秒）
+        /// timeout default:5000 Milliseconds
         /// </summary>
 
         public int Timeout { get; set; } = 5000;
 
 
+        /// <summary>
+        /// ssl
+        /// </summary>
+        public bool Ssl { get; set; } = false;
     }
 
     public class RedisEndPoint
     {
         /// <summary>
-        /// 主机
+        /// host url
         /// </summary>
-        public string Host { get; set; }
+        public string Host { get; set; } = "";
 
         /// <summary>
-        /// 端口
+        /// port
         /// </summary>
         public int Port { get; set; }
     }

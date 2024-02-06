@@ -63,7 +63,7 @@ namespace jfYu.Core.Office.Excel
         /// <param name="filePath">file path</param>
         /// <param name="titles">title</param>
         /// <param name="callback">export progress callback</param>
-        void ToCSV<T>(List<T> source, string filePath, Dictionary<string, string> titles = null, Action<int> callback = null);
+        void ToCSV<T>(List<T> source, string filePath, Dictionary<string, string>? titles = null, Action<int>? callback = null);
 
         /// <summary>
         /// export      
@@ -72,7 +72,7 @@ namespace jfYu.Core.Office.Excel
         /// <param name="filePath">file path</param>
         /// <param name="titles">titles</param>
         /// <param name="callback">export progress callback</param>
-        void ToExcel(DataTable source, string filePath, Dictionary<string, string> titles = null, Action<int> callback = null);
+        void ToExcel(DataTable source, string filePath, Dictionary<string, string>? titles = null, Action<int>? callback = null);
 
         /// <summary>
         /// export
@@ -81,7 +81,7 @@ namespace jfYu.Core.Office.Excel
         /// <param name="filePath">file path</param>
         /// <param name="titles">title</param>
         /// <param name="callback">export progress callback</param>
-        void ToExcel(DbDataReader sqlDataReader, string filePath, Dictionary<string, string> titles = null, Action<int> callback = null);
+        void ToExcel(DbDataReader sqlDataReader, string filePath, Dictionary<string, string>? titles = null, Action<int>? callback = null);
 
         /// <summary>
         /// export    
@@ -91,7 +91,7 @@ namespace jfYu.Core.Office.Excel
         /// <param name="filePath">file path</param>
         /// <param name="titles">titles</param>
         /// <param name="callback">export progress callback</param>
-        void ToExcel<T>(IQueryable<T> source, string filePath, Dictionary<string, string> titles = null, Action<int> callback = null) where T : new();
+        void ToExcel<T>(IQueryable<T> source, string filePath, Dictionary<string, string>? titles = null, Action<int>? callback = null) where T : new();
 
         /// <summary>
         /// export    
@@ -101,6 +101,6 @@ namespace jfYu.Core.Office.Excel
         /// <param name="filePath">file path</param>
         /// <param name="titles">titles</param>
         /// <param name="callback">export progress callback</param>
-        void ToExcel<T>(List<T> source, string filePath, Dictionary<string, string> titles = null, Action<int> callback = null) where T : new();
+        void ToExcel<T>(List<T> source, string filePath, Dictionary<string, string>? titles = null, Action<int>? callback = null) where T : new();
     }
 }

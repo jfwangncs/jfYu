@@ -15,6 +15,8 @@ Install-Package jfYu.Core.Excel
 
 使用
 
+Excel:
+
 ```
 
 //IOC注入
@@ -65,4 +67,37 @@ workbook.Save(workbook, "exceltest/new.xlsx");
 var dtsourceH = excel.ToDataTable("exceltest/tmp2.xlsx", 0, 1);
 var list = excel.GetList<ExcelTest>("exceltest/ImportList.xlsx");
 
+```
+
+Word:
+
+```
+builder.Services.AddJfYuWord();
+
+var x = new System.Collections.Generic.Dictionary<string, object>
+{
+    { "x", "测试哦" }
+};
+
+var doc = _jfYuWord.GenerateWord();
+var paragraph = doc.CreateParagraph();
+paragraph.Alignment = ParagraphAlignment.CENTER; //字体居中
+var run = paragraph.CreateRun();
+run.IsBold = true;
+run.SetText("${x}测试测试${y}");
+run.FontSize = 28;
+run.SetFontFamily("黑体", FontCharRange.None); //设置黑体
+paragraph.SpacingBeforeLines = 20;//上方距离
+paragraph.SpacingAfterLines = 20;//下方距离
+Directory.CreateDirectory("doctest");
+FileStream fs = new("doctest/1.docx", FileMode.Create);
+doc.Write(fs);
+fs.Close();
+x.Add("y", "xxx天秤");
+_jfYuWord.GenerateWordByTemplate("doctest/1.docx", x, "doctest/2.docx");
+Assert.True(File.Exists("doctest/2.docx"));
+var fst = File.Open("doctest/2.docx", FileMode.Open);
+Assert.True(fst.Length > 0);
+fst.Close();
+Directory.Delete("doctest", true);
 ```

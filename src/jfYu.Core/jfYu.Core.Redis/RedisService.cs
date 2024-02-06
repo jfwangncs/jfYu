@@ -1,183 +1,112 @@
-﻿using jfYu.Core.Configuration;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace jfYu.Core.Redis
 {
-    public class RedisService
+    public class RedisService : IRedisService
     {
-        /// <summary>
-        /// redis连接配置
-        /// </summary>
-        public RedisConfiguration RedisConfiguration { get; }
+
+
+        private IConnectionMultiplexer _client;
+
+
+        private IDatabase _database;
 
         /// <summary>
-        /// redis具体操作库
+        /// ConnectionMultiplexer
         /// </summary>
-        public IDatabase Database { get; }
+        public IConnectionMultiplexer Client { get { return _client; } set { _client = value; _database = value.GetDatabase(); } }
 
         /// <summary>
-        /// 客户端
+        /// database
         /// </summary>
-        public ConnectionMultiplexer Client { get; set; }
+        public IDatabase Database { get { return _database; } }
 
-        public RedisService()
+        public RedisService(RedisConfiguration redisConfiguration)
         {
             try
             {
-                RedisConfiguration = AppConfig.Configuration.GetSection("Redis").Get<RedisConfiguration>();
                 var configurationOptions = new ConfigurationOptions()
                 {
-                    Password = RedisConfiguration.Password,
-                    ConnectTimeout = RedisConfiguration.Timeout,
+                    Password = redisConfiguration.Password,
+                    ConnectTimeout = redisConfiguration.Timeout,
                     KeepAlive = 60,
-                    AbortOnConnectFail = false
+                    AbortOnConnectFail = false,
+                    Ssl = redisConfiguration.Ssl,
                 };
-                foreach (var endPoint in RedisConfiguration.EndPoints)
+                foreach (var endPoint in redisConfiguration.EndPoints)
                 {
                     configurationOptions.EndPoints.Add(endPoint.Host, endPoint.Port);
                 }
-                Client = ConnectionMultiplexer.Connect(configurationOptions);
-                Database = Client.GetDatabase(RedisConfiguration.DbIndex);
+                _client = ConnectionMultiplexer.Connect(configurationOptions);
+                _database = Client.GetDatabase(redisConfiguration.DbIndex);
             }
             catch (Exception ex)
             {
-                throw new Exception($"错误的redis配置:{ex.Message}-{ex.StackTrace}");
+                throw new Exception($"error redis config:{ex.Message}-{ex.InnerException?.Message}");
             }
         }
 
-        public T Get<T>(string key)
+        public async Task<bool> AddAsync<T>(string key, T value, TimeSpan? expiry = null)
         {
-            return Deserialize<T>(Database.StringGet(key));
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+
+            return await _database.StringSetAsync(key, JsonConvert.SerializeObject(value), expiry);
         }
-        public object Get(string key)
+
+        public async Task<string?> GetAsync(string key)
         {
-            return Deserialize<object>(Database.StringGet(key));
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+            var value = await Database.StringGetAsync(key);
+
+            if (value.IsNull)
+                return default;
+
+            return JsonConvert.DeserializeObject<string>(value.ToString());
         }
-        public async Task<T> GetAsync<T>(string key)
+
+        public async Task<T?> GetAsync<T>(string key)
         {
-            return Deserialize<T>(await Database.StringGetAsync(key));
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+
+            var value = await Database.StringGetAsync(key);
+
+            if (value.IsNull)
+                return default;
+
+            return JsonConvert.DeserializeObject<T>(value.ToString());
         }
-        public async Task<object> GetAsync(string key)
+
+        private static readonly RedisValue LockToken = Environment.MachineName;
+
+        public async Task<bool> LockAsync(string key, TimeSpan? expiry)
         {
-            return Deserialize<object>(await Database.StringGetAsync(key));
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+
+            expiry ??= TimeSpan.FromMinutes(1);
+
+            return await _database.LockTakeAsync(key, LockToken, expiry.Value);
+
         }
-        public bool Remove(string key)
+        public async Task<bool> UnLockAsync(string key)
         {
-            return Database.KeyDelete(key);
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+
+            return await _database.LockReleaseAsync(key, LockToken);
         }
         public async Task<bool> RemoveAsync(string key)
         {
-            return await Database.KeyDeleteAsync(key);
-        }
-        public bool Set(string key, object value)
-        {
-            return Database.StringSet(key, Serialize(value));
-        }
-        public async Task<bool> SetAsync(string key, object value)
-        {
-            return await Database.StringSetAsync(key, Serialize(value));
-        }
-        public bool Set(string key, object value, TimeSpan timeSpan)
-        {
-            return Database.StringSet(key, Serialize(value), timeSpan);
-        }
-        public async Task<bool> SetAsync(string key, object value, TimeSpan timeSpan)
-        {
-            return await Database.StringSetAsync(key, Serialize(value), timeSpan);
-        }
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
 
-        /// <summary>
-        /// 分布式锁
-        /// </summary>
-        /// <param name="key">锁key</param>
-        /// <param name="timeSpan">过期时间</param>
-        /// <returns>是否成功获取锁，解锁value</returns>
-        public (bool, string) Lock(string key, TimeSpan timeSpan)
-        {
-            string value = Guid.NewGuid().ToString("N");
-            var flag = Database.StringSet(key, value, timeSpan, When.NotExists, CommandFlags.None);
-            return (flag, value);
-        }
-
-        /// <summary>
-        /// 分布式锁
-        /// </summary>
-        /// <param name="key">锁key</param>
-        /// <param name="timeSpan">过期时间</param>
-        /// <returns>是否成功获取锁，解锁value</returns>
-        public async Task<(bool, string)> LockAsync(string key, TimeSpan timeSpan)
-        {
-            string value = Guid.NewGuid().ToString("N");
-            var flag = await Database.StringSetAsync(key, value, timeSpan, When.NotExists, CommandFlags.None);
-            return (flag, value);
-        }
-
-        /// <summary>
-        /// 解锁
-        /// </summary>
-        /// <param name="key">锁key</param>
-        /// <param name="value">解锁value</param>
-        /// <returns>是否成功</returns>
-        public bool UnLock(string key, string value)
-        {
-            if (Get(key).ToString() == value)
-                return Remove(key);
-            else
-                return false;
-        }
-
-        /// <summary>
-        /// 解锁
-        /// </summary>
-        /// <param name="key">锁key</param>
-        /// <param name="value">解锁value</param>
-        /// <returns>是否成功</returns>
-        public async Task<bool> UnLockAsync(string key, string value)
-        {
-            var kv = await GetAsync(key);
-            if (kv.ToString() == value)
-                return await RemoveAsync(key);
-            else
-                return false;
-        }
-        byte[] Serialize(object t)
-        {
-            if (t == null)
-            {
-                return null;
-            }
-
-            var settings = new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            };
-            var str = JsonConvert.SerializeObject(t, settings);
-            byte[] objectDataAsStream = Encoding.UTF8.GetBytes(str);
-            return objectDataAsStream;
-        }
-
-        T Deserialize<T>(byte[] stream)
-        {
-            if (stream == null)
-            {
-                return default;
-            }
-
-            var settings = new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            };
-            var json = Encoding.UTF8.GetString(stream);
-            return JsonConvert.DeserializeObject<T>(json, settings);
+            return await _database.KeyDeleteAsync(key);
         }
     }
 }

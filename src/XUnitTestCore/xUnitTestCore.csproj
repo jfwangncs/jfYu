@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<IsPackable>false</IsPackable>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -27,7 +28,9 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.1" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+		<PackageReference Include="Moq" Version="4.20.70" />
 		<PackageReference Include="xunit" Version="2.6.3" />
+		<PackageReference Include="Xunit.DependencyInjection" Version="8.9.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.5.5" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />	
 	</ItemGroup>
@@ -35,6 +38,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Cache\jfYu.Core.Cache.csproj" />
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Office\jfYu.Core.Office.csproj" />
+		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Redis\jfYu.Core.Redis.csproj" />
 	</ItemGroup>
 
 </Project>

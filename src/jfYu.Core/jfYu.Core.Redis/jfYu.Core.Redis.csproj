@@ -1,18 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;netstandard2.1;net461;net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;netstandard2.1;net462;net6.0;net7.0;net8.0</TargetFrameworks>
 		<LangVersion>12.0</LangVersion>
 		<Version>8.0.1</Version>
 		<Authors>jfwang</Authors>
-		<Description>RedisService</Description>
+		<Nullable>enable</Nullable>
+		<Description>redis</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/jfwangncs/jfYu</RepositoryUrl>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="StackExchange.Redis" Version="2.7.4" />
-		<PackageReference Include="Autofac" Version="7.1.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="\"/>
+		<None Include="..\..\..\LICENSE" Pack="true" PackagePath=""/>
 	</ItemGroup>
 
 </Project>

@@ -55,7 +55,7 @@ namespace jfYu.Core.Office.Excel
         /// <param name="filePath">file path</param>
         /// <param name="titles">titles</param>
         /// <param name="callback">export progress callback</param>
-        public void ToExcel<T>(List<T> source, string filePath, Dictionary<string, string> titles = null, Action<int> callback = null) where T : new()
+        public void ToExcel<T>(List<T> source, string filePath, Dictionary<string, string>? titles = null, Action<int>? callback = null) where T : new()
         {
             titles ??= ExcelExtension.GetTitles<T>();
             ToExcel(filePath, titles, (workbook, sheet) =>
@@ -102,12 +102,11 @@ namespace jfYu.Core.Office.Excel
         /// <param name="filePath">file path</param>
         /// <param name="titles">titles</param>
         /// <param name="callback">export progress callback</param>
-        public void ToExcel(DataTable source, string filePath, Dictionary<string, string> titles = null, Action<int> callback = null)
+        public void ToExcel(DataTable source, string filePath, Dictionary<string, string>? titles = null, Action<int>? callback = null)
         {
             if (titles == null)
             {
                 titles = [];
-                //获取表头字段
                 foreach (DataColumn item in source.Columns)
                     titles.Add(item.ColumnName, item.ColumnName);
             }
@@ -156,7 +155,7 @@ namespace jfYu.Core.Office.Excel
         /// <param name="filePath">file path</param>
         /// <param name="titles">titles</param>
         /// <param name="callback">export progress callback</param>
-        public void ToExcel<T>(IQueryable<T> source, string filePath, Dictionary<string, string> titles = null, Action<int> callback = null) where T : new()
+        public void ToExcel<T>(IQueryable<T> source, string filePath, Dictionary<string, string>? titles = null, Action<int>? callback = null) where T : new()
         {
             titles ??= ExcelExtension.GetTitles<T>();
             ToExcel(filePath, titles, (workbook, sheet) =>
@@ -204,8 +203,10 @@ namespace jfYu.Core.Office.Excel
         /// <param name="filePath">file path</param>
         /// <param name="titles">title</param>
         /// <param name="callback">export progress callback</param>
-        public void ToExcel(DbDataReader sqlDataReader, string filePath, Dictionary<string, string> titles, Action<int> callback = null)
+        public void ToExcel(DbDataReader sqlDataReader, string filePath, Dictionary<string, string>? titles = null, Action<int>? callback = null)
         {
+            if (sqlDataReader is null)
+                throw new NullReferenceException(nameof(sqlDataReader));
             if (sqlDataReader.IsClosed)
                 throw new Exception("data reader is closed.");
             if (titles is null || titles.Count <= 0)
@@ -255,7 +256,7 @@ namespace jfYu.Core.Office.Excel
         /// <param name="filePath">file path</param>
         /// <param name="titles">title</param>
         /// <param name="callback">export progress callback</param>
-        public void ToCSV<T>(List<T> source, string filePath, Dictionary<string, string> titles = null, Action<int> callback = null)
+        public void ToCSV<T>(List<T> source, string filePath, Dictionary<string, string>? titles = null, Action<int>? callback = null)
         {
             if (string.IsNullOrEmpty(filePath))
                 throw new NullReferenceException($"{filePath} is null");

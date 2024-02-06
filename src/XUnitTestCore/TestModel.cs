@@ -1,8 +1,8 @@
 ﻿namespace xUnitTestCore
 {
-    class TestModel
+    public class TestModel
     {
         public int Id;
-        public string Name;
+        public string? Name;
     }
 }
