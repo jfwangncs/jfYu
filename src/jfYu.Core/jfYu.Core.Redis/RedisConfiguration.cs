@@ -44,6 +44,6 @@ namespace jfYu.Core.Redis
         /// <summary>
         /// port
         /// </summary>
-        public int Port { get; set; }
+        public int Port { get; set; } = 6379;
     }
 }

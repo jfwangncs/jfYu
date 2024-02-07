@@ -1,23 +1,38 @@
 
 ### redis
 
-安装
+Install
 
 ```
 Install-Package jfYu.Core.Redis
 ```
-使用
+
+
+Configure
+
 ```
- var ContainerBuilder = new ContainerBuilder();
-var builder = new ConfigurationBuilder()
-    .AddConfigurationFile("CacheRedis.json", optional: true, reloadOnChange: true);
-_ = builder.Build();
-ContainerBuilder.AddRedisService();
-var c = ContainerBuilder.Build();
-var redis = c.Resolve<RedisService>();
-redis.Set("x", "y");
-redis.Get("x");
-redis.Remove("x");
+"Redis": {
+    "EndPoints": [
+      {
+        "Host": "127.0.0.1",
+        "Port": 6379
+      }
+    ],
+    "Password": "Password",
+    "DbIndex": 0,
+    "Timeout": 5000,
+    "Ssl": false
+  }
+```
+
+
+```
+//injection
+builder.Services.AddRedisService((new RedisConfiguration() { EndPoints = [new RedisEndPoint() { Host = "127.0.0.1" }] });  
+
+redis.SetAsync("x", "y");
+redis.GetAsync("x");
+redis.RemoveAsync("x");
 redis.Database.HashSet("x", new StackExchange.Redis.HashEntry[] { new StackExchange.Redis.HashEntry("n", "y") });
 
 ```
