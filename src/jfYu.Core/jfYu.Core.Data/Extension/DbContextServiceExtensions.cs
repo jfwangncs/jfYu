@@ -1,106 +1,73 @@
-﻿using Autofac;
-using jfYu.Core.Configuration;
+﻿using jfYu.Core.Data.Model;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Reflection;
+using System.Threading;
 
 namespace jfYu.Core.Data.Extension
 {
     public static class DbContextServiceExtensions
     {
+        private static readonly AsyncLocal<DatabaseConfig> config = new();
 
         /// <summary>
-        /// IOC注册
+        /// injection
         /// </summary>  
-        public static void AddDbContextService<T>(this ContainerBuilder services) where T : DbContext
+        public static void AddJfYuDbContextService<T>(this IServiceCollection services, JfYuDBConfig configuration) where T : DbContext, IJfYuDbContextService
         {
-            // 主从数据库配置
-            DatabaseConfiguration Config = new DatabaseConfiguration();
+            ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentException.ThrowIfNullOrEmpty(configuration.ConnectionString);
+
+            config.Value = configuration;
             try
             {
-                Config = AppConfig.Configuration.GetSection("ConnectionStrings").Get<DatabaseConfiguration>();
-
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"连接字符串配置错误:{ex.Message} - {ex.StackTrace}");
-            }
-
-            try
-            {
-                RegisterService<T>(services, Config);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"配置错误无法实例化主从连接:{ex.Message} - {ex.StackTrace}");
-            }
-
-
-
-        }
-
-        /// <summary>
-        /// IOC注册
-        /// </summary>   
-        public static void AddDbContextService<T>(this ContainerBuilder services, DatabaseConfiguration databaseConfiguration) where T : DbContext
-        {
-            try
-            {
-                RegisterService<T>(services, databaseConfiguration);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"配置错误无法实例化主从连接:{ex.Message} - {ex.StackTrace}");
-            }
-        }
-
-        private static void RegisterService<T>(ContainerBuilder services, DatabaseConfiguration config) where T : DbContext
-        {
-            if (config == null)
-                throw new Exception($"读取配置为空。");
-            //注册MasterDBContext
-            var masterOptBuilder = new DbContextOptionsBuilder<T>();
-            if (config.DatabaseType.Equals(DatabaseType.SqlServer))
-                masterOptBuilder.UseSqlServer(config.MasterConnectionString);
-            else if (config.DatabaseType.Equals(DatabaseType.Mysql))
-                masterOptBuilder.UseMySql(config.MasterConnectionString,ServerVersion.AutoDetect(config.MasterConnectionString)).EnableDetailedErrors();
-            services.RegisterType<T>().AsSelf().InstancePerLifetimeScope().WithParameter("options", masterOptBuilder.Options).Named<T>("MasterContext");
-
-            //注册SalveDBContext  
-            int slaveCount = config.SlaveConnectionStrings.Count;
-            if (slaveCount > 0)
-            {
-                for (int i = 0; i < slaveCount; i++)
+                services.AddDbContext<T>(masterOptBuilder =>
                 {
-                    var SlaveOptBuilder = new DbContextOptionsBuilder<T>();
-                    string SlaveConnectionString = config.SlaveConnectionStrings[i].ConnectionString;
-                    if (config.SlaveConnectionStrings[i].DatabaseType.Equals(DatabaseType.SqlServer))
-                        SlaveOptBuilder.UseSqlServer(SlaveConnectionString);
-                    else if (config.SlaveConnectionStrings[i].DatabaseType.Equals(DatabaseType.Mysql))
-                        SlaveOptBuilder.UseMySql(config.MasterConnectionString, ServerVersion.AutoDetect(config.MasterConnectionString)).EnableDetailedErrors();
-                    services.RegisterType<T>().AsSelf().InstancePerDependency().WithParameter("options", SlaveOptBuilder.Options).Named<T>($"SlaveContext{i + 1}");
+                    var dbConfig = config.Value ?? throw new ArgumentNullException(nameof(configuration));
+                    switch (dbConfig.DatabaseType)
+                    {
+                        case DatabaseType.Mysql:
+                            masterOptBuilder.UseMySql(dbConfig.ConnectionString, ServerVersion.AutoDetect(dbConfig.ConnectionString)).EnableDetailedErrors();
+                            break;
+                        case DatabaseType.Sqlite:
+                            masterOptBuilder.UseSqlite(dbConfig.ConnectionString).EnableDetailedErrors();
+                            break;
+                        default:
+                        case DatabaseType.SqlServer:
+                            masterOptBuilder.UseSqlServer(dbConfig.ConnectionString).EnableDetailedErrors();
+                            break;
+                    }
+                }, ServiceLifetime.Transient, ServiceLifetime.Transient);
+
+
+                if (configuration.ReadOnlyConfigs != null && configuration.ReadOnlyConfigs.Count > 0)
+                {
+                    services.AddScoped<IContextRead, T>(services =>
+                    {
+                        int index = new Random().Next(configuration.ReadOnlyConfigs.Count);
+                        var readonlyConfig = configuration.ReadOnlyConfigs[index];
+                        config.Value = readonlyConfig;
+                        return services.GetService<T>() ?? throw new ArgumentNullException(nameof(T));
+                    });
+
                 }
+                else
+                {
+                    services.AddScoped<IContextRead, T>(services =>
+                    {
+                        return services.GetService<T>() ?? throw new ArgumentNullException(nameof(T));
+                    });
+                }
+
+                services.AddScoped(typeof(ReadonlyDBContext<>));
+
+                //register service
+                services.AddScoped(typeof(IService<,>), typeof(Service<,>));
             }
-
-            var master = new Func<ParameterInfo, IComponentContext, object>((p, c) => c.ResolveNamed<T>("MasterContext"));
-            var salves = new Func<ParameterInfo, IComponentContext, object>((p, c) =>
-             {
-                 var salves = new List<T>();
-                 for (int j = 0; j < slaveCount; j++)
-                 {
-                     string slaveContextName = $"SlaveContext{j + 1}";
-                     salves.Add(c.ResolveNamed<T>(slaveContextName));
-                 }
-                 return salves;
-             });
-
-            services.RegisterType<DbContextService<T>>()
-                .WithParameter((p, c) => p.Name == "master", master)
-                .WithParameter((p, c) => p.Name == "salves", salves)
-                .WithParameter("configuration", config)
-                .AsImplementedInterfaces().InstancePerLifetimeScope();
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
     }

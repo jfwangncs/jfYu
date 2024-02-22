@@ -1,5 +1,4 @@
-﻿
-namespace jfYu.Core.Data
+﻿namespace jfYu.Core.Data.Model
 {
     /// <summary>
     /// 数据库类型
@@ -9,6 +8,8 @@ namespace jfYu.Core.Data
 
         SqlServer,
 
-        Mysql
+        Mysql,
+
+        Sqlite
     }
 }

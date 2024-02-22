@@ -11,7 +11,7 @@ using jfYu.Core.Office;
 using jfYu.Core.Office.Excel;
 using Microsoft.Data.Sqlite;
 
-namespace xUnitTestCore.Excel
+namespace xUnitTestCore
 {
     #region Model
     public class ExcelTest

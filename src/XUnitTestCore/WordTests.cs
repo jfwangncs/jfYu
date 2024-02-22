@@ -7,7 +7,7 @@ using System.IO;
 using Xunit;
 
 
-namespace xUnitTestCore.Word
+namespace xUnitTestCore
 {
     public class WordTests(IJfYuWord jfYuWord)
     {

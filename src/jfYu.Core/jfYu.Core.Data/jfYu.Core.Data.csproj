@@ -2,28 +2,37 @@
 
 	<PropertyGroup>
 
-		<TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>net8.0</TargetFrameworks>
 		<LangVersion>12.0</LangVersion>
-		<Version>8.0.1</Version>
+		<Version>8.0.2</Version>
 		<Authors>jfwang</Authors>
+		<Nullable>enable</Nullable>
 		<Description>Separation of reading and writing</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/jfwangncs/jfYu</RepositoryUrl>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Autofac" Version="7.1.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.25" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.25" />		
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.25" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.25" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.25" />
-		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.2" />
+	  <Compile Remove="Extension\ContainerBuilderExtensions.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\jfYu.Core.Configuration\jfYu.Core.Configuration.csproj" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.2" />		
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.2" />
+		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="\" />
+		<None Include="..\..\..\LICENSE" Pack="true" PackagePath="" />
 	</ItemGroup>
 
 </Project>

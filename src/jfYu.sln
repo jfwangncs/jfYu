@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xUnitTestCore", "XUnitTestC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jfYu.Core.Office", "jfYu.Core\jfYu.Core.Office\jfYu.Core.Office.csproj", "{353B915B-C636-4BD7-A43D-6B40A3081761}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jfYu.Core.Redis", "jfYu.Core\jfYu.Core.Redis\jfYu.Core.Redis.csproj", "{BD72F822-70AB-4E34-BC5E-D2BDF13B1A60}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jfYu.Core.Data", "jfYu.Core\jfYu.Core.Data\jfYu.Core.Data.csproj", "{9098ADFA-2331-4982-96A8-F9FFBA5C3FE7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{353B915B-C636-4BD7-A43D-6B40A3081761}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{353B915B-C636-4BD7-A43D-6B40A3081761}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{353B915B-C636-4BD7-A43D-6B40A3081761}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD72F822-70AB-4E34-BC5E-D2BDF13B1A60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD72F822-70AB-4E34-BC5E-D2BDF13B1A60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD72F822-70AB-4E34-BC5E-D2BDF13B1A60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD72F822-70AB-4E34-BC5E-D2BDF13B1A60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9098ADFA-2331-4982-96A8-F9FFBA5C3FE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9098ADFA-2331-4982-96A8-F9FFBA5C3FE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9098ADFA-2331-4982-96A8-F9FFBA5C3FE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9098ADFA-2331-4982-96A8-F9FFBA5C3FE7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

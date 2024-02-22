@@ -1,6 +1,5 @@
 using jfYu.Core.Redis;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualBasic;
 using Moq;
 using Newtonsoft.Json;
 using StackExchange.Redis;
@@ -10,7 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace xUnitTestCore.Redis
+namespace xUnitTestCore
 {
     public class RedisTest
     {

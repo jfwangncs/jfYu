@@ -5,7 +5,7 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace xUnitTestCore.Cache
+namespace xUnitTestCore
 {
     public class CacheTests(ICacheService cacheService)
     {

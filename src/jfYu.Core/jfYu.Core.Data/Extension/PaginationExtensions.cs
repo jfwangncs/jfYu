@@ -1,4 +1,4 @@
-﻿using jfYu.Core.Data.Model.View;
+﻿using jfYu.Core.Data.Model;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,129 +8,64 @@ using System.Threading.Tasks;
 namespace jfYu.Core.Data.Extension
 {
 
+    /// <summary>
+    /// Pagination
+    /// </summary>
     public static class PaginationExtensions
     {
-        public static PagedModel<T> ToPaged<T>(this IQueryable<T> source, int pageIndex = 1, int pageSize = 20)
+        /// <summary>
+        /// Pagination
+        /// </summary>
+        /// <typeparam name="T">model</typeparam>
+        /// <param name="source">source</param>
+        /// <param name="pageIndex">page index</param>
+        /// <param name="pageSize">page size</param>
+        /// <returns>data</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static async Task<PagedData<T>> ToPagedAsync<T>(this IQueryable<T> source, int pageIndex = 1, int pageSize = 20)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            ArgumentNullException.ThrowIfNull(source);
+
             if (pageIndex <= 0)
                 throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
 
-            int totalCount = source.Count();
-            var list = source.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToList();
-            int totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
-            int startNum = pageSize * (pageIndex - 1) + 1;
-            int endNum = startNum + list.Count - 1;
-            return new PagedModel<T>() { TotalPages = totalPages, List = list, FirstDigit = startNum, LastDigit = endNum, TotalCount = totalCount };
-        }
-        public static async Task<PagedModel<T>> ToPagedAsync<T>(this IQueryable<T> source, int pageIndex = 1, int pageSize = 20)
-        {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
-            if (pageIndex <= 0)
-                throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
-
-            int totalCount = await source.CountAsync();
-            var list = await source.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToListAsync();
-            int totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
-            int startNum = pageSize * (pageIndex - 1) + 1;
-            int endNum = startNum + list.Count - 1;
-            return new PagedModel<T>() { TotalPages = totalPages, List = list, FirstDigit = startNum, LastDigit = endNum, TotalCount = totalCount };
-        }
-        public static PagedModel<Q> ToPaged<T, Q>(this IQueryable<T> source, Func<IEnumerable<T>, IEnumerable<Q>> func, int pageIndex = 1, int pageSize = 20)
-        {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
-            if (func == null)
-                throw new ArgumentNullException(nameof(func));
-            if (pageIndex <= 0)
-                throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
-
-            int totalCount = source.Count();
-            var list = source.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToList();
-            int totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
-            int startNum = pageSize * (pageIndex - 1) + 1;
-            int endNum = startNum + list.Count - 1;
-            return new PagedModel<Q>() { TotalPages = totalPages, List = func(list).ToList(), FirstDigit = startNum, LastDigit = endNum, TotalCount = totalCount };
-        }
-        public static async Task<PagedModel<Q>> ToPagedAsync<T, Q>(this IQueryable<T> source, Func<IEnumerable<T>, IEnumerable<Q>> func, int pageIndex = 1, int pageSize = 20)
-        {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
-            if (func == null)
-                throw new ArgumentNullException(nameof(func));
-            if (pageIndex <= 0)
+            if (pageSize <= 0)
                 throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
 
             int totalCount = await source.CountAsync();
             var list = await source.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToListAsync();
             int totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
-            int startNum = pageSize * (pageIndex - 1) + 1;
-            int endNum = startNum + list.Count - 1;
-            return new PagedModel<Q>() { TotalPages = totalPages, List = func(list).ToList(), FirstDigit = startNum, LastDigit = endNum, TotalCount = totalCount };
+            return new PagedData<T>() { TotalPages = totalPages, Data = list, TotalCount = totalCount };
         }
 
-
-        public static PagedModel<T, P> ToPaged<T, P>(this IQueryable<T> source, int pageIndex = 1, int pageSize = 20) where P : QueryModel
+        /// <summary>
+        /// Pagination
+        /// </summary>
+        /// <typeparam name="T">model</typeparam>
+        /// <param name="source">source</param>
+        /// <param name="func">function</param>
+        /// <param name="pageIndex">page index</param>
+        /// <param name="pageSize">page size</param>
+        /// <returns>data</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>       
+        public static async Task<PagedData<Q>> ToPagedAsync<T, Q>(this IQueryable<T> source, Func<IEnumerable<T>, IEnumerable<Q>> func, int pageIndex = 1, int pageSize = 20)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            ArgumentNullException.ThrowIfNull(source);
+            ArgumentNullException.ThrowIfNull(func);
             if (pageIndex <= 0)
                 throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
 
-            int totalCount = source.Count();
-            var list = source.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToList();
-            int totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
-            int startNum = pageSize * (pageIndex - 1) + 1;
-            int endNum = startNum + list.Count - 1;
-            return new PagedModel<T, P>() { TotalPages = totalPages, List = list, FirstDigit = startNum, LastDigit = endNum, TotalCount = totalCount };
-        }
-        public static async Task<PagedModel<T,P>> ToPagedAsync<T,P>(this IQueryable<T> source, int pageIndex = 1, int pageSize = 20) where P : QueryModel
-        {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
-            if (pageIndex <= 0)
+            if (pageSize <= 0)
                 throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
 
             int totalCount = await source.CountAsync();
             var list = await source.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToListAsync();
             int totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
-            int startNum = pageSize * (pageIndex - 1) + 1;
-            int endNum = startNum + list.Count - 1;
-            return new PagedModel<T,P>() { TotalPages = totalPages, List = list, FirstDigit = startNum, LastDigit = endNum, TotalCount = totalCount };
+            return new PagedData<Q>() { TotalPages = totalPages, Data = func(list).ToList(), TotalCount = totalCount };
         }
-        public static PagedModel<Q,P> ToPaged<T, Q,P>(this IQueryable<T> source, Func<IEnumerable<T>, IEnumerable<Q>> func, int pageIndex = 1, int pageSize = 20) where P : QueryModel
-        {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
-            if (func == null)
-                throw new ArgumentNullException(nameof(func));
-            if (pageIndex <= 0)
-                throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
 
-            int totalCount = source.Count();
-            var list = source.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToList();
-            int totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
-            int startNum = pageSize * (pageIndex - 1) + 1;
-            int endNum = startNum + list.Count - 1;
-            return new PagedModel<Q,P>() { TotalPages = totalPages, List = func(list).ToList(), FirstDigit = startNum, LastDigit = endNum, TotalCount = totalCount };
-        }
-        public static async Task<PagedModel<Q,P>> ToPagedAsync<T, Q,P>(this IQueryable<T> source, Func<IEnumerable<T>, IEnumerable<Q>> func, int pageIndex = 1, int pageSize = 20) where P : QueryModel
-        {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
-            if (func == null)
-                throw new ArgumentNullException(nameof(func));
-            if (pageIndex <= 0)
-                throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
 
-            int totalCount = await source.CountAsync();
-            var list = await source.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToListAsync();
-            int totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
-            int startNum = pageSize * (pageIndex - 1) + 1;
-            int endNum = startNum + list.Count - 1;
-            return new PagedModel<Q,P>() { TotalPages = totalPages, List = func(list).ToList(), FirstDigit = startNum, LastDigit = endNum, TotalCount = totalCount };
-        }
     }
 }

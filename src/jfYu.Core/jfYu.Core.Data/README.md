@@ -2,7 +2,7 @@
 
 ###  代码轻量级读写分离功能
 
-支持MySql和SqlServer,如无从数据库可不配置，自动使用主数据库
+MySql,SqlServer,Sqlite 
 
 ```
 Install-Package jfYu.Core.Data
@@ -12,37 +12,21 @@ Install-Package jfYu.Core.Data
 
 ```
  "ConnectionStrings": {
-    "DatabaseType": "SqlServer", //MySql  
-    "MasterConnectionString": "Data Source = 127.0.0.1,9004; database = dbtest; User Id = sa; Password = 123456;",
-    "SlaveCheck": false,
-    "SlaveConnectionStrings": [
+    "DatabaseType": "SqlServer",
+    "ConnectionString": "Data Source = 127.0.0.1,9004; database = dbtest; User Id = sa; Password = 123456;"
+    "ReadOnlyConfigs": [
       {
-        "DatabaseType": "SqlServer", //MySql  
-        "ConnectionString": "Data Source = 127.0.0.1,9005; database = dbtest; User Id = sa; Password = 123456;",
-        "Weight": 2
+        "DatabaseType": "MySql", 
+        "ConnectionString": "server=127.0.0.1;userid=root;pwd=123456;port=9001;database=dbtest;"
       },
       {
-        "DatabaseType": "SqlServer", //MySql  
-        "ConnectionString": "Data Source = 127.0.0.1,9006; database = dbtest; User Id = sa; Password = 123456;",
-        "Weight": 8
-      }
-    ]
-
-    //"DatabaseType": "MySql", 
-    //"MasterConnectionString": "server=127.0.0.1;userid=root;pwd=123456;port=9001;database=dbtest;",
-    //"SlaveConnectionStrings": [
-    //  {
-    //    "ConnectionString": "server=127.0.0.1;userid=root;pwd=123456;port=9002;database=dbtest;",
-    //    "Weight": 2
-    //  },
-    //  {
-    //    "ConnectionString": "server=127.0.0.1;userid=root;pwd=123456;port=9003;database=dbtest;",
-    //    "Weight": 8
-    //  }
-    //]
+        "DatabaseType": "Sqlite",  
+        "ConnectionString": "Data Source= data/m2.db;Password = 123456;"
+    ]   
   }
 ```
-创建自己的DbContext
+
+创建DbContext
 
 ```
     public class User : BaseEntity
@@ -106,7 +90,7 @@ Install-Package jfYu.Core.Data
       
     }
 
-    public class DataContext : DbContext
+    public class DataContext : DbContext,IJfYuDbContextService
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -132,7 +116,7 @@ Install-Package jfYu.Core.Data
         }
     }
 ```
-迁移数据,在控制台或者cmd命令行下执行
+迁移数据
 ```
 //配置迁移数据库连接字符串
 $env:EFConString="Data Source = xxx; database = test; User Id = sa; Password = xxx;";
@@ -143,34 +127,29 @@ dotnet ef  database update
 
 ```
 
-
-DataContext 为自己创建的DbContext对象
+注册
 
 ```
-var containerBuilder = new ContainerBuilder();
-var builder = new ConfigurationBuilder().AddConfigurationFile("appsettings.json", optional: true, reloadOnChange: true);
-builder.Build();
-containerBuilder.AddDbContextService<DataContext>();
-var container = containerBuilder.Build();
-var db=container.Resolve<IDbContextService<DataContext>>();
-db.Master.Database.Migrate(); //代码应用迁移
+
+  services.AddJfYuDbContextService<DataContext>(new JfYuDBConfig() { DatabaseType = DatabaseType.Sqlite, ConnectionString = "Data Source= data/m1.db;" });
 
 ```
 使用
 
 ```
-////master
-if (db.Master.Database.GetPendingMigrations().Any())
-    db.Master.Database.Migrate();
+//master
+var _masterContext = serviceProvider.GetService<DataContext>();
 
-//slave
-if (db.Slave.Database.GetPendingMigrations().Any())
-    db.Slave.Database.Migrate();
+//readonly
+serviceProvider.GetService<ReadonlyDBContext<DataContext>>();
 
-//写
-db.Master.Users.Add(new User() { Id = 1, Name = 2 });
-db.Master.SaveChanges();
-//读
-db.Slave.Users.ToList();
-db.Slave.Users.Count();
+//service
+var _companyService=serviceProvider.GetService<IService<Company, DataContext>>();
+
+
+await _companyService.AddAsync(new Company() { Age = 33, Name = "test" }
+await _companyService.UpdateAsync(data)
+await _companyService.RemoveAsync(q => q.ID.Equals(data.ID))
+_companyService.GetList(q => q.Name == "test124")
+
 ```
