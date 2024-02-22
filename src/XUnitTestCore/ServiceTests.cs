@@ -8,11 +8,9 @@ using Xunit;
 namespace xUnitTestCore
 {
 
-    public class ServiceTests
+    public class ServiceTests(IService<Company, DataContext> company)
     {
-        readonly IService<Company, DataContext> _companyService;
-
-        public ServiceTests(IService<Company, DataContext> company) => _companyService = company;
+        readonly IService<Company, DataContext> _companyService = company;
 
         [Fact]
         public void IocTest()

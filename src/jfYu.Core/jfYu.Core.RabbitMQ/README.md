@@ -3,14 +3,14 @@
 
 ```
 Install-Package jfYu.Core.RabbitMQ
-```
-封装的RabbitMQ工具，队列，数据持久化，支持发送和接受重连，支持常用的5种模式
+``` 
 
-配置rabbit连接
+config
+
 ```
  "RabbitMQ": {
     "HostName": "127.0.0.1",
-    "UserName": "jfwang",
+    "UserName": "xxx",
     "Password": "123456",
     "VirtualHost": "/",
     "HeartBeat": "60",
@@ -18,44 +18,36 @@ Install-Package jfYu.Core.RabbitMQ
   }
 ```
 
-ioc注入
+injection
+
 ```
-var builder = new ConfigurationBuilder()
-        .AddConfigurationFile("appsettings.json", optional: true, reloadOnChange: true);
-var Configuration = builder.Build();
-var con = new ContainerBuilder();
-con.AddRabbitMQService();
+ services.AddRabbitMQService(config);
 ```
 
-发送
-```
-var icon = con.Build();
-SendEventMessage(icon.Resolve<IRabbitMQService>());
-private static void SendEventMessage(IRabbitMQService rabbitMQServer)
-        {
-            for (var i = 1; i < 100; i++)
-            {
-                var originObject = new testclass()
-                {
-                    id = i,
-                    name = "姓名" + i
+send
 
-                };
-
-                rabbitMQServer.Send("changeNametest3","direct", originObject);
-
-                Console.WriteLine($"发送{i}");
-                Thread.Sleep(2000);
-            }
-        }
 ```
 
-接收
+mq.Send("test", "xxxxxx");
+mq.Send("test", "test");
+mq.Send("test", new TestModel() { Id = 122, Name = "name" });
+
+mq.QueueBind("q12", "ex12", ExchangeType.Topic);
+mq.Send("ex12", ExchangeType.Fanout, "Fanout", "123");
 ```
-var mq = icon.Resolve<IRabbitMQService>();
-mq.Receive("queName", "changeNametest3", "direct", q =>
+
+Receive
+```
+mq.Receive("topic", q =>
 {
-   Thread.Sleep(4000);
-   Console.WriteLine(q);
+    Assert.NotEmpty(q);
+    Thread.Sleep(1000);
+});
+
+mq.ReceiveAsync("topic", async q =>
+{
+
+    Assert.NotEmpty(q);
+    await Task.Delay(5000);
 });
 ```

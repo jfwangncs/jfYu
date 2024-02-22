@@ -1,6 +1,4 @@
-﻿using jfYu.Core.Common.Utilities;
-using jfYu.Core.Configuration;
-using Microsoft.Extensions.Configuration;
+﻿using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
@@ -12,35 +10,24 @@ namespace jfYu.Core.RabbitMQ
 {
 
     public class RabbitMQService : IRabbitMQService
-    {        
+    {
+        public ConnectionFactory Factory { get; } 
 
-        /// <summary>
-        /// MQ连接
-        /// </summary>
-        private IConnection Con { get; set; }
-
-        /// <summary>
-        /// MQ配置
-        /// </summary>
-        public RabbitMQEndPoint RabbitMQConf { get; } = new RabbitMQEndPoint();
-
-        public RabbitMQService()
+        public RabbitMQService(RabbitMQConfig config)
         {
             try
             {
-                RabbitMQConf = AppConfig.Configuration.GetSection("RabbitMQ")?.Get<RabbitMQEndPoint>();
-                var factory = new ConnectionFactory//创建连接工厂对象
+                Factory = new ConnectionFactory
                 {
-                    HostName = RabbitMQConf.HostName,
-                    Port = RabbitMQConf.Port,
-                    UserName = RabbitMQConf.UserName,
-                    Password = RabbitMQConf.Password,
-                    VirtualHost=RabbitMQConf.VirtualHost,
-                    RequestedHeartbeat = TimeSpan.FromSeconds(RabbitMQConf.HeartBeat),
-                    AutomaticRecoveryEnabled = true //自动重连
+                    HostName = config.HostName,
+                    Port = config.Port,
+                    UserName = config.UserName,
+                    Password = config.Password,
+                    VirtualHost = config.VirtualHost,
+                    RequestedHeartbeat = TimeSpan.FromSeconds(config.HeartBeat),
+                    AutomaticRecoveryEnabled = true, 
 
                 };
-                Con = factory.CreateConnection();//创建连接对象
             }
             catch (Exception)
             {
@@ -48,117 +35,80 @@ namespace jfYu.Core.RabbitMQ
             }
 
         }
-        public RabbitMQService(string connstr)
+        public bool QueueBind(string queueName, string exchangeName, ExchangeType exchangeType, string routingKey = "")
         {
-            try
-            {
-                var factory = new ConnectionFactory
-                {
-                    Uri = new Uri(connstr),
-                    AutomaticRecoveryEnabled = true
-                };
-                Con = factory.CreateConnection();//创建连接对象
-            }
-            catch (Exception)
-            {                
-                throw;
-            }
-
-        }
-
-        #region 发送
-
-        /// <summary>
-        /// 一般模式，work模式
-        /// </summary>       
-        /// <param name="queName">队列名称</param>
-        /// <param name="msg">发送的消息</param>
-        public bool Send<T>(string queName, T msg) where T : class
-        {
-            //发送重连
-            if (!Con.IsOpen)
-            {
-                while (true)
-                {
-                    if (Con.IsOpen)
-                        break;
-                    Task.Delay(Con.Heartbeat).Wait();
-                }
-            }
-            using var channel = Con.CreateModel();
-            channel.ConfirmSelect(); //确认发送成功否
-            //声明一个队列
-            channel.QueueDeclare(queName, true, false, false, null);
+            Factory.DispatchConsumersAsync = false;
+            using var connection = Factory.CreateConnection();
+            using var channel = connection.CreateModel();
+            channel.ConfirmSelect(); // confirm           
+            channel.QueueDeclare(queueName, true, false, false, null);
+            channel.ExchangeDeclare(exchangeName, exchangeType.ToString().ToLower(), true);
             var basicProperties = channel.CreateBasicProperties();
-            //1：非持久化 2：可持久化
             basicProperties.DeliveryMode = 2;
-            var payload = Encoding.UTF8.GetBytes(Serializer.Serialize(msg));
-            channel.BasicPublish("", queName, basicProperties, payload);
+            channel.QueueBind(queueName, exchangeName, routingKey);
             return channel.WaitForConfirms();
         }
 
-        /// <summary>
-        /// 发布订阅模式,路由模式,通配符模式发送消息
-        /// </summary>
-        /// <param name="exchangeName">交换机名称</param>
-        /// <param name="exchangeType">模式类型fanout,direct,topic,headers  </param>
-        /// <param name="key">通配符</param>
-        /// <param name="msg">发送的消息</param>
-        public bool Send<T>(string exchangeName, string exchangeType, T msg, string key = "") where T : class
+        public bool ExchangeBind(string destination, string source, ExchangeType exchangeType, string routingKey = "")
         {
-            key = exchangeType == "fanout" ? "" : key;
-            //发送重连
-            if (!Con.IsOpen)
-            {
-                while (true)
-                {
-                    if (Con.IsOpen)
-                        break;
-                    Task.Delay(Con.Heartbeat).Wait();
-                }
-            }
-            using var channel = Con.CreateModel();
-            channel.ConfirmSelect(); //确认发送成功否
-            //发送方确认机制
+            Factory.DispatchConsumersAsync = false;
+            using var connection = Factory.CreateConnection();
+            using var channel = connection.CreateModel();
+            channel.ConfirmSelect(); // confirm
+            channel.ExchangeDeclare(destination, exchangeType.ToString().ToLower(), true);
+            channel.ExchangeDeclare(source, exchangeType.ToString().ToLower(), true);
+            var basicProperties = channel.CreateBasicProperties();
+            basicProperties.DeliveryMode = 2;
+            channel.ExchangeBind(destination, source, routingKey);
+            return channel.WaitForConfirms();
+        }
+
+
+        public bool Send(string queueName, object msg)
+        {
+            Factory.DispatchConsumersAsync = false;
+            using var connection = Factory.CreateConnection();
+            using var channel = connection.CreateModel();
+            channel.ConfirmSelect(); // confirm           
+            channel.QueueDeclare(queueName, true, false, false, null);
+            var basicProperties = channel.CreateBasicProperties();
+            basicProperties.DeliveryMode = 2;
+            var payload = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(msg));
+            channel.BasicPublish("", queueName, basicProperties, payload);
+            return channel.WaitForConfirms();
+        }
+
+        public bool Send(string exchangeName, ExchangeType exchangeType, object msg, string routingKey = "")
+        {
+            Factory.DispatchConsumersAsync = false;
+            routingKey = exchangeType == ExchangeType.Fanout ? "" : routingKey;
+            using var connection = Factory.CreateConnection();
+            using var channel = connection.CreateModel();
             channel.ConfirmSelect();
-            //声明exchange
-            channel.ExchangeDeclare(exchangeName, exchangeType, true);
+            channel.ExchangeDeclare(exchangeName, exchangeType.ToString().ToLower(), true);
             var basicProperties = channel.CreateBasicProperties();
-            //1：非持久化 2：可持久化
             basicProperties.DeliveryMode = 2;
-            var payload = Encoding.UTF8.GetBytes(Serializer.Serialize(msg));
-            channel.BasicPublish(exchangeName, key, basicProperties, payload);
+            var payload = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(msg));
+            channel.BasicPublish(exchangeName, routingKey, basicProperties, payload);
             return channel.WaitForConfirms();
         }
 
-        #endregion
 
-        #region 接收
-
-
-        /// <summary>
-        /// 接受消息
-        /// </summary>
-        /// <param name="queName">队列名</param>
-        /// <param name="received">处理方法</param>
-        public void Receive(string queName, Action<string> received)
+        public void Receive(string queueName, Action<string> func)
         {
-            var channel = Con.CreateModel();
-            // 声明队列
-            channel.QueueDeclare(queName, true, false, false, null);
-            //每次只能向消费者发送一条信息,再消费者未确认之前,不再向他发送信息
+            Factory.DispatchConsumersAsync = false;
+            var connection = Factory.CreateConnection();
+            var channel = connection.CreateModel();
+            channel.QueueDeclare(queueName, true, false, false, null);
+            //consume one by one
             channel.BasicQos(0, 1, false);
-            //事件基本消费者
             var consumer = new EventingBasicConsumer(channel);
-
-            //接收到消息事件
             consumer.Received += (ch, ea) =>
             {
                 try
                 {
                     string message = Encoding.UTF8.GetString(ea.Body.ToArray());
-                    received(message);
-                    //确认该消息已被消费
+                    func(message);
                     channel.BasicAck(ea.DeliveryTag, false);
                 }
                 catch (Exception)
@@ -168,40 +118,55 @@ namespace jfYu.Core.RabbitMQ
                 };
 
             };
-            //启动消费者 设置为手动应答消息
-            channel.BasicConsume(queName, false, consumer);
+            //manually confirm
+            channel.BasicConsume(queueName, false, consumer);
         }
 
-        /// <summary>
-        /// 接受消息
-        /// </summary>
-        /// <param name="queName">队列名</param>
-        /// <param name="exchangeName">交换机名称</param>
-        /// <param name="routingKey">通配符</param>
-        /// <param name="received">处理方法</param>
-        public void Receive(string queName, string exchangeName, string exchangeType, Action<string> received, string routingKey = "")
+        public void ReceiveAsync(string queueName, Func<string, Task> func)
         {
-
-            var channel = Con.CreateModel();
-            //声明交换机
-            channel.ExchangeDeclare(exchangeName, exchangeType, true);
-            // 声明队列
-            channel.QueueDeclare(queName, true, false, false, null);
-            //绑定到交换机
-            channel.QueueBind(queName, exchangeName, routingKey);
-            //每次只能向消费者发送一条信息,再消费者未确认之前,不再向他发送信息
+            Factory.DispatchConsumersAsync = true;
+            var connection = Factory.CreateConnection();
+            var channel = connection.CreateModel();
+            channel.QueueDeclare(queueName, true, false, false, null);
+            //consume one by one
             channel.BasicQos(0, 1, false);
-            //事件基本消费者
-            var consumer = new EventingBasicConsumer(channel);
+            var consumer = new AsyncEventingBasicConsumer(channel);
+            consumer.Received += async (ch, ea) =>
+            {
+                try
+                {
+                    string message = Encoding.UTF8.GetString(ea.Body.ToArray());
+                    await func(message);
+                    channel.BasicAck(ea.DeliveryTag, false);
+                }
+                catch (Exception)
+                {
+                    channel.BasicReject(ea.DeliveryTag, true);
+                    throw;
+                };
 
-            //接收到消息事件
+            };
+            //manually confirm
+            channel.BasicConsume(queueName, false, consumer);
+        }
+
+        public void Receive(string queueName, string exchangeName, string exchangeType, Action<string> func, string routingKey = "")
+        {
+            Factory.DispatchConsumersAsync = false;
+            var connection = Factory.CreateConnection();
+            var channel = connection.CreateModel();
+            channel.ExchangeDeclare(exchangeName, exchangeType, true);
+            channel.QueueDeclare(queueName, true, false, false, null);
+            channel.QueueBind(queueName, exchangeName, routingKey);
+            //consume one by one
+            channel.BasicQos(0, 1, false);
+            var consumer = new EventingBasicConsumer(channel);
             consumer.Received += (ch, ea) =>
             {
                 try
                 {
                     string message = Encoding.UTF8.GetString(ea.Body.ToArray());
-                    received(message);
-                    //确认该消息已被消费
+                    func(message);
                     channel.BasicAck(ea.DeliveryTag, false);
                 }
                 catch (Exception)
@@ -211,11 +176,37 @@ namespace jfYu.Core.RabbitMQ
                 }
 
             };
-            //启动消费者 设置为手动应答消息
-            channel.BasicConsume(queName, false, consumer);
+            //manually confirm
+            channel.BasicConsume(queueName, false, consumer);
         }
+        public void ReceiveAsync(string queueName, string exchangeName, string exchangeType, Func<string, Task> func, string routingKey = "")
+        {
+            Factory.DispatchConsumersAsync = true;
+            var connection = Factory.CreateConnection();
+            var channel = connection.CreateModel();
+            channel.ExchangeDeclare(exchangeName, exchangeType, true);
+            channel.QueueDeclare(queueName, true, false, false, null);
+            channel.QueueBind(queueName, exchangeName, routingKey);
+            //consume one by one
+            channel.BasicQos(0, 1, false);
+            var consumer = new AsyncEventingBasicConsumer(channel);
+            consumer.Received += async (ch, ea) =>
+            {
+                try
+                {
+                    string message = Encoding.UTF8.GetString(ea.Body.ToArray());
+                    await func(message);
+                    channel.BasicAck(ea.DeliveryTag, false);
+                }
+                catch (Exception)
+                {
+                    channel.BasicReject(ea.DeliveryTag, true);
+                    throw;
+                }
 
-        #endregion
-
+            };
+            //manually confirm
+            channel.BasicConsume(queueName, false, consumer);
+        }
     }
 }

@@ -12,8 +12,7 @@
 	  <Compile Remove="TestConfigCore.cs" />
 	  <Compile Remove="TestDataCore.cs" />
 	  <Compile Remove="TestjfYuRequestCore.cs" />
-	  <Compile Remove="TestMongoDBCore.cs" />
-	  <Compile Remove="TestRabbitMQ.cs" />
+	  <Compile Remove="TestMongoDBCore.cs" /> 
 	  <Compile Remove="TestRedisCore.cs" />
 	  <Compile Remove="TestWordCore.cs" />
 	</ItemGroup>
@@ -40,6 +39,7 @@
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Cache\jfYu.Core.Cache.csproj" />
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Data\jfYu.Core.Data.csproj" />
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Office\jfYu.Core.Office.csproj" />
+		<ProjectReference Include="..\jfYu.Core\jfYu.Core.RabbitMQ\jfYu.Core.RabbitMQ.csproj" />
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Redis\jfYu.Core.Redis.csproj" />
 	</ItemGroup>
 

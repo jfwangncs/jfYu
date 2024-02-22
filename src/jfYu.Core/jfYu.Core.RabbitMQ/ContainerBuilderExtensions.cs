@@ -1,4 +1,6 @@
-﻿using Autofac;
+﻿
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace jfYu.Core.RabbitMQ
 {
@@ -6,22 +8,19 @@ namespace jfYu.Core.RabbitMQ
     {
 
         /// <summary>
-        /// IOC注入
+        /// injection
         /// </summary>
         /// <param name="services"></param>
-        public static void AddRabbitMQService(this ContainerBuilder services)
+        public static void AddRabbitMQService(this IServiceCollection services, RabbitMQConfig config)
         {
-            services.Register(q => new RabbitMQService()).As<IRabbitMQService>();
-        }
+            if (config == null)
+                throw new ArgumentNullException(nameof(config));
 
+            if (string.IsNullOrEmpty(config.HostName))
+                throw new ArgumentNullException(nameof(config.HostName));
 
-        /// <summary>
-        /// IOC注入
-        /// </summary>
-        /// <param name="services"></param>
-        public static void AddRabbitMQService(this ContainerBuilder services, string config)
-        {
-            services.Register(q => new RabbitMQService(config)).As<IRabbitMQService>();
+            services.AddSingleton(config);
+            services.AddScoped<IRabbitMQService, RabbitMQService>();
         }
     }
 }

@@ -1,49 +1,69 @@
-﻿using System;
+﻿using RabbitMQ.Client;
+using System;
+using System.Threading.Tasks;
 
 namespace jfYu.Core.RabbitMQ
 {
     public interface IRabbitMQService
     {
-      
-
-
         /// <summary>
-        /// MQ连接
+        /// Rabbit clinet
         /// </summary>
-        RabbitMQEndPoint RabbitMQConf { get; }
+        ConnectionFactory Factory { get; }
 
         /// <summary>
-        /// 接受消息
+        /// simple mode
         /// </summary>
-        /// <param name="queName">队列名</param>
-        /// <param name="received">处理方法</param>
-        void Receive(string queName, Action<string> received);
+        /// <param name="queName">queue name</param>
+        /// <param name="msg"></param>
+        /// <returns>successful/failed</returns>
+        bool Send(string queueName, object msg);
 
         /// <summary>
-        /// 接受消息
+        /// Publish/Subscribe,Routing,Topics mode
         /// </summary>
-        /// <param name="queName">队列名</param>
-        /// <param name="exchangeName">交换机名称</param>
-        /// <param name="exchangeType">模式类型fanout,direct,topic,headers </param>
-        /// <param name="routingKey">通配符</param>
-        /// <param name="received">处理方法</param>
-        void Receive(string queName, string exchangeName, string exchangeType, Action<string> received, string routingKey = "");
+        /// <param name="exchangeName">exchange name</param>
+        /// <param name="exchangeType">exchange type</param>
+        /// <param name="msg">msg</param>
+        /// <param name="routingKey">key</param>
+        /// <returns>successful/failed</returns>
+        bool Send(string exchangeName, ExchangeType exchangeType, object msg, string routingKey = "");
 
         /// <summary>
-        /// 发布订阅模式,路由模式,通配符模式发送消息
+        /// receive
         /// </summary>
-        /// <param name="exchangeName">交换机名称</param>
-        /// <param name="exchangeType">模式类型fanout,direct,topic,headers </param>
-        /// <param name="key">通配符</param>
-        /// <param name="msg">发送的消息</param>
-        bool Send<T>(string exchangeName, string exchangeType, T msg, string key = "") where T : class;
+        /// <param name="queueName">queue name</param>
+        /// <param name="func">function</param>
+        void Receive(string queueName, Action<string> func);
+
+        /// <summary>
+        /// receive
+        /// </summary>
+        /// <param name="queueName">queue name</param>
+        /// <param name="exchangeName">exchange name</param>
+        /// <param name="exchangeType">exchange type</param>
+        /// <param name="func">function</param>
+        /// <param name="routingKey">routing key</param>
+        void Receive(string queueName, string exchangeName, string exchangeType, Action<string> func, string routingKey = "");
+
+        /// <summary>
+        /// receive
+        /// </summary>
+        /// <param name="queueName">queue name</param>
+        /// <param name="exchangeName">exchange name</param>
+        /// <param name="exchangeType">exchange type</param>
+        /// <param name="func">function</param>
+        /// <param name="routingKey">routing key</param>
+        void ReceiveAsync(string queueName, string exchangeName, string exchangeType, Func<string, Task> func, string routingKey = "");
 
 
         /// <summary>
-        /// 一般模式，work模式
-        /// </summary>       
-        /// <param name="queName">队列名称</param>
-        /// <param name="msg">发送的消息</param>
-        bool Send<T>(string queName, T msg) where T : class;
+        /// receive
+        /// </summary>
+        /// <param name="queueName">queue name</param>
+        /// <param name="func">function</param>
+        void ReceiveAsync(string queueName, Func<string, Task> func);
+        bool QueueBind(string queueName, string exchangeName, ExchangeType exchangeType, string routingKey = "");
+        bool ExchangeBind(string destination, string source, ExchangeType exchangeType, string routingKey = "");
     }
 }
