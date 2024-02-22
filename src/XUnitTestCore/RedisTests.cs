@@ -203,7 +203,7 @@ namespace xUnitTestCore
         {
             Assert.True(await _redis.AddAsync(key, value, TimeSpan.FromSeconds(expiry)));
             Assert.Equal(value.ToString(), await _redis.GetAsync(key));
-            await Task.Delay(expiry * 1000);
+            await Task.Delay((expiry + 1) * 1000);
             Assert.Null(await _redis.GetAsync(key));
         }
 

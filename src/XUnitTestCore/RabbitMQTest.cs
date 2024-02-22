@@ -1,14 +1,9 @@
 using jfYu.Core.RabbitMQ;
 using Microsoft.Extensions.DependencyInjection;
-using StackExchange.Redis;
 using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
-using static Org.BouncyCastle.Math.EC.ECCurve;
 
-namespace xUnitTestCore.RabbitMQ
+namespace xUnitTestCore
 {
 
     public class RabbitMQTest
