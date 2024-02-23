@@ -35,7 +35,9 @@ namespace jfYu.Core.Data
         {
             entity.UpdatedTime = DateTime.Now;
             Context.Update(entity);
-            return await Context.SaveChangesAsync();
+            var result = await Context.SaveChangesAsync();
+            Context.Entry(entity).State = EntityState.Detached;
+            return result;
         }
         public virtual async Task<int> UpdateRangeAsync(List<T> list)
         {
@@ -44,7 +46,12 @@ namespace jfYu.Core.Data
                 entity.UpdatedTime = DateTime.Now;
                 Context.Update(entity);
             });
-            return await Context.SaveChangesAsync();
+            var result = await Context.SaveChangesAsync();
+            list.ForEach(entity =>
+            {
+                Context.Entry(entity).State = EntityState.Detached;
+            });
+            return result;
         }
 
 
