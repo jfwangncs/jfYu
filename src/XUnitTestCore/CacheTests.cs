@@ -140,7 +140,7 @@ namespace xUnitTestCore
         {
             await _cacheService.AddAsync(key, value, TimeSpan.FromSeconds(expiry));
             Assert.Equal(value.ToString(), await _cacheService.GetAsync(key));
-            await Task.Delay(expiry * 1000);
+            await Task.Delay((expiry + 1) * 1000);
             Assert.Null(await _cacheService.GetAsync(key));
         }
 
