@@ -18,7 +18,9 @@ namespace jfYu.Core.Data
         {
             entity.CreatedTime = entity.UpdatedTime = DateTime.Now;
             await Context.AddAsync(entity);
-            return await Context.SaveChangesAsync();
+            var result = await Context.SaveChangesAsync();
+            Context.Entry(entity).State = EntityState.Detached;
+            return result;
         }
 
 
@@ -27,7 +29,9 @@ namespace jfYu.Core.Data
         {
             list.ForEach(entity => { entity.CreatedTime = entity.UpdatedTime = DateTime.Now; });
             await Context.AddRangeAsync(list);
-            return await Context.SaveChangesAsync();
+            var result = await Context.SaveChangesAsync();
+            list.ForEach(entity => { Context.Entry(entity).State = EntityState.Detached; });
+            return result;
         }
 
 
