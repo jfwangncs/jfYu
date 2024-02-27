@@ -1,35 +1,40 @@
 
-### 网页内容获取
-
-安装
 
 ```
 Install-Package jfYu.Core.jfYuRequest 
 
 ```
 
-为了最大化的性能，.net framework应当使用httpwebrequest(对应jfYuRequest) .net core使用HttpClient(对应jfYuHttpClient)。
 
 ```
-var jfYu = new jfYuRequest("https://b2b.10086.cn/b2b/main/listVendorNotice.html?noticeType=2")
+Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+var jfYu1 = new JfYuHttpClient()
 {
-    Method = jfYuRequestMethod.Get
+	Url = "www.xxx.com",
+	Method = RequestMethod.Get,
+	Timeout = 60,
+	RequestEncoding = Encoding.GetEncoding("GB18030"),
 };
-jfYu.RequestHeader.Host = "https://b2b.10086.cn";
-var x = jfYu.GetHtml();
-var y = await jfYu.GetHtmlAsync();
+var html1 = await jfYu1.SendAsync(); 
 
-var jfYu1 = new jfYuHttpClient("https://b2b.10086.cn/b2b/main/listVendorNotice.html?noticeType=2")
+var jfYu = new JfYuHttpRequest()
 {
-    Method = jfYuRequestMethod.Get
+	Url = "www.xxx.com",
+	Method = RequestMethod.Get,
+	Timeout = 60,
+	RequestEncoding = Encoding.GetEncoding("GB18030"),
 };
-jfYu.RequestHeader.Host = "https://b2b.10086.cn";
-var x1 = jfYu.GetHtml();
-var y1 = await jfYu.GetHtmlAsync();
-//下载文件
-jfYuRequest jfYu = new jfYuRequest("https://img.nga.178.com/attachments/mon_201904/11/-7da9Q5-dgq4ZgT3cSzk-qo.jpg");
-jfYu.GetFile("d:/2.jpg",(q,w,e)=> { });
-jfYuHttpClient jfYu1 = new jfYuHttpClient("https://img.nga.178.com/attachments/mon_201904/11/-7da9Q5-dgq4ZgT3cSzk-qo.jpg");
-jfYu1.GetFile("d:/4.jpg");
+var html = await jfYu.SendAsync(); 
 
+var jfYu = new JfYuHttpRequest()
+{
+	Url = "https://www.xxx.com/1.jpg"
+};
+
+var flag = await jfYu.DownloadFileAsync("requestest/2.jpg"); 
+var stream = await jfYu.DownloadFileAsync();
+FileStream fs = File.Create("requestest/3.jpg");
+await fs.WriteAsync(stream?.ToArray());
+fs.Flush();
+fs.Close();
 ```

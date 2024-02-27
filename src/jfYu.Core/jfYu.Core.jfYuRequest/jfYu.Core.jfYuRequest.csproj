@@ -1,32 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;netstandard2.1;net462;net6.0;net7.0;net8.0</TargetFrameworks>
+		<LangVersion>12.0</LangVersion>
+		<Version>8.0.2</Version>
+		<Authors>jfwang</Authors>
+		<Nullable>enable</Nullable>
+		<Description>HttpRequest</Description>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/jfwangncs/jfYu</RepositoryUrl>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+	</PropertyGroup> 
+ 
+	<ItemGroup>
+		<PackageReference Include="Brotli.NET" Version="2.1.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	</ItemGroup>
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
-    <LangVersion>12.0</LangVersion>
-    <Version>8.0.1</Version>
-    <Authors>jfwang</Authors>
-    <Description>HttpRequest Helper</Description>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.1|AnyCPU'">
-    <DefineConstants>TRACE;NETSTANDARD21;NET461</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">
-    <DefineConstants>TRACE;NETSTANDARD21;NET461</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-    <DefineConstants>TRACE;NETSTANDARD20;NET461</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <DefineConstants>TRACE;NETSTANDARD20;NET461</DefineConstants>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="brotli.net" Version="2.1.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\.editorconfig" Link=".editorconfig" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
+		<None Include="..\..\..\LICENSE" Pack="true" PackagePath="" />
+	</ItemGroup>
 </Project>
+

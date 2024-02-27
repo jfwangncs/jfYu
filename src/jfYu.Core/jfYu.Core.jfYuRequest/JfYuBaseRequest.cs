@@ -1,123 +1,74 @@
-﻿using Newtonsoft.Json;
+﻿using jfYu.Core.jfYuRequest.Enum;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace jfYu.Core.jfYuRequest
 {
-    public abstract class jfYuBaseRequest
+    public abstract class JfYuBaseRequest : IJfYuRequest
     {
-        public jfYuBaseRequest(string url)
-        {
-            this.Url = url;
-        }
 
-        #region 属性
-        /// <summary>
-        /// Url
-        /// </summary>
         public string Url { get; set; } = "";
-
-        /// <summary>
-        /// ContentType
-        /// </summary>
-        public string ContentType { get; set; } = "";
-
-        /// <summary>
-        /// get或者post请求，默认为get
-        /// </summary>
-        public jfYuRequestMethod Method { get; set; } = jfYuRequestMethod.Get;
-        /// <summary>
-        /// key=>value参数
-        /// </summary>
-        public Dictionary<string, string> Para { get; set; } = new Dictionary<string, string>();
-        /// <summary>
-        ///  raw参数
-        /// </summary>
-        public string RawPara { get; set; } = "";
-        /// <summary>
-        /// 字符集
-        /// </summary>
-        public Encoding Encoding { get; set; } = Encoding.UTF8;
-        /// <summary>
-        /// 请求cookie
-        /// </summary>
-        public CookieContainer Cookies { get; set; } = new CookieContainer();
-        /// <summary>
-        /// 请求返回的cookie
-        /// </summary>
-        public CookieCollection SetCookies { get; set; } = new CookieCollection();
-        /// <summary>
-        /// 代理
-        /// </summary>
-        public WebProxy Proxy { get; set; } = null;
-        /// <summary>
-        /// 需要上传的文件
-        /// </summary>
-        public Dictionary<string, string> Files { get; set; } = new Dictionary<string, string>();
-        /// <summary>
-        /// 头部请求参数
-        /// </summary>
-        public RequestHeader RequestHeader { get; set; } = new RequestHeader();
-        /// <summary>
-        /// 超时设置（秒） 默认5秒
-        /// </summary>
+        public string ContentType { get; set; } = RequestContentType.TextHtml;
+        public RequestMethod Method { get; set; } = RequestMethod.Get;
+        public Dictionary<string, string> Params { get; set; } = [];
+        public string RawParams { get; set; } = "";
+        public Encoding RequestEncoding { get; set; } = Encoding.UTF8;
+        public CookieContainer RequestCookies { get; set; } = new();
+        public CookieCollection ReturnCookies { get; set; } = [];
+        public WebProxy? Proxy { get; set; }
+        public Dictionary<string, string> Files { get; set; } = [];
+        public RequestHeader RequestHeader { get; set; } = new();
         public int Timeout { get; set; } = 5;
-        /// <summary>
-        /// 失败重复次数 默认1次补重复
-        /// </summary>
-        public int Repetitions { get; set; } = 1;
-        /// <summary>
-        /// post参数是否使用Playload模式，默认不
-        /// </summary>
         public bool UsePayload { get; set; } = false;
-        /// <summary>
-        /// 自定义header头
-        /// </summary>
-        public Dictionary<string, string> CustomHeader { get; set; } = new Dictionary<string, string>();
-
-        public X509Certificate2 Cert = null;
-        #endregion
-
-        #region 方法     
-        /// <summary>
-        /// 拼接参数
-        /// </summary>  
-        protected string GetParaStr()
+        public Dictionary<string, string> CustomHeaders { get; set; } = [];
+        public X509Certificate2? Cert { get; set; }
+        public bool CertificateValidation { get; set; } = false;
+        public HttpStatusCode StatusCode { get; protected set; }
+        public Action<object>? CustomInitFunc { get; set; } 
+        protected string GetParamString()
         {
             try
             {
-                if (this.ContentType == "application/json")
+                if (ContentType == RequestContentType.Json)
                 {
-                    if (!string.IsNullOrEmpty(RawPara))
+                    if (!string.IsNullOrEmpty(RawParams))
                     {
-                        var RawParaDic = RawPara.Split('&');
+                        var RawParaDic = RawParams.Split('&');
                         foreach (var item in RawParaDic)
                         {
                             var r = item.Split('=');
-                            Para.Add(r[0], r[1]);
+                            Params.Add(r[0], r[1]);
                         }
                     }
-                    return JsonConvert.SerializeObject(Para);
+                    return JsonConvert.SerializeObject(Params);
                 }
                 else
                 {
                     string p = "";
-                    foreach (var item in Para)
+                    foreach (var item in Params)
                         p += $"{item.Key}={item.Value}&";
-                    p = p.Trim('&') + RawPara;
+                    p = p.Trim('&') + RawParams;
                     return p;
                 }
             }
             catch (Exception)
             {
-
                 throw;
             }
 
         }
-        #endregion
+
+        public abstract Task<string> SendAsync();
+
+        public abstract Task<bool> DownloadFileAsync(string path, Action<decimal, decimal, decimal>? progress = null);
+
+        public abstract Task<MemoryStream?> DownloadFileAsync(Action<decimal, decimal, decimal>? progress = null);
+                
     }
 }

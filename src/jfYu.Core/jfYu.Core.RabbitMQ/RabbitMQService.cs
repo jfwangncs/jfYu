@@ -122,7 +122,7 @@ namespace jfYu.Core.RabbitMQ
             channel.BasicConsume(queueName, false, consumer);
         }
 
-        public void ReceiveAsync(string queueName, Func<string, Task> func)
+        public void Receive(string queueName, Func<string, Task> func)
         {
             Factory.DispatchConsumersAsync = true;
             var connection = Factory.CreateConnection();
@@ -179,7 +179,7 @@ namespace jfYu.Core.RabbitMQ
             //manually confirm
             channel.BasicConsume(queueName, false, consumer);
         }
-        public void ReceiveAsync(string queueName, string exchangeName, string exchangeType, Func<string, Task> func, string routingKey = "")
+        public void Receive(string queueName, string exchangeName, string exchangeType, Func<string, Task> func, string routingKey = "")
         {
             Factory.DispatchConsumersAsync = true;
             var connection = Factory.CreateConnection();

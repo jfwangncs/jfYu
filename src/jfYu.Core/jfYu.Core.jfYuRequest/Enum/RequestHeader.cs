@@ -1,5 +1,8 @@
-﻿namespace jfYu.Core.jfYuRequest
+﻿namespace jfYu.Core.jfYuRequest.Enum
 {
+    /// <summary>
+    /// request header default values
+    /// </summary>
     public class RequestHeader
     {
         public string Accept { get; set; } = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
@@ -12,7 +15,4 @@
         public string Referer { get; set; } = "";
         public string UserAgent { get; set; } = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36";
     }
-
-
-
 }

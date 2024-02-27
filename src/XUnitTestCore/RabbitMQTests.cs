@@ -6,7 +6,7 @@ using Xunit;
 namespace xUnitTestCore
 {
 
-    public class RabbitMQTest
+    public class RabbitMQTests
     {
 
         public class NullParaData : TheoryData<RabbitMQConfig?>

@@ -11,7 +11,6 @@
 	  <Compile Remove="TestCaptchaCore.cs" />
 	  <Compile Remove="TestConfigCore.cs" />
 	  <Compile Remove="TestDataCore.cs" />
-	  <Compile Remove="TestjfYuRequestCore.cs" />
 	  <Compile Remove="TestMongoDBCore.cs" /> 
 	  <Compile Remove="TestRedisCore.cs" />
 	  <Compile Remove="TestWordCore.cs" />
@@ -28,6 +27,7 @@
 		<PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.2" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
 		<PackageReference Include="Moq" Version="4.20.70" />
+		<PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
 		<PackageReference Include="xunit" Version="2.6.3" />
 		<PackageReference Include="Xunit.DependencyInjection" Version="8.9.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.5.5" />
@@ -38,6 +38,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Cache\jfYu.Core.Cache.csproj" />
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Data\jfYu.Core.Data.csproj" />
+		<ProjectReference Include="..\jfYu.Core\jfYu.Core.jfYuRequest\jfYu.Core.jfYuRequest.csproj" />
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Office\jfYu.Core.Office.csproj" />
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.RabbitMQ\jfYu.Core.RabbitMQ.csproj" />
 		<ProjectReference Include="..\jfYu.Core\jfYu.Core.Redis\jfYu.Core.Redis.csproj" />

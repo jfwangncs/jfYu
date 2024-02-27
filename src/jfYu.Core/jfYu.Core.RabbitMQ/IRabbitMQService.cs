@@ -54,7 +54,7 @@ namespace jfYu.Core.RabbitMQ
         /// <param name="exchangeType">exchange type</param>
         /// <param name="func">function</param>
         /// <param name="routingKey">routing key</param>
-        void ReceiveAsync(string queueName, string exchangeName, string exchangeType, Func<string, Task> func, string routingKey = "");
+        void Receive(string queueName, string exchangeName, string exchangeType, Func<string, Task> func, string routingKey = "");
 
 
         /// <summary>
@@ -62,8 +62,26 @@ namespace jfYu.Core.RabbitMQ
         /// </summary>
         /// <param name="queueName">queue name</param>
         /// <param name="func">function</param>
-        void ReceiveAsync(string queueName, Func<string, Task> func);
+        void Receive(string queueName, Func<string, Task> func);
+
+        /// <summary>
+        /// QueueBind
+        /// </summary>
+        /// <param name="queueName">queue name</param>
+        /// <param name="exchangeName">exchange name</param>
+        /// <param name="exchangeType">exchange type</param>
+        /// <param name="routingKey">routing key</param>
+        /// <returns></returns>
         bool QueueBind(string queueName, string exchangeName, ExchangeType exchangeType, string routingKey = "");
+
+        /// <summary>
+        /// ExchangeBind
+        /// </summary>
+        /// <param name="destination">destination exchange name</param>
+        /// <param name="source">source exchange nam</param>
+        /// <param name="exchangeType">exchange type</param>
+        /// <param name="routingKey">routing key</param>
+        /// <returns></returns>
         bool ExchangeBind(string destination, string source, ExchangeType exchangeType, string routingKey = "");
     }
 }

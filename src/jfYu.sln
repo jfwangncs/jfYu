@@ -15,6 +15,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jfYu.Core.Data", "jfYu.Core
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jfYu.Core.RabbitMQ", "jfYu.Core\jfYu.Core.RabbitMQ\jfYu.Core.RabbitMQ.csproj", "{62E35DEE-8023-4EA1-A7E1-6EE600762521}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jfYu.Core.jfYuRequest", "jfYu.Core\jfYu.Core.jfYuRequest\jfYu.Core.jfYuRequest.csproj", "{F1E0C5AD-99B3-49C3-98DD-5374B490A242}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2D5CC537-56EC-455E-94B4-8CEEBDA19A4F}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +52,10 @@ Global
 		{62E35DEE-8023-4EA1-A7E1-6EE600762521}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62E35DEE-8023-4EA1-A7E1-6EE600762521}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62E35DEE-8023-4EA1-A7E1-6EE600762521}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1E0C5AD-99B3-49C3-98DD-5374B490A242}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1E0C5AD-99B3-49C3-98DD-5374B490A242}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1E0C5AD-99B3-49C3-98DD-5374B490A242}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1E0C5AD-99B3-49C3-98DD-5374B490A242}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

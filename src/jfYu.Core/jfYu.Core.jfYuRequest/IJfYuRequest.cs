@@ -1,32 +1,127 @@
-﻿using System;
+﻿using jfYu.Core.jfYuRequest.Enum;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace jfYu.Core.jfYuRequest
 {
-    public interface IjfYuRequest
+    public interface IJfYuRequest
     {
         /// <summary>
-        /// 异步获取网页内容
+        /// HttpStatusCode
         /// </summary>
-        /// <returns>网页内容</returns>
+        public HttpStatusCode StatusCode { get; }
+
+        /// <summary>
+        /// Url
+        /// </summary>
+        public string Url { get; set; }
+
+        /// <summary>
+        /// ContentType defalut:application/json
+        /// </summary>
+        public string ContentType { get; set; }
+
+        /// <summary>
+        /// get/post default:get
+        /// </summary>
+        public RequestMethod Method { get; set; }
+
+        /// <summary>
+        ///  params
+        /// </summary>
+        public Dictionary<string, string> Params { get; set; }
+
+        /// <summary>
+        ///  raw pParams
+        /// </summary>
+        public string RawParams { get; set; }
+
+        /// <summary>
+        /// encoding default:utf8
+        /// </summary>
+        public Encoding RequestEncoding { get; set; }
+
+        /// <summary>
+        /// request cookies
+        /// </summary>
+        public CookieContainer RequestCookies { get; set; }
+
+        /// <summary>
+        /// return cookies
+        /// </summary>
+        public CookieCollection ReturnCookies { get; set; }
+
+        /// <summary>
+        /// proxy
+        /// </summary>
+        public WebProxy? Proxy { get; set; }
+
+        /// <summary>
+        /// upload files
+        /// </summary>
+        public Dictionary<string, string> Files { get; set; }
+
+        /// <summary>
+        /// header
+        /// </summary>
+        public RequestHeader RequestHeader { get; set; }
+
+        /// <summary>
+        /// timeout default:5 seconds
+        /// </summary>
+        public int Timeout { get; set; }
+
+        /// <summary>
+        /// use payload default:false
+        /// </summary>
+        public bool UsePayload { get; set; }
+
+        /// <summary>
+        /// custom headers
+        /// </summary>
+        public Dictionary<string, string> CustomHeaders { get; set; }
+
+        /// <summary>
+        /// ssl
+        /// </summary>
+        public X509Certificate2? Cert { get; set; }
+
+        /// <summary>
+        /// CertificateValidation default=false
+        /// </summary>
+        public bool CertificateValidation { get; set; }
+
+        /// <summary>
+        /// custom init func.for jfYuHttpRequest:object as HttpWebRequest,for jfYuHttpClient:object as HttpClient
+        /// </summary>
+        Action<object>? CustomInitFunc { get; set; } 
+
+        /// <summary>
+        /// get html
+        /// </summary>
+        /// <returns>result</returns>
         Task<string> SendAsync();
 
 
         /// <summary>
-        /// 下载文件
+        /// download file
         /// </summary>
-        /// <param name="path">文件保存地址</param>
-        /// <param name="setProgress">进度、速度、所需时间匿名回调函数，第一个参数：为下载进度，第二个参数：下载速度默认单位KB/s,第三个参数：剩余所需时间单位秒</param>
-        Task<bool> DownloadFileAsync(string savePath, Action<decimal, decimal, decimal> setProgress = null);
-
+        /// <param name="path">file save location</param>
+        /// <param name="progress">progress delegate function first：download progress，the second：download speed KB/s,third ：remaining time required in seconds</param>
+        /// <returns>successful/failed</returns>
+        Task<bool> DownloadFileAsync(string path, Action<decimal, decimal, decimal>? progress = null);
 
         /// <summary>
-        /// 下载文件
-        /// </summary>
-        /// <param name="path">文件保存地址</param>
-        /// <param name="setProgress">进度、速度、所需时间匿名回调函数，第一个参数：为下载进度，第二个参数：下载速度默认单位KB/s,第三个参数：剩余所需时间单位秒</param>
-        Task<MemoryStream> DownloadFileAsync(Action<decimal, decimal, decimal> setProgress = null);
+        /// download file
+        /// </summary> 
+        /// <param name="progress">progress delegate function first：download progress，the second：download speed KB/s,third ：remaining time required in seconds</param>
+        /// <returns>file stream</returns>
+        Task<MemoryStream?> DownloadFileAsync(Action<decimal, decimal, decimal>? progress = null);
 
     }
 }
