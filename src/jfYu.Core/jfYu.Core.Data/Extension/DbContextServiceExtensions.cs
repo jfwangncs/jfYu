@@ -53,6 +53,11 @@ namespace jfYu.Core.Data.Extension
                 }
                 else
                 {
+                    services.AddScoped<IContextWrite, T>(services =>
+                    {
+                        SetConfiglValue(configuration);
+                        return services.GetService<T>() ?? throw new ArgumentNullException(nameof(T));
+                    });
                     services.AddScoped<IContextRead, T>(services =>
                     {
                         return services.GetService<T>() ?? throw new ArgumentNullException(nameof(T));

@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.Data
 {
-    public class Service<T, TContext>(TContext context, ReadonlyDBContext<TContext> readonlyContext) : IService<T, TContext> where T : BaseEntity
+    public class Service<T, TContext>(IContextWrite context, ReadonlyDBContext<TContext> readonlyContext) : IService<T, TContext> where T : BaseEntity
         where TContext : DbContext, IJfYuDbContextService
     {
-        public TContext Context { get; } = context;
-        public TContext ReadonlyContext { get; } = readonlyContext?.Current ?? context;
+        public TContext Context { get; } = (TContext)context;
+        public TContext ReadonlyContext { get; } = (TContext)(readonlyContext?.Current ?? context);
 
         public virtual async Task<int> AddAsync(T entity)
         {
