@@ -43,7 +43,7 @@ namespace jfYu.Core.Office.Excel
         /// <param name="stream">excel file stream</param>
         /// <param name="firstRow">srart index,default:1,0 is title</param>
         /// <param name="sheetIndex">sheet index</param>
-        List<T> GetList<T>(Stream stream, int firstRow = 1, int sheetIndex = 0) where T : new();
+        List<T>? GetList<T>(Stream stream, int firstRow = 1, int sheetIndex = 0) where T : new();
 
         /// <summary>
         /// import to list
@@ -52,7 +52,7 @@ namespace jfYu.Core.Office.Excel
         /// <param name="filePath">excel file path</param>
         /// <param name="firstRow">srart index,default:1,0 is title</param>
         /// <param name="sheetIndex">sheet index</param>
-        List<T> GetList<T>(string filePath, int firstRow = 1, int sheetIndex = 0) where T : new();
+        List<T>? GetList<T>(string filePath, int firstRow = 1, int sheetIndex = 0) where T : new();
 
 
         /// <summary>

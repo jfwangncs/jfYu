@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.Common;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace jfYu.Core.Office.Excel
@@ -315,11 +316,9 @@ namespace jfYu.Core.Office.Excel
             if (!File.Exists(filePath))
                 throw new FileNotFoundException($"{filePath} file not found");
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            IWorkbook wb;
-            using FileStream file = new(filePath, FileMode.Open, FileAccess.Read);
             try
             {
-                wb = WorkbookFactory.Create(file);
+                IWorkbook wb = WorkbookFactory.Create(filePath);
                 ISheet sheet = wb.GetSheetAt(sheetIndex);
                 return GetDataTable(sheet, firstRow);
             }
@@ -363,9 +362,23 @@ namespace jfYu.Core.Office.Excel
         /// <param name="firstRow">srart index,default:1,0 is title</param>
         /// <param name="sheetIndex">sheet index</param>
         /// <returns></returns>
-        public List<T> GetList<T>(string filePath, int firstRow = 1, int sheetIndex = 0) where T : new()
+        public List<T>? GetList<T>(string filePath, int firstRow = 1, int sheetIndex = 0) where T : new()
         {
-            return ExcelExtension.ToModel<T>(GetDataTable(filePath, firstRow, sheetIndex));
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException($"{filePath} file not found");
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            try
+            {
+                using FileStream file = new(filePath, FileMode.Open, FileAccess.Read);
+                IWorkbook wb = WorkbookFactory.Create(file);
+                ISheet sheet = wb.GetSheetAt(sheetIndex);
+                return GetList<T>(sheet, firstRow);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"import failed,{ex.Message},{ex.InnerException?.Message}");
+            }
+
         }
 
         /// <summary>
@@ -375,9 +388,158 @@ namespace jfYu.Core.Office.Excel
         /// <param name="firstRow">srart index,default:1,0 is title</param>
         /// <param name="sheetIndex">sheet index</param>
         /// <returns></returns>
-        public List<T> GetList<T>(Stream stream, int firstRow = 1, int sheetIndex = 0) where T : new()
+        public List<T>? GetList<T>(Stream stream, int firstRow = 1, int sheetIndex = 0) where T : new()
         {
-            return ExcelExtension.ToModel<T>(GetDataTable(stream, firstRow, sheetIndex));
+
+            if (stream == null)
+                throw new ArgumentNullException("steam is null");
+            try
+            {
+                DataTable dt = new();
+                IWorkbook wb;
+                using (stream)
+                    wb = WorkbookFactory.Create(stream);
+                ISheet sheet = wb.GetSheetAt(sheetIndex);
+                return GetList<T>(sheet, firstRow);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"import failed,{ex.Message},{ex.InnerException?.Message}");
+            }
+        }
+
+        private List<T>? GetList<T>(ISheet sheet, int firstRow)
+        {
+            //title
+            var headerRow = sheet.GetRow(0);
+            if (headerRow == null)
+                return default;
+            int cellCount = headerRow.LastCellNum;
+            var titles = ExcelExtension.GetTitles<T>();
+            Dictionary<int, string> cellNums = [];
+            for (int i = headerRow.FirstCellNum; i < cellCount; i++)
+            {
+                var headerValue = headerRow.GetCell(i).StringCellValue.Replace(" ", "").Trim();
+                if (titles.ContainsKey(headerValue))
+                    cellNums.Add(i, headerValue);
+            }
+            List<T> list = [];
+            //content
+            for (int i = firstRow; i <= sheet.LastRowNum; i++)
+            {
+                try
+                {
+                    IRow row = sheet.GetRow(i);
+                    if (sheet.GetRow(i) != null)
+                    {
+                        var obj = Activator.CreateInstance(typeof(T));
+                        if (obj == null)
+                            return default;
+                        T item = (T)obj;
+                        foreach (var c in cellNums)
+                        {
+                            if (row != null)
+                            {
+                                var cell = row.GetCell(c.Key);
+                                object? value;
+                                switch (cell.CellType)
+                                {
+                                    case CellType.Numeric:
+                                        if (DateUtil.IsCellDateFormatted(cell))
+                                            value = DateTime.FromOADate(cell.NumericCellValue);
+                                        else
+                                            value = Convert.ToDecimal(cell.NumericCellValue);
+                                        break;
+                                    case CellType.Boolean:
+                                        value = Convert.ToString(cell.BooleanCellValue);
+                                        break;
+                                    case CellType.Error:
+                                        value = ErrorEval.GetText(cell.ErrorCellValue);
+                                        break;
+                                    case CellType.Formula:
+                                        switch (cell.CachedFormulaResultType)
+                                        {
+
+                                            case CellType.Numeric:
+                                                value = Convert.ToString(cell.NumericCellValue);
+                                                break;
+                                            case CellType.Boolean:
+                                                value = Convert.ToString(cell.BooleanCellValue);
+                                                break;
+                                            case CellType.Error:
+                                                value = ErrorEval.GetText(cell.ErrorCellValue);
+                                                break;
+                                            default:
+                                            case CellType.String:
+                                                string strFORMULA = cell.StringCellValue;
+                                                value = strFORMULA?.ToString();
+                                                break;
+                                        }
+                                        break;
+                                    default:
+                                    case CellType.String:
+                                        string str = cell.StringCellValue;
+                                        value = str?.ToString();
+                                        break;
+                                }
+
+                                PropertyInfo? p = typeof(T)?.GetProperty(c.Value);
+                                try
+                                { // if exists, set the value
+                                    if (p != null)
+                                    {
+                                        if (value != null)
+                                        {
+                                            if (p.PropertyType == typeof(int))
+                                            {
+                                                p.SetValue(item, int.Parse(value.ToString() ?? ""), null);
+                                            }
+                                            else if (p.PropertyType == typeof(long))
+                                            {
+                                                p.SetValue(item, long.Parse(value.ToString() ?? ""), null);
+                                            }
+                                            else if (p.PropertyType == typeof(double))
+                                            {
+                                                p.SetValue(item, double.Parse(value.ToString() ?? "", null));
+                                            }
+                                            else if (p.PropertyType == typeof(decimal))
+                                            {
+                                                p.SetValue(item, decimal.Parse(value.ToString() ?? ""), null);
+                                            }
+                                            else if (p.PropertyType == typeof(float))
+                                            {
+                                                p.SetValue(item, float.Parse(value.ToString() ?? ""), null);
+                                            }
+                                            else
+                                            {
+                                                p.SetValue(item, value.ToString() ?? "", null);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            p.SetValue(item, null, null);
+                                        }
+                                    }
+                                }
+                                catch (ArgumentException ex)
+                                {
+                                    throw new Exception($"convert {p?.Name} get error,value:{value}，model format:{p?.PropertyType.Name},errorMsg:{ex.Message}");
+                                }
+                                catch (Exception)
+                                {
+                                    throw;
+                                }
+                            }
+                        }
+                        list.Add(item);
+                    }
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+            return list;
         }
 
         /// <summary>

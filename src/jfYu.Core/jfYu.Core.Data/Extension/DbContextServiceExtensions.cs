@@ -2,13 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Threading;
-
 namespace jfYu.Core.Data.Extension
 {
     public static class DbContextServiceExtensions
     {
-        private static readonly AsyncLocal<DatabaseConfig> config = new();
+        private static readonly object _syncLock = new();
+        private static DatabaseConfig? _config;
 
         /// <summary>
         /// injection
@@ -18,23 +17,24 @@ namespace jfYu.Core.Data.Extension
             ArgumentNullException.ThrowIfNull(configuration);
             ArgumentException.ThrowIfNullOrEmpty(configuration.ConnectionString);
 
-            config.Value = configuration;
+            SetConfiglValue(configuration);
             try
             {
-                services.AddDbContext<T>(masterOptBuilder =>
+                services.AddDbContext<T>((q, masterOptBuilder) =>
                 {
-                    var dbConfig = config.Value ?? throw new ArgumentNullException(nameof(configuration));
-                    switch (dbConfig.DatabaseType)
+                    var config = GetConfigValue();
+                    ArgumentNullException.ThrowIfNull(config);
+                    switch (config.DatabaseType)
                     {
                         case DatabaseType.Mysql:
-                            masterOptBuilder.UseMySql(dbConfig.ConnectionString, ServerVersion.AutoDetect(dbConfig.ConnectionString)).EnableDetailedErrors();
+                            masterOptBuilder.UseMySql(config.ConnectionString, ServerVersion.AutoDetect(config.ConnectionString)).EnableDetailedErrors();
                             break;
                         case DatabaseType.Sqlite:
-                            masterOptBuilder.UseSqlite(dbConfig.ConnectionString).EnableDetailedErrors();
+                            masterOptBuilder.UseSqlite(config.ConnectionString).EnableDetailedErrors();
                             break;
                         default:
                         case DatabaseType.SqlServer:
-                            masterOptBuilder.UseSqlServer(dbConfig.ConnectionString).EnableDetailedErrors();
+                            masterOptBuilder.UseSqlServer(config.ConnectionString).EnableDetailedErrors();
                             break;
                     }
                 }, ServiceLifetime.Transient, ServiceLifetime.Transient);
@@ -46,7 +46,7 @@ namespace jfYu.Core.Data.Extension
                     {
                         int index = new Random().Next(configuration.ReadOnlyConfigs.Count);
                         var readonlyConfig = configuration.ReadOnlyConfigs[index];
-                        config.Value = readonlyConfig;
+                        SetConfiglValue(readonlyConfig);
                         return services.GetService<T>() ?? throw new ArgumentNullException(nameof(T));
                     });
 
@@ -67,6 +67,22 @@ namespace jfYu.Core.Data.Extension
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        public static DatabaseConfig? GetConfigValue()
+        {
+            lock (_syncLock)
+            {
+                return _config;
+            }
+        }
+
+        public static void SetConfiglValue(DatabaseConfig value)
+        {
+            lock (_syncLock)
+            {
+                _config = value;
             }
         }
 

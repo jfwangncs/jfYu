@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net462;net6.0;net7.0;net8.0</TargetFrameworks>
 		<LangVersion>12.0</LangVersion>
-		<Version>8.0.2</Version>
+		<Version>8.0.3</Version>
 		<Authors>jfwang</Authors>
 		<Nullable>enable</Nullable>
 		<Description>read/write microsoft office file</Description>
