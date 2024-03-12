@@ -17,11 +17,14 @@ namespace jfYu.Core.jfYuRequest
             var paramString = GetParamString();
 
             if (Method.Equals(RequestMethod.Get))
-                _request = WebRequest.Create($"{Url}?{paramString}") as HttpWebRequest;
-
+            {
+                _request = (HttpWebRequest)WebRequest.Create($"{Url}?{paramString}");
+                _request.Method = Method.ToString().ToUpper();
+            }
             else
             {
                 _request = (HttpWebRequest)WebRequest.Create(Url);
+                _request.Method = Method.ToString().ToUpper();
                 if (UsePayload)
                 {
                     var memStream = new MemoryStream();
@@ -75,7 +78,7 @@ namespace jfYu.Core.jfYuRequest
 
             if (_request == null)
                 throw new NullReferenceException("init failed._request is null");
-            _request.Method = Method.ToString().ToUpper();
+         
             _request.ContentType = ContentType;
             _request.CookieContainer = RequestCookies;
             try
