@@ -11,7 +11,7 @@ namespace jfYu.Core.RabbitMQ
 
     public class RabbitMQService : IRabbitMQService
     {
-        public ConnectionFactory Factory { get; } 
+        public ConnectionFactory Factory { get; }
 
         public RabbitMQService(RabbitMQConfig config)
         {
@@ -25,7 +25,7 @@ namespace jfYu.Core.RabbitMQ
                     Password = config.Password,
                     VirtualHost = config.VirtualHost,
                     RequestedHeartbeat = TimeSpan.FromSeconds(config.HeartBeat),
-                    AutomaticRecoveryEnabled = true, 
+                    AutomaticRecoveryEnabled = true,
 
                 };
             }
@@ -94,7 +94,7 @@ namespace jfYu.Core.RabbitMQ
         }
 
 
-        public void Receive(string queueName, Action<string> func)
+        public void Receive(string queueName, Func<string, bool> func)
         {
             Factory.DispatchConsumersAsync = false;
             var connection = Factory.CreateConnection();
@@ -108,8 +108,10 @@ namespace jfYu.Core.RabbitMQ
                 try
                 {
                     string message = Encoding.UTF8.GetString(ea.Body.ToArray());
-                    func(message);
-                    channel.BasicAck(ea.DeliveryTag, false);
+                    if (func(message))
+                        channel.BasicAck(ea.DeliveryTag, false);
+                    else
+                        channel.BasicReject(ea.DeliveryTag, true);
                 }
                 catch (Exception)
                 {
@@ -122,7 +124,7 @@ namespace jfYu.Core.RabbitMQ
             channel.BasicConsume(queueName, false, consumer);
         }
 
-        public void Receive(string queueName, Func<string, Task> func)
+        public void Receive(string queueName, Func<string, Task<bool>> func)
         {
             Factory.DispatchConsumersAsync = true;
             var connection = Factory.CreateConnection();
@@ -136,8 +138,10 @@ namespace jfYu.Core.RabbitMQ
                 try
                 {
                     string message = Encoding.UTF8.GetString(ea.Body.ToArray());
-                    await func(message);
-                    channel.BasicAck(ea.DeliveryTag, false);
+                    if (await func(message))
+                        channel.BasicAck(ea.DeliveryTag, false);
+                    else
+                        channel.BasicReject(ea.DeliveryTag, true);
                 }
                 catch (Exception)
                 {
@@ -150,7 +154,7 @@ namespace jfYu.Core.RabbitMQ
             channel.BasicConsume(queueName, false, consumer);
         }
 
-        public void Receive(string queueName, string exchangeName, string exchangeType, Action<string> func, string routingKey = "")
+        public void Receive(string queueName, string exchangeName, string exchangeType, Func<string,bool> func, string routingKey = "")
         {
             Factory.DispatchConsumersAsync = false;
             var connection = Factory.CreateConnection();
@@ -166,8 +170,10 @@ namespace jfYu.Core.RabbitMQ
                 try
                 {
                     string message = Encoding.UTF8.GetString(ea.Body.ToArray());
-                    func(message);
-                    channel.BasicAck(ea.DeliveryTag, false);
+                    if (func(message))
+                        channel.BasicAck(ea.DeliveryTag, false);
+                    else
+                        channel.BasicReject(ea.DeliveryTag, true);
                 }
                 catch (Exception)
                 {
@@ -179,7 +185,7 @@ namespace jfYu.Core.RabbitMQ
             //manually confirm
             channel.BasicConsume(queueName, false, consumer);
         }
-        public void Receive(string queueName, string exchangeName, string exchangeType, Func<string, Task> func, string routingKey = "")
+        public void Receive(string queueName, string exchangeName, string exchangeType, Func<string, Task<bool>> func, string routingKey = "")
         {
             Factory.DispatchConsumersAsync = true;
             var connection = Factory.CreateConnection();
@@ -195,8 +201,10 @@ namespace jfYu.Core.RabbitMQ
                 try
                 {
                     string message = Encoding.UTF8.GetString(ea.Body.ToArray());
-                    await func(message);
-                    channel.BasicAck(ea.DeliveryTag, false);
+                    if (await func(message))
+                        channel.BasicAck(ea.DeliveryTag, false);
+                    else
+                        channel.BasicReject(ea.DeliveryTag, true);
                 }
                 catch (Exception)
                 {
