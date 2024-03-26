@@ -460,14 +460,14 @@ namespace xUnitTestCore
             _jfYuExcel.ToExcel(source, "exceltest/ImportList.xlsx");
             var dtsource = _jfYuExcel.GetList<ExcelTestNoDisplayName>("exceltest/ImportList.xlsx");
 
-            Assert.Equal(3, dtsource.Count);
+            Assert.Equal(3, dtsource?.Count);
 
             var pops = typeof(ExcelTestNoDisplayName).GetProperties();
             for (int i = 0; i < source.Count; i++)
             {
                 for (int j = 0; j < pops.Length; j++)
                 {
-                    Assert.True(pops[j].GetValue(dtsource[i])?.ToString() == pops[j].GetValue(source[i])?.ToString());
+                    Assert.True(pops[j].GetValue(dtsource?[i])?.ToString() == pops[j].GetValue(source[i])?.ToString());
                 }
             }
             File.Delete("exceltest/ImportList.xlsx");
@@ -488,17 +488,17 @@ namespace xUnitTestCore
             _jfYuExcel.ToExcel(source, "exceltest/ImportListMoreFiled.xlsx");
             var dtsource = _jfYuExcel.GetList<ExcelTestMore>("exceltest/ImportListMoreFiled.xlsx");
 
-            Assert.Equal(3, dtsource.Count);
+            Assert.Equal(3, dtsource?.Count);
 
 
             for (int i = 0; i < source.Count; i++)
             {
-                Assert.True(dtsource[i].Name == source[i].Name);
-                Assert.True(dtsource[i].Age == source[i].Age);
-                Assert.True(dtsource[i].Address == source[i].Address);
+                Assert.True(dtsource?[i].Name == source[i].Name);
+                Assert.True(dtsource?[i].Age == source[i].Age);
+                Assert.True(dtsource?[i].Address == source[i].Address);
 
-                Assert.Null(dtsource[i].Phone);
-                Assert.Null(dtsource[i].Num);
+                Assert.Null(dtsource?[i].Phone);
+                Assert.Null(dtsource?[i].Num);
             }
 
             File.Delete("exceltest/ImportListMoreFiled.xlsx");
@@ -519,13 +519,13 @@ namespace xUnitTestCore
             _jfYuExcel.ToExcel(source, "exceltest/ImportListLessFiled.xlsx");
             var dtsource = _jfYuExcel.GetList<ExcelTestLess>("exceltest/ImportListLessFiled.xlsx");
 
-            Assert.Equal(3, dtsource.Count);
+            Assert.Equal(3, dtsource?.Count);
 
 
             for (int i = 0; i < source.Count; i++)
             {
-                Assert.True(dtsource[i].Name == source[i].Name);
-                Assert.True(dtsource[i].Age == source[i].Age);
+                Assert.True(dtsource?[i].Name == source[i].Name);
+                Assert.True(dtsource?[i].Age == source[i].Age);
             }
             File.Delete("exceltest/ImportListLessFiled.xlsx");
         }
@@ -582,14 +582,14 @@ namespace xUnitTestCore
             _jfYuExcel.ToExcel(source, "exceltest/ImListStream.xlsx");
             var dtsource = _jfYuExcel.GetList<ExcelTestNoDisplayName>(File.Open("exceltest/ImListStream.xlsx", FileMode.Open));
 
-            Assert.Equal(3, dtsource.Count);
+            Assert.Equal(3, dtsource?.Count);
 
             var pops = typeof(ExcelTestNoDisplayName).GetProperties();
             for (int i = 0; i < source.Count; i++)
             {
                 for (int j = 0; j < pops.Length; j++)
                 {
-                    Assert.True(pops[j].GetValue(dtsource[i])?.ToString() == pops[j].GetValue(source[i])?.ToString());
+                    Assert.True(pops[j].GetValue(dtsource?[i])?.ToString() == pops[j].GetValue(source[i])?.ToString());
                 }
             }
             File.Delete("exceltest/ImListStream.xlsx");
