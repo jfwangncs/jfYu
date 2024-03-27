@@ -51,7 +51,7 @@ namespace xUnitTestCore
             foreach (var item in companyFakeData)
             {
                 //插入数据
-                sql = $"INSERT INTO Companys VALUES('{item.Name}','{item.ID.ToString().ToUpper()}',{item.Age},{item.State},'{item.CreatedTime}','{item.UpdatedTime}')";
+                sql = $"INSERT INTO Companys VALUES('{item.Name}','{item.Id.ToString().ToUpper()}',{item.Age},{item.State},'{item.CreatedTime}','{item.UpdatedTime}')";
                 cmd.CommandText = sql;
                 cmd.ExecuteNonQuery();
             }

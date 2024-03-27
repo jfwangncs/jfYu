@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace jfYu.Core.Data.Model
@@ -13,7 +12,7 @@ namespace jfYu.Core.Data.Model
         /// Id
         /// </summary>
         [Key]
-        public Guid ID { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
         /// State

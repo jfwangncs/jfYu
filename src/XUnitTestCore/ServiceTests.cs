@@ -66,9 +66,9 @@ namespace xUnitTestCore
             var data = await _companyService.GetOneAsync(q => true);
 
             Assert.NotNull(data);
-            Assert.Equal(1, await _companyService.RemoveAsync(q => q.ID.Equals(data.ID)));
+            Assert.Equal(1, await _companyService.RemoveAsync(q => q.Id.Equals(data.Id)));
 
-            data = await _companyService.GetOneAsync(q => q.ID == data.ID);
+            data = await _companyService.GetOneAsync(q => q.Id == data.Id);
             Assert.NotNull(data);
             Assert.Equal(0, data.State);
             Assert.Equal(0, await _companyService.RemoveAsync(null));
@@ -79,8 +79,8 @@ namespace xUnitTestCore
         { 
             var data = await _companyService.GetOneAsync(q => true);
             Assert.NotNull(data);
-            Assert.Equal(1, await _companyService.HardRemoveAsync(q => q.ID == data.ID));
-            Assert.Null(await _companyService.GetOneAsync(q => q.ID == data.ID));
+            Assert.Equal(1, await _companyService.HardRemoveAsync(q => q.Id == data.Id));
+            Assert.Null(await _companyService.GetOneAsync(q => q.Id == data.Id));
 
             Assert.Equal(0, await _companyService.HardRemoveAsync(null));
         }
@@ -90,7 +90,7 @@ namespace xUnitTestCore
         { 
             var data = new Company() { Age = 33, Name = "test" };
             await _companyService.AddAsync(data);
-            Assert.NotNull(await _companyService.GetOneAsync(q => q.ID == data.ID));
+            Assert.NotNull(await _companyService.GetOneAsync(q => q.Id == data.Id));
             Assert.Null(await _companyService.GetOneAsync());
             Assert.Null(await _companyService.GetOneAsync(q => q.State == 33));
         }

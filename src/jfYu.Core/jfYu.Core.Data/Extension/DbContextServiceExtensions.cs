@@ -1,14 +1,14 @@
 ﻿using jfYu.Core.Data.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Globalization;
+using System.Reflection;
 namespace jfYu.Core.Data.Extension
 {
     public static class DbContextServiceExtensions
-    {
-        private static readonly object _syncLock = new();
-        private static DatabaseConfig? _config;
-
+    {       
         /// <summary>
         /// injection
         /// </summary>  
@@ -17,27 +17,24 @@ namespace jfYu.Core.Data.Extension
             ArgumentNullException.ThrowIfNull(configuration);
             ArgumentException.ThrowIfNullOrEmpty(configuration.ConnectionString);
 
-            SetConfiglValue(configuration);
             try
             {
                 services.AddDbContext<T>((q, masterOptBuilder) =>
                 {
-                    var config = GetConfigValue();
-                    ArgumentNullException.ThrowIfNull(config);
-                    switch (config.DatabaseType)
+                    switch (configuration.DatabaseType)
                     {
                         case DatabaseType.Mysql:
-                            masterOptBuilder.UseMySql(config.ConnectionString, ServerVersion.AutoDetect(config.ConnectionString)).EnableDetailedErrors();
+                            masterOptBuilder.UseMySql(configuration.ConnectionString, ServerVersion.AutoDetect(configuration.ConnectionString)).EnableDetailedErrors();
                             break;
                         case DatabaseType.Sqlite:
-                            masterOptBuilder.UseSqlite(config.ConnectionString).EnableDetailedErrors();
+                            masterOptBuilder.UseSqlite(configuration.ConnectionString).EnableDetailedErrors();
                             break;
                         default:
                         case DatabaseType.SqlServer:
-                            masterOptBuilder.UseSqlServer(config.ConnectionString).EnableDetailedErrors();
+                            masterOptBuilder.UseSqlServer(configuration.ConnectionString).EnableDetailedErrors();
                             break;
                     }
-                }, ServiceLifetime.Transient, ServiceLifetime.Transient);
+                });
 
 
                 if (configuration.ReadOnlyConfigs != null && configuration.ReadOnlyConfigs.Count > 0)
@@ -46,16 +43,29 @@ namespace jfYu.Core.Data.Extension
                     {
                         int index = new Random().Next(configuration.ReadOnlyConfigs.Count);
                         var readonlyConfig = configuration.ReadOnlyConfigs[index];
-                        SetConfiglValue(readonlyConfig);
-                        return services.GetService<T>() ?? throw new ArgumentNullException(nameof(T));
+                        var optionsBuilder = new DbContextOptionsBuilder<T>();
+                        switch (readonlyConfig.DatabaseType)
+                        {
+                            case DatabaseType.Mysql:
+                                optionsBuilder.UseMySql(readonlyConfig.ConnectionString, ServerVersion.AutoDetect(readonlyConfig.ConnectionString)).EnableDetailedErrors();
+                                break;
+                            case DatabaseType.Sqlite:
+                                optionsBuilder.UseSqlite(readonlyConfig.ConnectionString).EnableDetailedErrors();
+                                break;
+                            default:
+                            case DatabaseType.SqlServer:
+                                optionsBuilder.UseSqlServer(readonlyConfig.ConnectionString).EnableDetailedErrors();
+                                break;
+                        }
+                        var dbContextType = typeof(T);
+                        var dbContext = Activator.CreateInstance(dbContextType, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, [optionsBuilder.Options], CultureInfo.InvariantCulture);
+                        return (T)(dbContext ?? throw new ArgumentNullException(nameof(T)));
                     });
-
                 }
                 else
                 {
                     services.AddScoped<IContextWrite, T>(services =>
-                    {
-                        SetConfiglValue(configuration);
+                    {                    
                         return services.GetService<T>() ?? throw new ArgumentNullException(nameof(T));
                     });
                     services.AddScoped<IContextRead, T>(services =>
@@ -74,22 +84,5 @@ namespace jfYu.Core.Data.Extension
                 throw;
             }
         }
-
-        public static DatabaseConfig? GetConfigValue()
-        {
-            lock (_syncLock)
-            {
-                return _config;
-            }
-        }
-
-        public static void SetConfiglValue(DatabaseConfig value)
-        {
-            lock (_syncLock)
-            {
-                _config = value;
-            }
-        }
-
     }
 }
