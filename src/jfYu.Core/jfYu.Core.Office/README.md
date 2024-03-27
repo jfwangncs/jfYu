@@ -1,32 +1,32 @@
 
 ### <a href="#Office">Office</a>
 ```
-1¡¢Ö§³Öµ¼³ö¡¢µ¼Èë¡¢×ÔÓÉ²Ù×÷Excel¡£
-2¡¢Êı¾İÔ´Ö§³ÖList,Datatable¡¢IQueryable¡¢DbDataReader¡£
-3¡¢×Ô¶¯Ê¶±ğ±íÍ·£¬Èç´øModelµÄµ¼³ö£¬²¢ÇÒModel×Ö¶Î±ê¼ÇÓĞDisplayNameÔò×Ô¶¯Ê¶±ğÎª±íÍ·£¬Ò²¿É×ÔĞĞÉèÖÃ±íÍ·¡£
-4¡¢Ê¹ÓÃSXSSFµ¼³ö·½Ê½£¬½µµÍÄÚ´æÕ¼ÓÃÁ¿¡£Ö§³Öº£Á¿Êı¾İµ¼³ö£¬Ê¹ÓÃ³¬¹ı100wÊı¾İ×Ô¶¯·ÖSheet
+1ã€æ”¯æŒå¯¼å‡ºã€å¯¼å…¥ã€è‡ªç”±æ“ä½œExcelã€‚
+2ã€æ•°æ®æºæ”¯æŒList,Datatableã€IQueryableã€DbDataReaderã€‚
+3ã€è‡ªåŠ¨è¯†åˆ«è¡¨å¤´ï¼Œå¦‚å¸¦Modelçš„å¯¼å‡ºï¼Œå¹¶ä¸”Modelå­—æ®µæ ‡è®°æœ‰DisplayNameåˆ™è‡ªåŠ¨è¯†åˆ«ä¸ºè¡¨å¤´ï¼Œä¹Ÿå¯è‡ªè¡Œè®¾ç½®è¡¨å¤´ã€‚
+4ã€ä½¿ç”¨SXSSFå¯¼å‡ºæ–¹å¼ï¼Œé™ä½å†…å­˜å ç”¨é‡ã€‚æ”¯æŒæµ·é‡æ•°æ®å¯¼å‡ºï¼Œä½¿ç”¨è¶…è¿‡100wæ•°æ®è‡ªåŠ¨åˆ†Sheet
 
 ```
-Nuget°²×°
+Nugetå®‰è£…
 
 ```
 Install-Package jfYu.Core.Excel
 ```
 
-Ê¹ÓÃ
+ä½¿ç”¨
 
 Excel:
 
 ```
 
-//IOC×¢Èë
+//IOCæ³¨å…¥
 builder.Services.AddJfYuExcel();  
 
-//listµ¼³ö
+//listå¯¼å‡º
 var source = new List<ExcelTest>();
-source.Add(new ExcelTest() { name = "A", age = 18, Address = "µØÖ·1" });
-source.Add(new ExcelTest() { name = "B", age = 19, Address = "µØÖ·2" });
-source.Add(new ExcelTest() { name = "C", age = 20, Address = "µØÖ·3" });
+source.Add(new ExcelTest() { name = "A", age = 18, Address = "åœ°å€1" });
+source.Add(new ExcelTest() { name = "B", age = 19, Address = "åœ°å€2" });
+source.Add(new ExcelTest() { name = "C", age = 20, Address = "åœ°å€3" });
 excel.ToExcel(source, "exceltest/source.xlsx");
 
 //datatable
@@ -35,9 +35,9 @@ dt.Columns.Add("id");
 dt.Columns.Add("name");
 dt.Columns.Add("sex");
 dt.Columns.Add("age");
-dt.Rows.Add("1", "Íõ", "ÄĞ", "12");
-dt.Rows.Add("2", "wang", "ÄĞ", "1200000");
-dt.Rows.Add("3", "´óµÄÍİµØ", "Å®", "12");
+dt.Rows.Add("1", "ç‹", "ç”·", "12");
+dt.Rows.Add("2", "wang", "ç”·", "1200000");
+dt.Rows.Add("3", "å¤§çš„æ´¼åœ°", "å¥³", "12");
 dt.Rows.Add("4", "dwadwadwad", "1", "12");
 dt.Rows.Add("5", "13213213", "0", "1465452");
 excel.ToExcel(dt, "exceltest/dtwoh.xlsx");
@@ -49,21 +49,21 @@ sql = "SELECT * FROM test";
 cmd.CommandText = sql;
 var reader = cmd.ExecuteReader();
 excel.ToExcel(reader, "exceltest/dtreader.xlsx", dir);
-excel.ToExcel<ExcelTest>(reader, "exceltest/reader.xlsx");//´ømodel
+excel.ToExcel<ExcelTest>(reader, "exceltest/reader.xlsx");//å¸¦model
 
-//×ÔÓÉ²Ù×÷Excel
+//è‡ªç”±æ“ä½œExcel
 var workbook = excel.CreateWorkbook();
 workbook.CreateSheetWithTitles<ExcelTest>();
   var dir = new Dictionary<string, string>
                 {
-                    { "Age", "ÄêÁä" }
+                    { "Age", "å¹´é¾„" }
                 };
 workbook.CreateSheetWithTitles(dir);
 workbook.Save(workbook, "exceltest/new.xlsx");
 
  
 
-//excelµ¼Èë
+//excelå¯¼å…¥
 var dtsourceH = excel.ToDataTable("exceltest/tmp2.xlsx", 0, 1);
 var list = excel.GetList<ExcelTest>("exceltest/ImportList.xlsx");
 
@@ -76,24 +76,24 @@ builder.Services.AddJfYuWord();
 
 var x = new System.Collections.Generic.Dictionary<string, object>
 {
-    { "x", "²âÊÔÅ¶" }
+    { "x", "æµ‹è¯•å“¦" }
 };
 
 var doc = _jfYuWord.GenerateWord();
 var paragraph = doc.CreateParagraph();
-paragraph.Alignment = ParagraphAlignment.CENTER; //×ÖÌå¾ÓÖĞ
+paragraph.Alignment = ParagraphAlignment.CENTER; //å­—ä½“å±…ä¸­
 var run = paragraph.CreateRun();
 run.IsBold = true;
-run.SetText("${x}²âÊÔ²âÊÔ${y}");
+run.SetText("${x}æµ‹è¯•æµ‹è¯•${y}");
 run.FontSize = 28;
-run.SetFontFamily("ºÚÌå", FontCharRange.None); //ÉèÖÃºÚÌå
-paragraph.SpacingBeforeLines = 20;//ÉÏ·½¾àÀë
-paragraph.SpacingAfterLines = 20;//ÏÂ·½¾àÀë
+run.SetFontFamily("é»‘ä½“", FontCharRange.None); //è®¾ç½®é»‘ä½“
+paragraph.SpacingBeforeLines = 20;//ä¸Šæ–¹è·ç¦»
+paragraph.SpacingAfterLines = 20;//ä¸‹æ–¹è·ç¦»
 Directory.CreateDirectory("doctest");
 FileStream fs = new("doctest/1.docx", FileMode.Create);
 doc.Write(fs);
 fs.Close();
-x.Add("y", "xxxÌì³Ó");
+x.Add("y", "xxxå¤©ç§¤");
 _jfYuWord.GenerateWordByTemplate("doctest/1.docx", x, "doctest/2.docx");
 Assert.True(File.Exists("doctest/2.docx"));
 var fst = File.Open("doctest/2.docx", FileMode.Open);
