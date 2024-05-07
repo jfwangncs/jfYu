@@ -441,81 +441,29 @@ namespace jfYu.Core.Office.Excel
                             if (row != null)
                             {
                                 var cell = row.GetCell(c.Key);
-                                object? value;
-                                switch (cell.CellType)
-                                {
-                                    case CellType.Numeric:
-                                        if (DateUtil.IsCellDateFormatted(cell))
-                                            value = DateTime.FromOADate(cell.NumericCellValue);
-                                        else
-                                            value = Convert.ToDecimal(cell.NumericCellValue);
-                                        break;
-                                    case CellType.Boolean:
-                                        value = Convert.ToString(cell.BooleanCellValue);
-                                        break;
-                                    case CellType.Error:
-                                        value = ErrorEval.GetText(cell.ErrorCellValue);
-                                        break;
-                                    case CellType.Formula:
-                                        switch (cell.CachedFormulaResultType)
-                                        {
-
-                                            case CellType.Numeric:
-                                                value = Convert.ToString(cell.NumericCellValue);
-                                                break;
-                                            case CellType.Boolean:
-                                                value = Convert.ToString(cell.BooleanCellValue);
-                                                break;
-                                            case CellType.Error:
-                                                value = ErrorEval.GetText(cell.ErrorCellValue);
-                                                break;
-                                            default:
-                                            case CellType.String:
-                                                string strFORMULA = cell.StringCellValue;
-                                                value = strFORMULA?.ToString();
-                                                break;
-                                        }
-                                        break;
-                                    default:
-                                    case CellType.String:
-                                        string str = cell.StringCellValue;
-                                        value = str?.ToString();
-                                        break;
-                                }
-
+                                if (cell == null)
+                                    continue;
+                                var formatter = new DataFormatter();
+                                string value = formatter.FormatCellValue(cell);
                                 PropertyInfo? p = typeof(T)?.GetProperty(c.Value);
                                 try
-                                { // if exists, set the value
+                                {
                                     if (p != null)
                                     {
                                         if (value != null)
                                         {
-                                            if (p.PropertyType == typeof(int))
+                                            var convertedValue = ConvertStringToType(value, p.PropertyType);
+                                            if (convertedValue != null)
                                             {
-                                                p.SetValue(item, int.Parse(value.ToString() ?? ""), null);
+                                                p.SetValue(item, convertedValue, null);
                                             }
-                                            else if (p.PropertyType == typeof(long))
+                                            else if (convertedValue == null && p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
                                             {
-                                                p.SetValue(item, long.Parse(value.ToString() ?? ""), null);
+                                                p.SetValue(item, null, null);
                                             }
-                                            else if (p.PropertyType == typeof(double))
-                                            {
-                                                p.SetValue(item, double.Parse(value.ToString() ?? "", null));
-                                            }
-                                            else if (p.PropertyType == typeof(decimal))
-                                            {
-                                                p.SetValue(item, decimal.Parse(value.ToString() ?? ""), null);
-                                            }
-                                            else if (p.PropertyType == typeof(float))
-                                            {
-                                                p.SetValue(item, float.Parse(value.ToString() ?? ""), null);
-                                            }
-                                            else
-                                            {
-                                                p.SetValue(item, value.ToString() ?? "", null);
-                                            }
+
                                         }
-                                        else
+                                        else if (p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
                                         {
                                             p.SetValue(item, null, null);
                                         }
@@ -642,6 +590,65 @@ namespace jfYu.Core.Office.Excel
                 throw new Exception($"import failed,{ex.Message},{ex.InnerException?.Message}");
             }
             return table;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="targetType"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static object? ConvertStringToType(string value, Type targetType)
+        {
+            if (targetType.IsAssignableFrom(typeof(string)))
+            {
+                return value;
+            }
+            else if (IsNumericType(targetType))
+            {
+                if (int.TryParse(value, out int intValue))
+                    return targetType == typeof(int) ? intValue : (object?)intValue;
+                else if (long.TryParse(value, out long longValue))
+                    return targetType == typeof(long) ? longValue : (object?)longValue;
+                else if (double.TryParse(value, out double doubleValue))
+                    return targetType == typeof(double) ? doubleValue : (object?)doubleValue;
+                else if (decimal.TryParse(value, out decimal decimalValue))
+                    return targetType == typeof(decimal) ? decimalValue : (object?)decimalValue;
+                else if (float.TryParse(value, out float floatValue))
+                    return targetType == typeof(float) ? floatValue : (object?)floatValue;
+            }
+            else if (targetType.IsAssignableFrom(typeof(DateTime)))
+            {
+                DateTime dateTime;
+                if (DateTime.TryParse(value, out dateTime))
+                    return targetType == typeof(DateTime) ? dateTime : (DateTime?)dateTime;
+            }
+            else if (targetType.IsAssignableFrom(typeof(bool)))
+            {
+                bool boolValue;
+                if (bool.TryParse(value, out boolValue))
+                    return targetType == typeof(bool) ? boolValue : (bool?)boolValue;
+            }
+
+            return null;
+
+            bool IsNumericType(Type t)
+            {
+                if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>))
+                {
+                    // Check if the underlying type of the Nullable is a numeric type
+                    Type underlyingType = Nullable.GetUnderlyingType(t);
+                    return underlyingType != null && IsNumericType(underlyingType);
+                }
+
+                return t == typeof(byte) || t == typeof(sbyte) ||
+                       t == typeof(short) || t == typeof(ushort) ||
+                       t == typeof(int) || t == typeof(uint) ||
+                       t == typeof(long) || t == typeof(ulong) ||
+                       t == typeof(float) || t == typeof(double) ||
+                       t == typeof(decimal);
+            }
         }
 
         #endregion
