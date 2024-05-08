@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -78,7 +79,7 @@ namespace jfYu.Core.jfYuRequest
 
             if (_request == null)
                 throw new NullReferenceException("init failed._request is null");
-         
+
             _request.ContentType = ContentType;
             _request.CookieContainer = RequestCookies;
             try
@@ -105,7 +106,7 @@ namespace jfYu.Core.jfYuRequest
                 if (!CertificateValidation)
                     ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
-                foreach (var item in CustomHeaders)
+                foreach (var item in RequestCustomHeaders)
                 {
                     _request.Headers.Add(item.Key, item.Value);
                 }
@@ -176,7 +177,9 @@ namespace jfYu.Core.jfYuRequest
                     html = GetResponseBody(response);
                 else
                     return "";
-                ReturnCookies = response.Cookies;
+                ResponseCookies = response.Cookies;
+                foreach (var header in response.Headers.AllKeys)
+                    ResponseHeader.Add(header, response.Headers.GetValues(header)?.ToList());
                 response.Close();
             }
             catch (WebException e)
@@ -221,7 +224,7 @@ namespace jfYu.Core.jfYuRequest
             if (response != null && response.StatusCode == HttpStatusCode.OK)
             {
                 using Stream responseStream = response.GetResponseStream();
-                ReturnCookies = response.Cookies;
+                ResponseCookies = response.Cookies;
                 var filesize = decimal.Parse(response.ContentLength.ToString());
                 decimal percentage = 0M;
                 decimal speed = 0M;
@@ -300,7 +303,7 @@ namespace jfYu.Core.jfYuRequest
             if (response != null && response.StatusCode == HttpStatusCode.OK)
             {
                 using Stream responseStream = response.GetResponseStream();
-                ReturnCookies = response.Cookies;
+                ResponseCookies = response.Cookies;
                 var FileSize = decimal.Parse(response.ContentLength.ToString());
                 var filesize = decimal.Parse(response.ContentLength.ToString());
                 decimal percentage = 0M;

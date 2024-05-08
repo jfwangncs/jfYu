@@ -22,7 +22,7 @@ namespace jfYu.Core.jfYuRequest
         public string Url { get; set; }
 
         /// <summary>
-        /// ContentType defalut:application/json
+        /// ContentType
         /// </summary>
         public string ContentType { get; set; }
 
@@ -37,7 +37,7 @@ namespace jfYu.Core.jfYuRequest
         public Dictionary<string, string> Params { get; set; }
 
         /// <summary>
-        ///  raw pParams
+        ///  raw params
         /// </summary>
         public string RawParams { get; set; }
 
@@ -54,7 +54,7 @@ namespace jfYu.Core.jfYuRequest
         /// <summary>
         /// return cookies
         /// </summary>
-        public CookieCollection ReturnCookies { get; set; }
+        public CookieCollection ResponseCookies { get; set; }
 
         /// <summary>
         /// proxy
@@ -84,7 +84,7 @@ namespace jfYu.Core.jfYuRequest
         /// <summary>
         /// custom headers
         /// </summary>
-        public Dictionary<string, string> CustomHeaders { get; set; }
+        public Dictionary<string, string> RequestCustomHeaders { get; set; }
 
         /// <summary>
         /// ssl
@@ -99,7 +99,12 @@ namespace jfYu.Core.jfYuRequest
         /// <summary>
         /// custom init func.for jfYuHttpRequest:object as HttpWebRequest,for jfYuHttpClient:object as HttpClient
         /// </summary>
-        Action<object>? CustomInitFunc { get; set; } 
+        Action<object>? CustomInitFunc { get; set; }
+
+        /// <summary>
+        /// Response Header
+        /// </summary>
+        public Dictionary<string, List<string>?> ResponseHeader { get; }
 
         /// <summary>
         /// get html

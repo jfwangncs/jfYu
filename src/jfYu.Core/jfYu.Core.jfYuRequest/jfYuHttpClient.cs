@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 #if NETSTANDARD21||NET6_0||NET7_0||NET8_0
 using System.Net.Http;
@@ -55,7 +56,7 @@ namespace jfYu.Core.jfYuRequest
                 if (!CertificateValidation)
                     handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
 
-                foreach (var item in CustomHeaders)
+                foreach (var item in RequestCustomHeaders)
                 {
                     _request.DefaultRequestHeaders.TryAddWithoutValidation(item.Key, item.Value);
                 }
@@ -77,11 +78,13 @@ namespace jfYu.Core.jfYuRequest
                 return html;
             var paramString = GetParamString();
             try
-            {
+            { 
                 if (Method.Equals(RequestMethod.Get))
                 {
                     using var response = await _request.GetAsync($"{Url}?{paramString}", HttpCompletionOption.ResponseHeadersRead);
-                    StatusCode = response.StatusCode;
+                    StatusCode = response.StatusCode; 
+                    foreach (var header in response.Headers)
+                        ResponseHeader.Add(header.Key, header.Value.ToList());
                     string content = await response.Content.ReadAsStringAsync();
                     html = RequestEncoding.GetString(RequestEncoding.GetBytes(content));
                 }
@@ -89,6 +92,8 @@ namespace jfYu.Core.jfYuRequest
                 {
                     using var response = await _request.PostAsync(Url, new StringContent(paramString, RequestEncoding, ContentType));
                     StatusCode = response.StatusCode;
+                    foreach (var header in response.Headers)
+                        ResponseHeader.Add(header.Key, header.Value.ToList());
                     string content = await response.Content.ReadAsStringAsync();
                     html = RequestEncoding.GetString(RequestEncoding.GetBytes(content));
                 }
@@ -96,6 +101,8 @@ namespace jfYu.Core.jfYuRequest
                 {
                     using var response = await _request.PutAsync(Url, new StringContent(paramString, RequestEncoding, ContentType));
                     StatusCode = response.StatusCode;
+                    foreach (var header in response.Headers)
+                        ResponseHeader.Add(header.Key, header.Value.ToList());
                     string content = await response.Content.ReadAsStringAsync();
                     html = RequestEncoding.GetString(RequestEncoding.GetBytes(content));
                 }
@@ -103,6 +110,8 @@ namespace jfYu.Core.jfYuRequest
                 {
                     using var response = await _request.DeleteAsync($"{Url}?{paramString}");
                     StatusCode = response.StatusCode;
+                    foreach (var header in response.Headers)
+                        ResponseHeader.Add(header.Key, header.Value.ToList());
                     string content = await response.Content.ReadAsStringAsync();
                     html = RequestEncoding.GetString(RequestEncoding.GetBytes(content));
                 }
