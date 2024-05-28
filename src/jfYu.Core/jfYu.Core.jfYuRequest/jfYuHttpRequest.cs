@@ -19,7 +19,7 @@ namespace jfYu.Core.jfYuRequest
 
             if (Method.Equals(RequestMethod.Get))
             {
-                _request = (HttpWebRequest)WebRequest.Create($"{Url}?{paramString}");
+                _request = (HttpWebRequest)WebRequest.Create($"{Url}");
                 _request.Method = Method.ToString().ToUpper();
             }
             else
@@ -99,6 +99,9 @@ namespace jfYu.Core.jfYuRequest
 
                 if (Proxy != null)
                     _request.Proxy = Proxy;
+
+                if (!string.IsNullOrEmpty(Authorization))
+                    _request.Headers.Add("Authorization", $"Bearer {Authorization.Replace("Bearer ", "")}");
 
                 if (Cert != null)
                     _request.ClientCertificates.Add(Cert);

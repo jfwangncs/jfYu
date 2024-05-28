@@ -42,6 +42,12 @@ namespace jfYu.Core.jfYuRequest
         public string RawParams { get; set; }
 
         /// <summary>
+        /// Authorization
+        /// </summary>
+        public string Authorization { get; set; }
+
+
+        /// <summary>
         /// encoding default:utf8
         /// </summary>
         public Encoding RequestEncoding { get; set; }

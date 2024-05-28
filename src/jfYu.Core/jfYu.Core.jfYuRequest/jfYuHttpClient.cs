@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -44,6 +45,9 @@ namespace jfYu.Core.jfYuRequest
                 if (!string.IsNullOrEmpty(RequestHeader.Accept))
                     _request.DefaultRequestHeaders.Accept.ParseAdd(RequestHeader.Accept);
 
+                if (!string.IsNullOrEmpty(Authorization))
+                    _request.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Authorization.Replace("Bearer ", ""));
+
                 if (Proxy != null)
                 {
                     handler.Proxy = Proxy;
@@ -78,11 +82,11 @@ namespace jfYu.Core.jfYuRequest
                 return html;
             var paramString = GetParamString();
             try
-            { 
+            {
                 if (Method.Equals(RequestMethod.Get))
                 {
-                    using var response = await _request.GetAsync($"{Url}?{paramString}", HttpCompletionOption.ResponseHeadersRead);
-                    StatusCode = response.StatusCode; 
+                    using var response = await _request.GetAsync($"{Url}", HttpCompletionOption.ResponseHeadersRead);
+                    StatusCode = response.StatusCode;
                     foreach (var header in response.Headers)
                         ResponseHeader.Add(header.Key, header.Value.ToList());
                     string content = await response.Content.ReadAsStringAsync();

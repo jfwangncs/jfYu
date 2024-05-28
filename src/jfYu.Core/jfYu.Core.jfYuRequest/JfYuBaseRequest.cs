@@ -18,6 +18,7 @@ namespace jfYu.Core.jfYuRequest
         public RequestMethod Method { get; set; } = RequestMethod.Get;
         public Dictionary<string, string> Params { get; set; } = [];
         public string RawParams { get; set; } = "";
+        public string Authorization { get; set; } = "";  
         public Encoding RequestEncoding { get; set; } = Encoding.UTF8;
         public CookieContainer RequestCookies { get; set; } = new();
         public CookieCollection ResponseCookies { get; set; } = [];
