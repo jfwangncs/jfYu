@@ -58,11 +58,12 @@ namespace xUnitTestCore
                 return true;
 
             });
-
+            databaseMock.Setup(d => d.LockTakeAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(), It.IsAny<TimeSpan>(), It.IsAny<CommandFlags>())).ReturnsAsync(true);
+            databaseMock.Setup(d => d.LockReleaseAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(), It.IsAny<CommandFlags>())).ReturnsAsync(true);
             var connectionMultiplexerMock = new Mock<IConnectionMultiplexer>();
             connectionMultiplexerMock.Setup(q => q.GetDatabase(It.IsAny<int>(), It.IsAny<object>())).Returns(databaseMock.Object);
 
-            var redisMock = new RedisService(new RedisConfiguration() { EndPoints = [new RedisEndPoint() { Host = "127.0.0.1" }] })
+            var redisMock = new RedisService(new RedisConfiguration() { EndPoints = [new RedisEndPoint() { Host = "127.0.0.1" }] }, connectionMultiplexerMock.Object)
             {
                 Client = connectionMultiplexerMock.Object
             };
@@ -74,9 +75,10 @@ namespace xUnitTestCore
         public void TestCreateEmpty()
         {
             var services = new ServiceCollection();
-            services.AddRedisService(new RedisConfiguration() { });
-            var serviceProvider = services.BuildServiceProvider();
-            Assert.ThrowsAny<Exception>(() => { serviceProvider.GetService<IRedisService>(); });
+            Assert.ThrowsAny<Exception>(() => { services.AddRedisService(new RedisConfiguration() { }); });
+            //services.AddRedisService(new RedisConfiguration() { });
+            //var serviceProvider = services.BuildServiceProvider();
+            //Assert.ThrowsAny<Exception>(() => { serviceProvider.GetService<IRedisService>(); });
         }
 
 
@@ -228,8 +230,7 @@ namespace xUnitTestCore
         }
         #endregion
 
-
-        #region Remove
+        #region remove
         [Theory]
         [InlineData("")]
         [InlineData(null)]
@@ -253,7 +254,7 @@ namespace xUnitTestCore
 
         #endregion
 
-        #region Get
+        #region get
 
         [Theory]
         [InlineData("")]
@@ -301,6 +302,56 @@ namespace xUnitTestCore
         }
         #endregion
 
+        #region lock
+        [Fact]
+        public async Task LockAsync_ValidKey_ReturnsTrue()
+        {
+            // Arrange
+            var key = "myKey";
+            var expiry = TimeSpan.FromMinutes(5);
 
+            // Act
+            var result = await _redis.LockAsync(key, expiry);
+
+            // Assert
+            Assert.True(result);
+        }
+        public class NullKeyData : TheoryData<string?>
+        {
+            public NullKeyData()
+            {
+                Add("");
+                Add(null);
+            }
+        }
+
+        [Theory]
+        [ClassData(typeof(NullKeyData))]
+        public async Task LockAsync_NullKey_ThrowsArgumentNullException(string key)
+        {
+            var expiry = TimeSpan.FromMinutes(5);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await _redis.LockAsync(key, expiry));
+        }
+
+        [Fact]
+        public async Task UnLockAsync_ValidKey_ReturnsTrue()
+        {
+            // Arrange
+            var key = "myKey"; 
+
+            // Act
+            var result = await _redis.UnLockAsync(key);
+
+            // Assert
+            Assert.True(result);
+        }        
+
+        [Theory]
+        [ClassData(typeof(NullKeyData))]
+        public async Task UnLockAsync_NullKey_ThrowsArgumentNullException(string key)
+        { 
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await _redis.UnLockAsync(key));
+        }
+        #endregion
     }
 }

@@ -7,12 +7,9 @@ namespace jfYu.Core.Redis
 {
     public class RedisService : IRedisService
     {
-
-
         private IConnectionMultiplexer _client;
-
-
         private IDatabase _database;
+        private static readonly RedisValue LockToken = Environment.MachineName;
 
         /// <summary>
         /// ConnectionMultiplexer
@@ -24,23 +21,11 @@ namespace jfYu.Core.Redis
         /// </summary>
         public IDatabase Database { get { return _database; } }
 
-        public RedisService(RedisConfiguration redisConfiguration)
+        public RedisService(RedisConfiguration redisConfiguration, IConnectionMultiplexer client)
         {
             try
             {
-                var configurationOptions = new ConfigurationOptions()
-                {
-                    Password = redisConfiguration.Password,
-                    ConnectTimeout = redisConfiguration.Timeout,
-                    KeepAlive = 60,
-                    AbortOnConnectFail = false,
-                    Ssl = redisConfiguration.Ssl,
-                };
-                foreach (var endPoint in redisConfiguration.EndPoints)
-                {
-                    configurationOptions.EndPoints.Add(endPoint.Host, endPoint.Port);
-                }
-                _client = ConnectionMultiplexer.Connect(configurationOptions);
+                _client = client;
                 _database = Client.GetDatabase(redisConfiguration.DbIndex);
             }
             catch (Exception ex)
@@ -56,7 +41,6 @@ namespace jfYu.Core.Redis
 
             return await _database.StringSetAsync(key, JsonConvert.SerializeObject(value), expiry);
         }
-
         public async Task<string?> GetAsync(string key)
         {
             if (string.IsNullOrEmpty(key))
@@ -68,7 +52,6 @@ namespace jfYu.Core.Redis
 
             return JsonConvert.DeserializeObject<string>(value.ToString());
         }
-
         public async Task<T?> GetAsync<T>(string key)
         {
             if (string.IsNullOrEmpty(key))
@@ -81,9 +64,6 @@ namespace jfYu.Core.Redis
 
             return JsonConvert.DeserializeObject<T>(value.ToString());
         }
-
-        private static readonly RedisValue LockToken = Environment.MachineName;
-
         public async Task<bool> LockAsync(string key, TimeSpan? expiry)
         {
             if (string.IsNullOrEmpty(key))
