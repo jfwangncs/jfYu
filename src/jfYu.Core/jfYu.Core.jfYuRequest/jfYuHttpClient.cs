@@ -13,19 +13,15 @@ using System.Threading.Tasks;
 namespace jfYu.Core.jfYuRequest
 {
 #if NETSTANDARD21||NET6_0||NET7_0||NET8_0
-    public class JfYuHttpClient : JfYuBaseRequest
+    public class JfYuHttpClient(IHttpClientFactory factory) : JfYuBaseRequest
     {
-
-
-        private HttpClient? _request;
+        private readonly HttpClient _request = factory.CreateClient("httpclient");
 
         private void Init()
         {
-            var handler = new HttpClientHandler() { CookieContainer = RequestCookies, AutomaticDecompression = DecompressionMethods.GZip };
-            _request = new HttpClient(handler);
             try
             {
-                _request.Timeout = new TimeSpan(0, 0, Timeout);
+                _request.Timeout = TimeSpan.FromSeconds(Timeout);
                 if (!string.IsNullOrEmpty(RequestHeader.UserAgent))
                     _request.DefaultRequestHeaders.UserAgent.ParseAdd(RequestHeader.UserAgent);
                 if (!string.IsNullOrEmpty(RequestHeader.AcceptEncoding))
@@ -48,17 +44,17 @@ namespace jfYu.Core.jfYuRequest
                 if (!string.IsNullOrEmpty(Authorization))
                     _request.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Authorization.Replace("Bearer ", ""));
 
-                if (Proxy != null)
-                {
-                    handler.Proxy = Proxy;
-                    handler.UseProxy = true;
-                }
+                //if (Proxy != null)
+                //{
+                //    handler.Proxy = Proxy;
+                //    handler.UseProxy = true;
+                //}
 
-                if (Cert != null)
-                    handler.ClientCertificates.Add(Cert);
+                //if (Cert != null)
+                //    handler.ClientCertificates.Add(Cert);
 
-                if (!CertificateValidation)
-                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                //if (!CertificateValidation)
+                //    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
 
                 foreach (var item in RequestCustomHeaders)
                 {

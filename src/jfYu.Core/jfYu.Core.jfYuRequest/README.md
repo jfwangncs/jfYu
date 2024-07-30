@@ -8,14 +8,16 @@ Install-Package jfYu.Core.jfYuRequest
 
 ```
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-var jfYu1 = new JfYuHttpClient()
-{
-	Url = "www.xxx.com",
-	Method = RequestMethod.Get,
-	Timeout = 60,
-	RequestEncoding = Encoding.GetEncoding("GB18030"),
-};
-var html1 = await jfYu1.SendAsync(); 
+
+//injection
+services.AddJfYuRequestService();
+services.AddJfYuHttpClientService(new System.Net.Http.HttpClientHandler() { UseCookies = false });
+
+//send
+_client.Url = "";
+_client.Method = RequestMethod.Get;
+_client.Timeout = 60;
+var html1 = await _client.SendAsync(); 
 
 var jfYu = new JfYuHttpRequest()
 {

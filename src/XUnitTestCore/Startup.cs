@@ -4,6 +4,7 @@ using jfYu.Core.Cache;
 using jfYu.Core.Data;
 using jfYu.Core.Data.Extension;
 using jfYu.Core.Data.Model;
+using jfYu.Core.jfYuRequest;
 using jfYu.Core.Office;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +21,7 @@ namespace xUnitTestCore
             services.AddJfYuWord();
 
             services.AddJfYuDbContextService<DataContext>(new JfYuDBConfig() { DatabaseType = DatabaseType.Sqlite, ConnectionString = "Data Source= data/m1.db" });
-
+            services.AddJfYuHttpClientService();
             Prepardata();
         }
 

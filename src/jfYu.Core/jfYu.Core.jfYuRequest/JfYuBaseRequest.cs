@@ -25,14 +25,14 @@ namespace jfYu.Core.jfYuRequest
         public WebProxy? Proxy { get; set; }
         public Dictionary<string, string> Files { get; set; } = [];
         public RequestHeader RequestHeader { get; set; } = new();
-        public int Timeout { get; set; } = 5;
+        public int Timeout { get; set; } = 30;
         public bool UsePayload { get; set; } = false;
         public Dictionary<string, string> RequestCustomHeaders { get; set; } = [];
         public X509Certificate2? Cert { get; set; }
         public bool CertificateValidation { get; set; } = false;
         public HttpStatusCode StatusCode { get; protected set; }
         public Action<object>? CustomInitFunc { get; set; }
-        public Dictionary<string, List<string>?> ResponseHeader { get; protected set; } = new Dictionary<string, List<string>?>();
+        public Dictionary<string, List<string>?> ResponseHeader { get; protected set; } = [];
 
         protected string GetParamString()
         {
