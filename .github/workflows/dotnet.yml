@@ -25,6 +25,6 @@ jobs:
       run: dotnet build -c release 
     - name: Push NuGet packages
       run: |
-        for file in $(find src/ -name "*.nupkg"); do
+        for file in $(find / -name "*.nupkg"); do
           dotnet nuget push "$file" -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate;
         done
