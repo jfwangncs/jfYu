@@ -18,7 +18,7 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Unit test
-      run: dotnet test  
+      run:  dotnet test      
     - name: Clean old packages
       run: dotnet clean 
     - name: Build
