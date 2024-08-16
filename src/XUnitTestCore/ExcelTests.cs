@@ -289,10 +289,11 @@ namespace xUnitTestCore
         {
             if (File.Exists("exceltest/tmp.db"))
                 File.Delete("exceltest/tmp.db");
-            string datasource = "Data Source = exceltest/tmp.db";
+            string datasource = "Data Source = exceltest/tmp.db"; 
+            using var conn = new SqliteConnection(datasource);
             try
             {
-                using var conn = new SqliteConnection(datasource);
+             
                 conn.Open();
             }
             catch (SqliteException ex)
