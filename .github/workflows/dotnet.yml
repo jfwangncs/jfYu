@@ -18,9 +18,13 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Unit test
+      run:  dotnet test      
+    - name: Clean old packages
+      run: dotnet clean 
+    - name: Build
+      run: dotnet build -c release 
+    - name: Push NuGet packages
       run: |
-         dotnet test --logger "console;verbosity=detailed"  
-         continue-on-error: true
-    - name: List files in directory
-      if: always()
-      run: find . -type f -ls
+        for file in $(find src/ -name "*.nupkg"); do
+          dotnet nuget push "$file" -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate;
+        done
