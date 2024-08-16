@@ -286,22 +286,12 @@ namespace xUnitTestCore
 
         [Fact]
         public void DbDataReaderExportTest()
-        {
+        {      
             if (File.Exists("exceltest/tmp.db"))
                 File.Delete("exceltest/tmp.db");
-            string datasource = "Data Source = exceltest/tmp.db"; 
+            string datasource = "Data Source = exceltest/tmp.db";
             using var conn = new SqliteConnection(datasource);
-            try
-            {
-             
-                conn.Open();
-            }
-            catch (SqliteException ex)
-            {
-                Console.WriteLine($"Error opening database: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
-            }
-           
+            conn.Open();
             //´´½¨±í
             SqliteCommand cmd = new();
             string sql = "CREATE TABLE test(name varchar(20),age int,Address varchar(20) )";

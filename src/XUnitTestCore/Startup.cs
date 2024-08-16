@@ -35,6 +35,9 @@ namespace xUnitTestCore
 
             if (!Directory.Exists("data"))
                 Directory.CreateDirectory("data");
+            //for excel test
+            if (!Directory.Exists("exceltest"))
+                Directory.CreateDirectory("exceltest");
 
             if (File.Exists("data/m1.db"))
                 File.Delete("data/m1.db");
