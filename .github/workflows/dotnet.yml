@@ -23,4 +23,4 @@ jobs:
          continue-on-error: true
     - name: List files in directory
       if: always()
-      run: ls -la
+      run: find . -type f -ls
