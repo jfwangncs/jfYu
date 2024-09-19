@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using jfYu.Core.jfYuRequest.Enum;
@@ -17,7 +18,7 @@ namespace jfYu.Core.jfYuRequest
         {
             var paramString = GetParamString();
 
-            if (Method.Equals(RequestMethod.Get))
+            if (Method.Equals(HttpMethod.Get))
             {
                 _request = (HttpWebRequest)WebRequest.Create($"{Url}");
                 _request.Method = Method.ToString().ToUpper();
@@ -78,7 +79,7 @@ namespace jfYu.Core.jfYuRequest
             }
 
             if (_request == null)
-                throw new NullReferenceException("init failed._request is null");
+                throw new NullReferenceException("init failed. request is null");
 
             _request.ContentType = ContentType;
             _request.CookieContainer = RequestCookies;
@@ -168,38 +169,40 @@ namespace jfYu.Core.jfYuRequest
 
         public override async Task<string> SendAsync()
         {
-            string html = "";
             Init();
             if (_request == null)
-                return html;
+                throw new NullReferenceException("init failed. request is null");
             try
             {
                 using var response = (HttpWebResponse)await _request.GetResponseAsync();
                 StatusCode = response.StatusCode;
-                if (response != null)
-                    html = GetResponseBody(response);
-                else
-                    return "";
+                if (response == null)
+                    throw new WebException("response null");
+
+                var html = GetResponseBody(response);
                 ResponseCookies = response.Cookies;
                 foreach (var header in response.Headers.AllKeys)
                     ResponseHeader.Add(header, response.Headers.GetValues(header)?.ToList());
                 response.Close();
+                return html;
             }
             catch (WebException e)
             {
                 if (e.Response != null)
                 {
                     var response = (HttpWebResponse)e.Response;
-                    html = GetResponseBody(response);
+                    var html = GetResponseBody(response);
                     StatusCode = response.StatusCode;
+                    return html;
                 }
+                throw;
             }
             catch (Exception)
             {
                 throw;
             }
 
-            return html;
+
         }
 
         public override async Task<bool> DownloadFileAsync(string path, Action<decimal, decimal, decimal>? progress = null)
@@ -292,12 +295,6 @@ namespace jfYu.Core.jfYuRequest
             {
                 response = (HttpWebResponse)(await _request.GetResponseAsync());
                 StatusCode = response.StatusCode;
-            }
-            catch (WebException e)
-            {
-                if (e.Response != null)
-                    StatusCode = ((HttpWebResponse)e.Response).StatusCode;
-                return default;
             }
             catch (Exception)
             {

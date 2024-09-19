@@ -12,8 +12,7 @@ namespace jfYu.Core.Cache
 
         public async Task AddAsync<T>(string key, T value, TimeSpan? expiry)
         {
-            if (string.IsNullOrEmpty(key))
-                throw new ArgumentNullException(nameof(key));
+            HandleKey(key);
 
             expiry ??= TimeSpan.FromMinutes(1);
 
@@ -25,8 +24,7 @@ namespace jfYu.Core.Cache
 
         public async Task<string?> GetAsync(string key)
         {
-            if (string.IsNullOrEmpty(key))
-                throw new ArgumentNullException(nameof(key));
+            HandleKey(key);
 
             var value = await _cache.GetStringAsync(key);
 
@@ -38,8 +36,7 @@ namespace jfYu.Core.Cache
 
         public async Task<T?> GetAsync<T>(string key) where T : class
         {
-            if (string.IsNullOrEmpty(key))
-                throw new ArgumentNullException(nameof(key));
+            HandleKey(key);
 
             var value = await _cache.GetStringAsync(key);
 
@@ -51,8 +48,7 @@ namespace jfYu.Core.Cache
 
         public async Task<int?> GetIntAsync(string key)
         {
-            if (string.IsNullOrEmpty(key))
-                throw new ArgumentNullException(nameof(key));
+            HandleKey(key);
 
             var value = await _cache.GetStringAsync(key);
 
@@ -69,9 +65,17 @@ namespace jfYu.Core.Cache
 
         public async Task RemoveAsync(string key)
         {
+            HandleKey(key);
+
+            await _cache.RemoveAsync(key);
+        }
+
+        public static string HandleKey(string key)
+        {
             if (string.IsNullOrEmpty(key))
                 throw new ArgumentNullException(nameof(key));
-            await _cache.RemoveAsync(key);
+
+            return key;
         }
     }
 }

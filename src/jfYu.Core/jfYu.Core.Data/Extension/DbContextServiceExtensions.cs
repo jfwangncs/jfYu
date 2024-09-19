@@ -1,4 +1,5 @@
 ﻿using jfYu.Core.Data.Model;
+using jfYu.Core.Data.Service;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;

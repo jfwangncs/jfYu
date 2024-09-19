@@ -1,18 +1,13 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using jfYu.Core.jfYuRequest.Enum;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net;
-#if NETSTANDARD21||NET6_0||NET7_0||NET8_0
 using System.Net.Http;
-using System.Text;
-using System.Threading;
-#endif
 using System.Threading.Tasks;
 
 namespace jfYu.Core.jfYuRequest
 {
-#if NETSTANDARD21||NET6_0||NET7_0||NET8_0
+#if NETCORE
     public class JfYuHttpClient(IHttpClientFactory factory) : JfYuBaseRequest
     {
         private readonly HttpClient _request = factory.CreateClient("httpclient");
@@ -75,11 +70,11 @@ namespace jfYu.Core.jfYuRequest
             string html = "";
             Init();
             if (_request == null)
-                return html;
+                throw new NullReferenceException("init failed. request is null");
             var paramString = GetParamString();
             try
             {
-                if (Method.Equals(RequestMethod.Get))
+                if (Method.Equals(HttpMethod.Get))
                 {
                     using var response = await _request.GetAsync($"{Url}", HttpCompletionOption.ResponseHeadersRead);
                     StatusCode = response.StatusCode;
@@ -88,7 +83,7 @@ namespace jfYu.Core.jfYuRequest
                     string content = await response.Content.ReadAsStringAsync();
                     html = RequestEncoding.GetString(RequestEncoding.GetBytes(content));
                 }
-                else if (Method.Equals(RequestMethod.Post))
+                else if (Method.Equals(HttpMethod.Post))
                 {
                     using var response = await _request.PostAsync(Url, new StringContent(paramString, RequestEncoding, ContentType));
                     StatusCode = response.StatusCode;
@@ -97,7 +92,7 @@ namespace jfYu.Core.jfYuRequest
                     string content = await response.Content.ReadAsStringAsync();
                     html = RequestEncoding.GetString(RequestEncoding.GetBytes(content));
                 }
-                else if (Method.Equals(RequestMethod.Put))
+                else if (Method.Equals(HttpMethod.Put))
                 {
                     using var response = await _request.PutAsync(Url, new StringContent(paramString, RequestEncoding, ContentType));
                     StatusCode = response.StatusCode;
@@ -106,7 +101,7 @@ namespace jfYu.Core.jfYuRequest
                     string content = await response.Content.ReadAsStringAsync();
                     html = RequestEncoding.GetString(RequestEncoding.GetBytes(content));
                 }
-                else if (Method.Equals(RequestMethod.Delete))
+                else if (Method.Equals(HttpMethod.Delete))
                 {
                     using var response = await _request.DeleteAsync($"{Url}?{paramString}");
                     StatusCode = response.StatusCode;
@@ -115,16 +110,13 @@ namespace jfYu.Core.jfYuRequest
                     string content = await response.Content.ReadAsStringAsync();
                     html = RequestEncoding.GetString(RequestEncoding.GetBytes(content));
                 }
+                return html;
             }
             catch (Exception)
             {
                 throw;
-            }
-
-            return html;
+            }           
         }
-
-
 
         public override async Task<bool> DownloadFileAsync(string path, Action<decimal, decimal, decimal>? progress = null)
         {
@@ -190,8 +182,6 @@ namespace jfYu.Core.jfYuRequest
             return false;
         }
 
-
-
         public override async Task<MemoryStream?> DownloadFileAsync(Action<decimal, decimal, decimal>? progress = null)
         {
             Init();
@@ -246,12 +236,7 @@ namespace jfYu.Core.jfYuRequest
                 }
             }
             return default;
-        }
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
+        } 
     }
 #endif
 }

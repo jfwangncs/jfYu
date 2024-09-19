@@ -72,11 +72,11 @@ namespace jfYu.Core.Office.Word
         /// </summary>
         /// <param name="para">doc</param>
         /// <param name="model">model</param>
-        private void ReplaceKey(XWPFParagraph para, Dictionary<string, object> model)
+        private static void ReplaceKey(XWPFParagraph para, Dictionary<string, object> model)
         {
             string text = para.ParagraphText;
             var runs = para.Runs;
-            int length = runs.Count();
+            int length = runs.Count;
             string styleid = para.Style;
             text = string.Join("", runs.Select(x => x.Text));
             foreach (var p in model)
@@ -112,7 +112,7 @@ namespace jfYu.Core.Office.Word
         /// <param name="id">pic id</param>
         /// <param name="width">width</param>
         /// <param name="height">height</param>
-        private void CreatePicture(XWPFParagraph para, string id, int width, int height)
+        private static void CreatePicture(XWPFParagraph para, string id, int width, int height)
         {
             int EMU = 9525;
             width *= EMU;

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,7 +30,7 @@ namespace jfYu.Core.jfYuRequest
         /// <summary>
         /// get/post default:get
         /// </summary>
-        public RequestMethod Method { get; set; }
+        public HttpMethod Method { get; set; }
 
         /// <summary>
         ///  params

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace jfYu.Core.jfYuRequest
 
         public string Url { get; set; } = "";
         public string ContentType { get; set; } = RequestContentType.TextHtml;
-        public RequestMethod Method { get; set; } = RequestMethod.Get;
+        public HttpMethod Method { get; set; } = HttpMethod.Get;
         public Dictionary<string, string> Params { get; set; } = [];
         public string RawParams { get; set; } = "";
         public string Authorization { get; set; } = "";  

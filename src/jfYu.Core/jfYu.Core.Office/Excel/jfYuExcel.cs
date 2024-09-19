@@ -288,7 +288,7 @@ namespace jfYu.Core.Office.Excel
                 foreach (var title in titles)
                 {
                     var value = typeof(T).GetProperty(title.Key)?.GetValue(item)?.ToString() ?? "";
-                    if (value.Contains(","))
+                    if (value.Contains(','))
                         rowStr += value.Replace(",", "\",\"") + ",";
                     else
                         rowStr += value + ",";
@@ -338,7 +338,7 @@ namespace jfYu.Core.Office.Excel
         public DataTable GetDataTable(Stream stream, int firstRow = 1, int sheetIndex = 0)
         {
             if (stream == null)
-                throw new ArgumentNullException("steam is null");
+                throw new ArgumentNullException(nameof(stream));
             try
             {
                 DataTable dt = new();
@@ -392,7 +392,7 @@ namespace jfYu.Core.Office.Excel
         {
 
             if (stream == null)
-                throw new ArgumentNullException("steam is null");
+                throw new ArgumentNullException(nameof(stream));
             try
             {
                 DataTable dt = new();
@@ -408,7 +408,7 @@ namespace jfYu.Core.Office.Excel
             }
         }
 
-        private List<T>? GetList<T>(ISheet sheet, int firstRow)
+        private static List<T>? GetList<T>(ISheet sheet, int firstRow)
         {
             //title
             var headerRow = sheet.GetRow(0);
@@ -496,7 +496,7 @@ namespace jfYu.Core.Office.Excel
         /// <param name="sheet">sheet</param>
         /// <param name="firstRow">srart index,default:1,0 is title</param>
         /// <returns></returns>
-        private DataTable GetDataTable(ISheet sheet, int firstRow)
+        private static DataTable GetDataTable(ISheet sheet, int firstRow)
         {
             DataTable table = new();
             IRow headerRow;
@@ -620,25 +620,23 @@ namespace jfYu.Core.Office.Excel
             }
             else if (targetType.IsAssignableFrom(typeof(DateTime)))
             {
-                DateTime dateTime;
-                if (DateTime.TryParse(value, out dateTime))
+                if (DateTime.TryParse(value, out DateTime dateTime))
                     return targetType == typeof(DateTime) ? dateTime : (DateTime?)dateTime;
             }
             else if (targetType.IsAssignableFrom(typeof(bool)))
             {
-                bool boolValue;
-                if (bool.TryParse(value, out boolValue))
+                if (bool.TryParse(value, out bool boolValue))
                     return targetType == typeof(bool) ? boolValue : (bool?)boolValue;
             }
 
             return null;
 
-            bool IsNumericType(Type t)
+            static bool IsNumericType(Type t)
             {
                 if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>))
                 {
                     // Check if the underlying type of the Nullable is a numeric type
-                    Type underlyingType = Nullable.GetUnderlyingType(t);
+                    Type? underlyingType = Nullable.GetUnderlyingType(t);
                     return underlyingType != null && IsNumericType(underlyingType);
                 }
 

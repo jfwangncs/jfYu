@@ -1,4 +1,4 @@
-﻿using jfYu.Core.Data;
+﻿using jfYu.Core.Data.Service;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;

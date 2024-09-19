@@ -2,13 +2,13 @@
 {
     public class Constant
     {
-        public static string Mini = "Mini";
-        public static string Payment = "Payment";
+        public static readonly string Mini = "Mini";
+        public static readonly string Payment = "Payment";
     }
 
     public class ErrorCode
     {
-        public static string Success = "1";
-        public static string Failed = "0";
+        public static readonly string Success = "1";
+        public static readonly string Failed = "0";
     }
 }

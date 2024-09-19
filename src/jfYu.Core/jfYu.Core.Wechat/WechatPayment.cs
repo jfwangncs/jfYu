@@ -28,30 +28,29 @@ namespace jfYu.Core.Wechat
         /// </summary>
         public async Task<PaymentResult?> MakeOrderAsync(UnifiedOrder order)
         {
-            _logger.LogInformation($"make order start,request:{JsonConvert.SerializeObject(order)}");
+            _logger.LogInformation("make order start,request:{Order}", JsonConvert.SerializeObject(order));
             order.AppId = _config.AppId;
             order.MchId = _config.MchID;
             if (string.IsNullOrEmpty(order.NotifyUrl))
                 order.NotifyUrl = _config.NotifyUrl;
 
             if (string.IsNullOrEmpty(order.SpbillCreateIp))
-                throw new ArgumentNullException($"参数{nameof(order.SpbillCreateIp)}必须有值");
+                throw new NullReferenceException(nameof(order.SpbillCreateIp));
 
             //check
             if (string.IsNullOrEmpty(order.Body))
-                throw new ArgumentNullException($"参数{nameof(order.Body)}必须有值");
+                throw new NullReferenceException(nameof(order.Body));
             if (string.IsNullOrEmpty(order.OutTradeNo))
-                throw new ArgumentNullException($"参数{nameof(order.OutTradeNo)}必须有值");
+                throw new NullReferenceException(nameof(order.OutTradeNo));
 
             if (string.IsNullOrEmpty(order.TradeType))
-                throw new ArgumentNullException($"参数{nameof(order.TradeType)}必须有值");
+                throw new NullReferenceException(nameof(order.TradeType));
 
             if (order.TradeType == "NATIVE" && string.IsNullOrEmpty(order.ProductId))
-
-                throw new ArgumentNullException($"trade_type=NATIVE时，参数{nameof(order.ProductId)}必须有值");
+                throw new NullReferenceException($"when trade_type=NATIVE，{nameof(order.ProductId)} is mandatory");
 
             if (order.TradeType == "JSAPI" && string.IsNullOrEmpty(order.Openid))
-                throw new ArgumentNullException($"trade_type=JSAPI时，参数{nameof(order.Openid)}必须有值");
+                throw new NullReferenceException($"when trade_type=JSAPI，{nameof(order.Openid)} is mandatory");
 
             //随机数
             order.NonceStr = Guid.NewGuid().ToString("N");
@@ -63,10 +62,10 @@ namespace jfYu.Core.Wechat
             var result = await httpResponseMessage.Content.ReadAsStringAsync();
             if (httpResponseMessage.IsSuccessStatusCode)
             {
-                _logger.LogInformation($"make order  successful,response:{result},status:{httpResponseMessage.StatusCode}");
+                _logger.LogInformation("make order successful,response:{Result}", result);
                 return XmlGet<PaymentResult>(result);
             }
-            _logger.LogError($"make order failed,response:{result},status:{httpResponseMessage.StatusCode}");
+            _logger.LogError("make order failed,response:{Result}", result);
             return default;
         }
 
@@ -77,7 +76,7 @@ namespace jfYu.Core.Wechat
         /// <returns></returns>
         public async Task<QueryOrderResult?> QueryOrderByOurOrderNoAsync(string orderNo)
         {
-            _logger.LogInformation($"get order by OrderNo start,orderNo:{orderNo}");
+            _logger.LogInformation("get order by OrderNo start,orderNo:{OrderNo}", orderNo);
             var dic = new Dictionary<string, string>
             {
                 { "appid", _config.AppId },
@@ -94,10 +93,10 @@ namespace jfYu.Core.Wechat
             var result = await httpResponseMessage.Content.ReadAsStringAsync();
             if (httpResponseMessage.IsSuccessStatusCode)
             {
-                _logger.LogInformation($"get order by OrderNo successful,response:{result}");
+                _logger.LogInformation("get order by OrderNo successful,response:{Result}", result);
                 return XmlGet<QueryOrderResult>(result);
             }
-            _logger.LogError($"get order by OrderNo failed,response:{result},status:{httpResponseMessage.StatusCode}");
+            _logger.LogError("get order by OrderNo failed,response:{Result}", result);
             return default;
         }
 
@@ -108,7 +107,7 @@ namespace jfYu.Core.Wechat
         /// <returns></returns>
         public async Task<QueryOrderResult?> QueryOrderByWxIDAsync(string transactionId)
         {
-            _logger.LogInformation($"get order by WxId start,transactionId:{transactionId}");
+            _logger.LogInformation("get order by WxId start,transactionId:{TransactionId}", transactionId);
             var dic = new Dictionary<string, string>
             {
                 { "appid", _config.AppId },
@@ -125,10 +124,10 @@ namespace jfYu.Core.Wechat
             var result = await httpResponseMessage.Content.ReadAsStringAsync();
             if (httpResponseMessage.IsSuccessStatusCode)
             {
-                _logger.LogInformation($"get order by WxId successful,response:{result}");
+                _logger.LogInformation("get order by WxId successful,response:{Result}", result);
                 return XmlGet<QueryOrderResult>(result);
             }
-            _logger.LogError($"get order by WxId failed,response:{result},status:{httpResponseMessage.StatusCode}");
+            _logger.LogError("get order by WxId failed,response:{Result}", result);
             return default;
         }
 
@@ -142,7 +141,7 @@ namespace jfYu.Core.Wechat
         /// <returns></returns>
         public async Task<RefundResult?> RefundAsync(string orderNo, string outRefundNo, int totalFee, int refundFee)
         {
-            _logger.LogInformation($"refund order start,orderNo:{orderNo},outRefundNo:{outRefundNo},totalFee：{totalFee},refundFee:{refundFee}");
+            _logger.LogInformation("refund order start,orderNo:{OrderNo},outRefundNo:{OutRefundNo},totalFee：{TotalFee},refundFee:{RefundFee}", orderNo, outRefundNo, totalFee, refundFee);
             var dic = new Dictionary<string, string>
             {
                 { "appid", _config.AppId },
@@ -162,16 +161,11 @@ namespace jfYu.Core.Wechat
             var result = await httpResponseMessage.Content.ReadAsStringAsync();
             if (httpResponseMessage.IsSuccessStatusCode)
             {
-                _logger.LogInformation($"refund order successful,response:{result}");
+                _logger.LogInformation("refund order successful,response:{Result}", result);
                 return XmlGet<RefundResult>(result);
             }
-            _logger.LogError($"refund order failed,response:{result},status:{httpResponseMessage.StatusCode}");
+            _logger.LogError("refund order failed,response:{Result}", result);
             return default;
-        }
-
-        public NotifyResult? NotifyCheck(string xml)
-        {
-            return XmlGet<NotifyResult>(xml);
         }
 
         public string GetSign(Dictionary<string, string> dic)
@@ -189,7 +183,7 @@ namespace jfYu.Core.Wechat
             }
         }
 
-        private string SHAmd5Encrypt(string normalTxt)
+        private static string SHAmd5Encrypt(string normalTxt)
         {
             var bytes = Encoding.Default.GetBytes(normalTxt);//求Byte[]数组  
             using var md5 = MD5.Create();
@@ -203,10 +197,10 @@ namespace jfYu.Core.Wechat
                 }
                 return md_str;
             }
-            return BytesToHex(encryptbytes);//将Byte[]数组转为净荷明文(其实就是字符串)  
+            return BytesToHex(encryptbytes);//将Byte[]数组转为明文(其实就是字符串)  
         }
 
-        public T? XmlGet<T>(string xml)
+        public static T? XmlGet<T>(string xml)
         {
             var obj = new JObject();
             var xmlDoc = new XmlDocument();

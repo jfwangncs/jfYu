@@ -31,18 +31,18 @@ namespace jfYu.Core.Wechat
 
             try
             {
-                _logger.LogInformation($"login start,code:{code}");
+                _logger.LogInformation("login start,code:{Code}", code);
                 var httpClient = _httpClientFactory.CreateClient(Constant.Mini);
                 var httpResponseMessage = await httpClient.GetAsync($"{LoginUrl}?appid={_config.AppId}&secret={_config.Secret}&js_code={code}&grant_type=authorization_code");
                 var result = await httpResponseMessage.Content.ReadAsStringAsync();
                 if (httpResponseMessage.IsSuccessStatusCode)
                     return JsonConvert.DeserializeObject<WechatSession>(result);
-                _logger.LogError($"login failed,code:{code},response:{result},status:{httpResponseMessage.StatusCode}");
-                return new WechatSession() { Code = ErrorCode.Failed};
+                _logger.LogError("login failed,code:{Code},response:{Result},status:{HttpResponseMessageStatusCode}", code, result, httpResponseMessage.StatusCode);
+                return new WechatSession() { Code = ErrorCode.Failed };
             }
             catch (Exception ex)
             {
-                _logger.LogError($"login failed,code:{code},error:{ex.Message}");
+                _logger.LogError("login failed,code:{code},error:{Message}", code, ex.Message);
                 return new WechatSession() { Code = ErrorCode.Failed, Msg = ex.Message };
             }
         }
@@ -55,19 +55,19 @@ namespace jfYu.Core.Wechat
         {
             try
             {
-                _logger.LogInformation($"get token start");
+                _logger.LogInformation("get token start");
                 var httpClient = _httpClientFactory.CreateClient(Constant.Mini);
                 var httpResponseMessage = await httpClient.GetAsync($"{GetTokenUrl}?appid={_config.AppId}&secret={_config.Secret}&grant_type=client_credential");
 
                 var result = await httpResponseMessage.Content.ReadAsStringAsync();
                 if (httpResponseMessage.IsSuccessStatusCode)
                     return JsonConvert.DeserializeObject<AccessToken>(result);
-                _logger.LogError($"get token failed,response:{result},status:{httpResponseMessage.StatusCode}");
+                _logger.LogError("get token failed,response:{Result},status:{HttpResponseMessageStatusCode}", result, httpResponseMessage.StatusCode);
                 return default;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"get token failed,error:{ex.Message}");
+                _logger.LogError("get token failed,error:{Message}", ex.Message + ex?.InnerException?.Message);
                 return default;
             }
         }
@@ -83,7 +83,7 @@ namespace jfYu.Core.Wechat
 
             try
             {
-                _logger.LogInformation($"get phone start");
+                _logger.LogInformation("get phone start");
                 var token = await GetTokenAsync();
                 var content = new StringContent(JsonConvert.SerializeObject(new { code }), Encoding.UTF8, "application/json");
 
@@ -93,12 +93,12 @@ namespace jfYu.Core.Wechat
                 if (httpResponseMessage.IsSuccessStatusCode)
                     return JsonConvert.DeserializeObject<WechatResult<PhoneInfo>>(result);
 
-                _logger.LogError($"get phone failed,response:{result},status:{httpResponseMessage.StatusCode}");
+                _logger.LogError("get phone failed,response:{Result},status:{HttpResponseMessageStatusCode}", result, httpResponseMessage.StatusCode);
                 return default;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"get phone failed,error:{ex.Message}");
+                _logger.LogError("get phone failed,error:{Message}", ex.Message + ex?.InnerException?.Message);
                 return default;
             }
         }

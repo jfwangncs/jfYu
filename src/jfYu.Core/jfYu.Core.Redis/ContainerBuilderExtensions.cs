@@ -16,7 +16,7 @@ namespace jfYu.Core.Redis
         /// <param name="services"></param>
         public static void AddRedisService(this IServiceCollection services, RedisConfiguration redisConfiguration)
         {
-            if (redisConfiguration == null || redisConfiguration.EndPoints == null || !redisConfiguration.EndPoints.Any())
+            if (redisConfiguration == null || redisConfiguration.EndPoints == null || redisConfiguration.EndPoints.Count == 0)
                 throw new NullReferenceException(nameof(redisConfiguration));
             services.AddSingleton(redisConfiguration);
             var configurationOptions = new ConfigurationOptions()

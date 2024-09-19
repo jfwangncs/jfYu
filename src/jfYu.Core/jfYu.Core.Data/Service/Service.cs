@@ -6,7 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace jfYu.Core.Data
+namespace jfYu.Core.Data.Service
 {
     public class Service<T, TContext>(IContextWrite context, ReadonlyDBContext<TContext> readonlyContext) : IService<T, TContext> where T : BaseEntity
         where TContext : DbContext, IJfYuDbContextService

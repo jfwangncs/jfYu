@@ -21,6 +21,6 @@ namespace jfYu.Core.Data.Model
         /// <summary>
         /// data
         /// </summary>
-        public List<T> Data { get; set; } = new List<T>();
+        public List<T> Data { get; set; } = [];
     }
 }

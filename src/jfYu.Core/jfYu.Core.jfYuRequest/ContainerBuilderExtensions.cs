@@ -3,12 +3,23 @@ using System.Net.Http;
 
 namespace jfYu.Core.jfYuRequest
 {
-#if NETSTANDARD21 || NET6_0 || NET7_0 || NET8_0
+
     /// <summary>
     /// 
     /// </summary>
     public static class ContainerBuilderExtensions
     {
+        /// <summary>
+        /// injection
+        /// </summary>
+        /// <param name="services"></param>
+        public static void AddJfYuHttpRequestService(this IServiceCollection services)
+        {
+            services.AddTransient<IJfYuRequest, JfYuHttpRequest>();
+        }
+
+
+#if NETCORE
         /// <summary>
         /// injection
         /// </summary>
@@ -23,6 +34,7 @@ namespace jfYu.Core.jfYuRequest
             });
             services.AddScoped<IJfYuRequest, JfYuHttpClient>();
         }
-    }
 #endif
+    }
+
 }

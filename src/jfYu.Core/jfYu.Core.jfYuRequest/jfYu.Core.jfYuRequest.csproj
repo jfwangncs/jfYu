@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;netstandard2.1;net462;net6.0;net7.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.1;net462;net6.0;net8.0</TargetFrameworks>
 		<LangVersion>12.0</LangVersion>
-		<Version>8.0.6</Version>
+		<Version>8.0.7</Version>
 		<Authors>jfwang</Authors>
 		<Nullable>enable</Nullable>
 		<Description>HttpRequest</Description>
@@ -10,8 +10,10 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/jfwangncs/jfYu</RepositoryUrl>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
-	</PropertyGroup> 
- 
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.1' Or '$(TargetFramework)' == 'net6.0' Or '$(TargetFramework)' == 'net8.0'">
+		<DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Brotli.NET" Version="2.1.1" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />

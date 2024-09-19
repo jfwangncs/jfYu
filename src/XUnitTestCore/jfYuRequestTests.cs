@@ -2,6 +2,8 @@ using jfYu.Core.jfYuRequest;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
@@ -13,7 +15,7 @@ namespace xUnitTestCore
         private readonly IJfYuRequest _client = client;
 
         [Fact]
-        public void IOCTest()
+        public void IOC_Should_Return_NotNull_When_Injected()
         {
             var services = new ServiceCollection();
             services.AddJfYuHttpClientService();
@@ -26,29 +28,29 @@ namespace xUnitTestCore
         [Theory]
         [InlineData("")]
         [InlineData(null)]
-        public async Task ErrorTest(string path)
+        public async Task DownloadFileAsync_Should_Return_Error(string path)
         {
             var jfYu = new JfYuHttpRequest()
             {
                 Url = "",
-                Method = RequestMethod.Get,
+                Method = HttpMethod.Get,
                 Timeout = 60
             };
             await Assert.ThrowsAnyAsync<Exception>(async () => await jfYu.DownloadFileAsync(path));
 
             _client.Url = "";
-            _client.Method = RequestMethod.Get;
+            _client.Method = HttpMethod.Get;
             _client.Timeout = 60;
             await Assert.ThrowsAnyAsync<Exception>(async () => await _client.DownloadFileAsync(path));
         }
 
         [Fact]
-        public async Task HtmlTest()
+        public async Task SendAsync_Should_Return_Html()
         {
             var jfYu = new JfYuHttpRequest()
             {
                 Url = "https://www.baidu.com/",
-                Method = RequestMethod.Get,
+                Method = HttpMethod.Get,
                 Timeout = 60
             };
             var html = await jfYu.SendAsync();
@@ -57,7 +59,7 @@ namespace xUnitTestCore
 
 
             _client.Url = "https://www.baidu.com/";
-            _client.Method = RequestMethod.Get;
+            _client.Method = HttpMethod.Get;
             _client.Timeout = 60;
 
             var html1 = await _client.SendAsync();
@@ -66,12 +68,12 @@ namespace xUnitTestCore
         }
 
         [Fact]
-        public async Task Err403Test()
+        public async Task SendAsync_Should_Return_403_When_Request_403()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             _client.Url = "https://bbs.nga.cn/read.php?tid=39381647";
-            _client.Method = RequestMethod.Get;
+            _client.Method = HttpMethod.Get;
             _client.Timeout = 60;
             _client.RequestEncoding = Encoding.GetEncoding("GB18030");
 
@@ -82,7 +84,7 @@ namespace xUnitTestCore
             var jfYu = new JfYuHttpRequest()
             {
                 Url = "https://bbs.nga.cn/read.php?tid=39381647",
-                Method = RequestMethod.Get,
+                Method = HttpMethod.Get,
                 Timeout = 60,
                 RequestEncoding = Encoding.GetEncoding("GB18030"),
             };
@@ -92,7 +94,7 @@ namespace xUnitTestCore
         }
 
         [Fact]
-        public async void TestFile()
+        public async Task DownloadFileAsync_Should_Return_True()
         {
             var jfYu = new JfYuHttpRequest()
             {
@@ -131,6 +133,63 @@ namespace xUnitTestCore
             Directory.Delete("requestest");
         }
 
+        [Fact]
+        public async Task SendAsync_Should_Throw_TimeoutException_When_Request_Times_Out()
+        {
+            var jfYu = new JfYuHttpRequest()
+            {
+                Url = "https://httpbin.org/delay/30",
+                Method = HttpMethod.Get,
+                Timeout = 5
+            };
 
+            await Assert.ThrowsAnyAsync<Exception>(jfYu.SendAsync);
+
+
+            _client.Url = "https://httpbin.org/delay/30";
+            _client.Method = HttpMethod.Get;
+            _client.Timeout = 5;
+            await Assert.ThrowsAnyAsync<Exception>(_client.SendAsync);
+        }
+
+        [Fact]
+        public async Task SendAsync_Should_Return_500_When_Request_500()
+        {
+            var jfYu = new JfYuHttpRequest()
+            {
+                Url = "https://httpbin.org/status/500",
+                Method = HttpMethod.Get,
+                Timeout = 20
+            };
+            await jfYu.SendAsync();
+            Assert.Equal(System.Net.HttpStatusCode.InternalServerError, jfYu.StatusCode);
+
+
+            _client.Url = "https://httpbin.org/status/500";
+            _client.Method = HttpMethod.Get;
+            _client.Timeout = 20;
+            await _client.SendAsync();
+            Assert.Equal(System.Net.HttpStatusCode.InternalServerError, _client.StatusCode);
+        }
+
+        [Fact]
+        public async Task SendAsync_Should_Return_404_When_Request_404()
+        {
+            var jfYu = new JfYuHttpRequest()
+            {
+                Url = "https://httpbin.org/status/404",
+                Method = HttpMethod.Get,
+                Timeout = 20
+            };
+            await jfYu.SendAsync();
+            Assert.Equal(HttpStatusCode.NotFound, jfYu.StatusCode);
+
+
+            _client.Url = "https://httpbin.org/status/404";
+            _client.Method = HttpMethod.Get;
+            _client.Timeout = 20;
+            await _client.SendAsync();
+            Assert.Equal(HttpStatusCode.NotFound, _client.StatusCode);
+        }
     }
 }

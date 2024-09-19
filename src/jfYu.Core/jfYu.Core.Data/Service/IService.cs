@@ -1,12 +1,12 @@
-﻿using System;
+﻿using jfYu.Core.Data.Model;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using jfYu.Core.Data.Model;
-using Microsoft.EntityFrameworkCore;
 
-namespace jfYu.Core.Data
+namespace jfYu.Core.Data.Service
 {
     public interface IService<T, TContext> where T : BaseEntity
          where TContext : DbContext, IJfYuDbContextService
