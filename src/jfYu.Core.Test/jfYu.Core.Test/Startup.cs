@@ -10,7 +10,6 @@ namespace jfYu.Core.Test
             services.AddRedisService(options =>
             {
                 options.EndPoints.Add(new RedisEndPoint { Host = "localhost", Port = 6379 });
-                options.Ssl = true;
             }).UsingNewtonsoft();
            
         }      
