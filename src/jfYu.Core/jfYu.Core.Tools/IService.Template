@@ -1,0 +1,8 @@
+﻿using jfYu.Core.Data;
+
+namespace {namespace}.IService
+{
+    public interface I{model}Service : IServiceKey, IService<{model}>
+    {         
+    }
+}

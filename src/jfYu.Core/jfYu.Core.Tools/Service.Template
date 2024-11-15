@@ -1,0 +1,14 @@
+﻿using {namespace}.IService;
+using jfYu.Core.Data;
+
+namespace {namespace}.Service
+{
+    public class {model}Service : Service<{model}, DataContext>, I{model}Service
+    {
+
+        public {model}Service(IDbContextService<DataContext> contextService) : base(contextService)
+        {
+
+        }       
+    }
+}
