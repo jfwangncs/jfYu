@@ -12,10 +12,10 @@ namespace jfYu.Core.Test.Office.Word
     {
 
         private readonly IJfYuWord _jfYuWord = jfYuWord;
-        private readonly string _testTemplatePath = "template.docx";
-        private readonly string _outputFilePath = "output.docx";
-        private readonly string _imagePath = "example.png";
-        private readonly string _imagePath1 = "example1.png";
+        private readonly string _testTemplatePath = "Static/template.docx";
+        private readonly string _outputFilePath = "Static/output.docx";
+        private readonly string _imagePath = "Static/example.png";
+        private readonly string _imagePath1 = "Static/example1.png";
 
         [Fact]
         public void AddJfYuWord_Registers()

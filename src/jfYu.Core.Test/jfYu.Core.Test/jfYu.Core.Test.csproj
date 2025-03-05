@@ -35,10 +35,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="example1.png">
+	  <None Update="Static\example1.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="example.png">
+	  <None Update="Static\example.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Static\template.docx">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
