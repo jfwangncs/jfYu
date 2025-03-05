@@ -1,14 +1,12 @@
-﻿using NPOI.SS.Formula.Eval;
+﻿using jfYu.Core.Office.Excel.Constant; 
+using jfYu.Core.Office.Excel.Extensions;
+using jfYu.Core.Office.Excel.Write.Interface;
+using Microsoft.Extensions.Options;
 using NPOI.SS.UserModel;
-using NPOI.XSSF.Streaming;
-using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
+using System.Dynamic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace jfYu.Core.Office.Excel
@@ -17,261 +15,64 @@ namespace jfYu.Core.Office.Excel
     /// <summary>
     /// 
     /// </summary>
-    public sealed class JfYuExcel : IJfYuExcel
+    public class JfYuExcel(IOptionsMonitor<JfYuExcelOption> configuration, IJfYuExcelWriterFactory excelWriterFactory) : IJfYuExcel
     {
-        /// <summary>
-        /// SXSSF row count in memory
-        /// </summary>
-        public int RowAccessSize { get; set; } = 1000;
+        private readonly IOptionsMonitor<JfYuExcelOption> _configuration = configuration;
+        private readonly IJfYuExcelWriterFactory _excelWriterFactory = excelWriterFactory;
 
-        /// <summary>
-        /// one sheet max count default:1000000
-        /// </summary>
-        public int SheetMaxCount { get; set; } = 1000000;
-
-        #region export    
-
-        private void ToExcel(string filePath, Dictionary<string, string> titles, Action<IWorkbook, ISheet> main)
+        public IWorkbook CreateExcel(JfYuExcelVersion excelVersion = JfYuExcelVersion.Xlsx)
         {
-            if (string.IsNullOrEmpty(filePath))
-                throw new NullReferenceException($"{filePath} is null");
+            return JfYuExcelExtension.CreateExcel(excelVersion, _configuration.CurrentValue.RowAccessSize);
+        }
 
-            var ext = Path.GetExtension(filePath);
-            if (string.IsNullOrEmpty(ext))
-                filePath += ".xlsx";
-            else
-                filePath = filePath.Replace(ext, ".xlsx");
-            var workbook = CreateWorkbook();
-            var sheet = workbook.CreateSheetWithTitles(titles);
-            main.Invoke(workbook, sheet);
-            workbook.Save(filePath);
+        public IWorkbook Write<T>(T source, string filePath, Dictionary<string, string>? titles = null, JfYuExcelWriteOperation writeOperation = JfYuExcelWriteOperation.None, Action<int>? callback = null)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+            ArgumentException.ThrowIfNullOrEmpty(filePath);
+            var writer = _excelWriterFactory.GetWriter<T>();
+            return writer.Write(source, filePath, titles, writeOperation, callback);
+        }
+
+        public void UpdateOption(Action<JfYuExcelOption> updateAction)
+        {
+            var currentOptions = _configuration.CurrentValue;
+            updateAction(currentOptions);
+        }
+
+        public T Read<T>(Stream stream, int firstRow = 1, int sheetIndex = 0)
+        {
+            ArgumentNullException.ThrowIfNull(stream, nameof(stream));
+            using var wb = WorkbookFactory.Create(stream);
+            return JfYuExcelExtension.Read<T>(wb, firstRow, sheetIndex);
 
         }
 
-        /// <summary>
-        /// export    
-        /// </summary>
-        /// <typeparam name="T">model</typeparam> 
-        /// <param name="source">data</param>
-        /// <param name="filePath">file path</param>
-        /// <param name="titles">titles</param>
-        /// <param name="callback">export progress callback</param>
-        public void ToExcel<T>(List<T> source, string filePath, Dictionary<string, string>? titles = null, Action<int>? callback = null) where T : new()
+        public T Read<T>(string filePath, int firstRow = 1, int sheetIndex = 0)
         {
-            titles ??= ExcelExtension.GetTitles<T>();
-            ToExcel(filePath, titles, (workbook, sheet) =>
-            {
-                //current row index
-                int sheetWriteRowIndex = 1;
-                //writed row count
-                int writedCount = 0;
-                //start write
-                foreach (var item in source)
-                {
-                    var dataRow = sheet.CreateRow(sheetWriteRowIndex);
-                    var columnIndex = 0;
-                    foreach (var title in titles)
-                    {
-                        var cell = dataRow.CreateCell(columnIndex);
-                        try
-                        {
-                            var value = typeof(T).GetProperty(title.Key)?.GetValue(item)?.ToString() ?? "";
-                            cell.SetCellValue(value);
-                        }
-                        catch (Exception)
-                        {
-                            cell.SetCellValue("");
-                        }
-                        columnIndex++;
-                    }
-                    sheetWriteRowIndex++;
-                    if (sheetWriteRowIndex > SheetMaxCount)
-                    {
-                        sheet = workbook.CreateSheetWithTitles(titles);
-                        sheetWriteRowIndex = 1;
-                    }
-                    writedCount++;
-                    callback?.Invoke(writedCount);
-                }
-            });
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException(nameof(filePath));
+            using FileStream file = new(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            IWorkbook wb = WorkbookFactory.Create(file);
+            return JfYuExcelExtension.Read<T>(wb, firstRow, sheetIndex);
+
         }
 
-        /// <summary>
-        /// export      
-        /// </summary>
-        /// <param name="source">data</param> 
-        /// <param name="filePath">file path</param>
-        /// <param name="titles">titles</param>
-        /// <param name="callback">export progress callback</param>
-        public void ToExcel(DataTable source, string filePath, Dictionary<string, string>? titles = null, Action<int>? callback = null)
+        public void WriteCSV<T>(List<T> source, string filePath, Dictionary<string, string>? titles = null, Action<int>? callback = null)
         {
-            if (titles == null)
-            {
-                titles = [];
-                foreach (DataColumn item in source.Columns)
-                    titles.Add(item.ColumnName, item.ColumnName);
-            }
-
-            ToExcel(filePath, titles, (workbook, sheet) =>
-            {
-                //current row index
-                int sheetWriteRowIndex = 1;
-                //writed row count
-                int writedCount = 0;
-                //start write
-                foreach (DataRow item in source.Rows)
-                {
-                    var dataRow = sheet.CreateRow(sheetWriteRowIndex);
-                    var columnIndex = 0;
-                    foreach (var title in titles)
-                    {
-                        var cell = dataRow.CreateCell(columnIndex);
-                        try
-                        {
-                            cell.SetCellValue(item[title.Key]?.ToString() ?? "");
-                        }
-                        catch (Exception)
-                        {
-                            cell.SetCellValue("");
-                        }
-                        columnIndex++;
-                    }
-                    sheetWriteRowIndex++;
-                    if (sheetWriteRowIndex > SheetMaxCount)
-                    {
-                        sheet = workbook.CreateSheetWithTitles(titles);
-                        sheetWriteRowIndex = 1;
-                    }
-                    writedCount++;
-                    callback?.Invoke(writedCount);
-                }
-            });
-        }
-
-        /// <summary>
-        /// export    
-        /// </summary>
-        /// <typeparam name="T">model</typeparam>
-        /// <param name="source">data</param
-        /// <param name="filePath">file path</param>
-        /// <param name="titles">titles</param>
-        /// <param name="callback">export progress callback</param>
-        public void ToExcel<T>(IQueryable<T> source, string filePath, Dictionary<string, string>? titles = null, Action<int>? callback = null) where T : new()
-        {
-            titles ??= ExcelExtension.GetTitles<T>();
-            ToExcel(filePath, titles, (workbook, sheet) =>
-            {
-                //current row index
-                int sheetWriteRowIndex = 1;
-                //writed row count
-                int writedCount = 0;
-                //start write
-                var enumerator = source.GetEnumerator();
-                while (enumerator.MoveNext())
-                {
-                    var dataRow = sheet.CreateRow(sheetWriteRowIndex);
-                    var columnIndex = 0;
-                    foreach (var title in titles)
-                    {
-                        var cell = dataRow.CreateCell(columnIndex);
-                        try
-                        {
-                            var value = typeof(T).GetProperty(title.Key)?.GetValue(enumerator.Current)?.ToString() ?? "";
-                            cell.SetCellValue(value);
-                        }
-                        catch (Exception)
-                        {
-                            cell.SetCellValue("");
-                        }
-                        columnIndex++;
-                    }
-                    sheetWriteRowIndex++;
-                    if (sheetWriteRowIndex > SheetMaxCount)
-                    {
-                        sheet = workbook.CreateSheetWithTitles(titles);
-                        sheetWriteRowIndex = 1;
-                    }
-                    writedCount++;
-                    callback?.Invoke(writedCount);
-                }
-            });
-        }
-
-        /// <summary>
-        /// export
-        /// </summary>
-        /// <param name="sqlDataReader">data source</param>
-        /// <param name="filePath">file path</param>
-        /// <param name="titles">title</param>
-        /// <param name="callback">export progress callback</param>
-        public void ToExcel(DbDataReader sqlDataReader, string filePath, Dictionary<string, string>? titles = null, Action<int>? callback = null)
-        {
-            if (sqlDataReader is null)
-                throw new NullReferenceException(nameof(sqlDataReader));
-            if (sqlDataReader.IsClosed)
-                throw new Exception("data reader is closed.");
-            if (titles is null || titles.Count <= 0)
-                throw new NullReferenceException("title is null.");
-            ToExcel(filePath, titles, (workbook, sheet) =>
-            {
-                //current row index
-                int sheetWriteRowIndex = 1;
-                //writed row count
-                int writedCount = 0;
-                //start write
-                while (sqlDataReader.Read())
-                {
-                    var dataRow = sheet.CreateRow(sheetWriteRowIndex);
-                    var columnIndex = 0;
-                    foreach (var title in titles)
-                    {
-                        var cell = dataRow.CreateCell(columnIndex);
-                        try
-                        {
-                            cell.SetCellValue(sqlDataReader[title.Key]?.ToString() ?? "");
-                        }
-                        catch (Exception)
-                        {
-                            cell.SetCellValue("");
-                        }
-                        columnIndex++;
-                    }
-                    sheetWriteRowIndex++;
-                    if (sheetWriteRowIndex > 1000000)
-                    {
-                        sheet = workbook.CreateSheetWithTitles(titles);
-                        sheetWriteRowIndex = 1;
-                    }
-                    writedCount++;
-                    callback?.Invoke(writedCount);
-                }
-                sqlDataReader.Close();
-            });
-        }
-
-        /// <summary>
-        /// export csv
-        /// </summary>
-        /// <typeparam name="T">model</typeparam>
-        /// <param name="source">data</param>
-        /// <param name="filePath">file path</param>
-        /// <param name="titles">title</param>
-        /// <param name="callback">export progress callback</param>
-        public void ToCSV<T>(List<T> source, string filePath, Dictionary<string, string>? titles = null, Action<int>? callback = null)
-        {
-            if (string.IsNullOrEmpty(filePath))
-                throw new NullReferenceException($"{filePath} is null");
-
+            ArgumentNullException.ThrowIfNull(source);
+            ArgumentException.ThrowIfNullOrEmpty(filePath);
             var ext = Path.GetExtension(filePath);
             if (string.IsNullOrEmpty(ext))
                 filePath += ".csv";
             else
                 filePath = filePath.Replace(ext, ".csv");
+            if (File.Exists(filePath))
+                throw new Exception("File is existing");
 
             using FileStream fs = File.Create(filePath);
             using StreamWriter sw = new(fs, Encoding.UTF8);
             StringBuilder str = new();
-            titles ??= ExcelExtension.GetTitles<T>();
+            titles ??= JfYuExcelExtension.GetTitles<T>();
             //title
             foreach (var item in titles)
             {
@@ -287,9 +88,11 @@ namespace jfYu.Core.Office.Excel
                 var columnIndex = 0;
                 foreach (var title in titles)
                 {
-                    var value = typeof(T).GetProperty(title.Key)?.GetValue(item)?.ToString() ?? "";
+                    var value = typeof(T).GetProperty(title.Key)!.GetValue(item)?.ToString() ?? "";
+                    if (typeof(T).GetProperty(title.Key)!.PropertyType == typeof(DateTime))
+                        value = DateTime.Parse(value).ToString("yyyy-MM-dd HH:mm:ss.fff");
                     if (value.Contains(','))
-                        rowStr += value.Replace(",", "\",\"") + ",";
+                        rowStr += $"\"{value}\",";
                     else
                         rowStr += value + ",";
                     columnIndex++;
@@ -298,379 +101,102 @@ namespace jfYu.Core.Office.Excel
                 writedCount++;
                 callback?.Invoke(writedCount);
             }
+            sw.Dispose();
+            fs.Dispose();
         }
 
-        #endregion
-
-        #region excel import
-
-        /// <summary>
-        /// import to datatable
-        /// </summary>
-        /// <param name="filePath">excel file path</param>
-        /// <param name="firstRow">srart index,default:1,0 is title</param>
-        /// <param name="sheetIndex">sheet index</param>
-        /// <returns></returns>
-        public DataTable GetDataTable(string filePath, int firstRow = 1, int sheetIndex = 0)
+        public List<dynamic> ReadCSV(string filePath, int firstRow = 1)
         {
             if (!File.Exists(filePath))
-                throw new FileNotFoundException($"{filePath} file not found");
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            try
+                throw new FileNotFoundException(nameof(filePath));
+            using FileStream fs = new(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using StreamReader sr = new(fs, Encoding.UTF8);
+            string? line;
+            int rowIndex = 1;
+            List<dynamic> records = [];
+            List<string> headerNames = [];
+            while ((line = sr.ReadLine()) != null)
             {
-                IWorkbook wb = WorkbookFactory.Create(filePath);
-                ISheet sheet = wb.GetSheetAt(sheetIndex);
-                return GetDataTable(sheet, firstRow);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"import failed,{ex.Message},{ex.InnerException?.Message}");
-            }
-        }
-
-        /// <summary>
-        /// import to datatable
-        /// </summary>
-        /// <param name="stream">excel file stream</param>
-        /// <param name="firstRow">srart index,default:1,0 is title</param>
-        /// <param name="sheetIndex">sheet index</param>
-        /// <returns></returns>
-        public DataTable GetDataTable(Stream stream, int firstRow = 1, int sheetIndex = 0)
-        {
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
-            try
-            {
-                DataTable dt = new();
-                IWorkbook wb;
-                using (stream)
-                    wb = WorkbookFactory.Create(stream);
-                ISheet sheet = wb.GetSheetAt(sheetIndex);
-                return GetDataTable(sheet, firstRow);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"import failed,{ex.Message},{ex.InnerException?.Message}");
-            }
-        }
-
-        /// <summary>
-        /// import to list
-        /// </summary>
-        /// <typeparam name="T">Model</typeparam>
-        /// <param name="filePath">excel file path</param>
-        /// <param name="firstRow">srart index,default:1,0 is title</param>
-        /// <param name="sheetIndex">sheet index</param>
-        /// <returns></returns>
-        public List<T>? GetList<T>(string filePath, int firstRow = 1, int sheetIndex = 0) where T : new()
-        {
-            if (!File.Exists(filePath))
-                throw new FileNotFoundException($"{filePath} file not found");
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            try
-            {
-                using FileStream file = new(filePath, FileMode.Open, FileAccess.Read);
-                IWorkbook wb = WorkbookFactory.Create(file);
-                ISheet sheet = wb.GetSheetAt(sheetIndex);
-                return GetList<T>(sheet, firstRow);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"import failed,{ex.Message},{ex.InnerException?.Message}");
-            }
-
-        }
-
-        /// <summary>
-        /// import to list
-        /// </summary>
-        /// <param name="stream">excel file stream</param>
-        /// <param name="firstRow">srart index,default:1,0 is title</param>
-        /// <param name="sheetIndex">sheet index</param>
-        /// <returns></returns>
-        public List<T>? GetList<T>(Stream stream, int firstRow = 1, int sheetIndex = 0) where T : new()
-        {
-
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
-            try
-            {
-                DataTable dt = new();
-                IWorkbook wb;
-                using (stream)
-                    wb = WorkbookFactory.Create(stream);
-                ISheet sheet = wb.GetSheetAt(sheetIndex);
-                return GetList<T>(sheet, firstRow);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"import failed,{ex.Message},{ex.InnerException?.Message}");
-            }
-        }
-
-        private static List<T>? GetList<T>(ISheet sheet, int firstRow)
-        {
-            //title
-            var headerRow = sheet.GetRow(0);
-            if (headerRow == null)
-                return default;
-            int cellCount = headerRow.LastCellNum;
-            var titles = ExcelExtension.GetTitles<T>();
-            Dictionary<int, string> cellNums = [];
-            for (int i = headerRow.FirstCellNum; i < cellCount; i++)
-            {
-                var headerValue = headerRow.GetCell(i).StringCellValue.Replace(" ", "").Trim();
-                if (titles.ContainsKey(headerValue))
-                    cellNums.Add(i, headerValue);
-            }
-            List<T> list = [];
-            //content
-            for (int i = firstRow; i <= sheet.LastRowNum; i++)
-            {
-                try
+                if (rowIndex < firstRow)
                 {
-                    IRow row = sheet.GetRow(i);
-                    if (sheet.GetRow(i) != null)
+                    rowIndex++;
+                    continue;
+                }
+                string[] fields = ParseCsvLine(line);
+
+                if (rowIndex == firstRow)
+                    headerNames = ReplaceEmptyStrings(new List<string>(fields));
+                else
+                {
+                    dynamic record = new ExpandoObject();
+                    var dict = (IDictionary<string, object>)record;
+                    if (fields.Length <= headerNames.Count)
                     {
-                        var obj = Activator.CreateInstance(typeof(T));
-                        if (obj == null)
-                            return default;
-                        T item = (T)obj;
-                        foreach (var c in cellNums)
+                        for (int i = 0; i < headerNames.Count && i < fields.Length; i++)
                         {
-                            if (row != null)
-                            {
-                                var cell = row.GetCell(c.Key);
-                                if (cell == null)
-                                    continue;
-                                var formatter = new DataFormatter();
-                                string value = formatter.FormatCellValue(cell);
-                                PropertyInfo? p = typeof(T)?.GetProperty(c.Value);                               
-                                try
-                                {
-                                    if (p != null)
-                                    {
-
-                                        if (p.PropertyType.Name == typeof(DateTime).Name)
-                                        {
-                                            p.SetValue(item, DateTime.Parse(cell.DateCellValue.ToString()), null);
-                                        }
-                                        else
-                                        {
-                                            if (value != null)
-                                            {
-                                                var convertedValue = ConvertStringToType(value, p.PropertyType);
-                                                if (convertedValue != null)
-                                                {
-                                                    p.SetValue(item, convertedValue, null);
-                                                }
-                                                else if (convertedValue == null && p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                                                {
-                                                    p.SetValue(item, null, null);
-                                                }
-
-                                            }
-                                            else if (p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                                            {
-                                                p.SetValue(item, null, null);
-                                            }
-                                        }
-                                    }
-                                }
-                                catch (ArgumentException ex)
-                                {
-                                    throw new Exception($"convert {p?.Name} get error,value:{value}，model format:{p?.PropertyType.Name},errorMsg:{ex.Message}");
-                                }
-                                catch (Exception)
-                                {
-                                    throw;
-                                }
-                            }
-                        }
-                        list.Add(item);
-                    }
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-            return list;
-        }
-
-        /// <summary>
-        /// get data from sheeet
-        /// </summary>
-        /// <param name="sheet">sheet</param>
-        /// <param name="firstRow">srart index,default:1,0 is title</param>
-        /// <returns></returns>
-        private static DataTable GetDataTable(ISheet sheet, int firstRow)
-        {
-            DataTable table = new();
-            IRow headerRow;
-            int cellCount;
-            try
-            {
-                //title
-                headerRow = sheet.GetRow(0);
-                if (headerRow == null)
-                    return table;
-                cellCount = headerRow.LastCellNum;
-                for (int i = headerRow.FirstCellNum; i < cellCount; i++)
-                {
-                    DataColumn column = new(headerRow.GetCell(i).StringCellValue);
-                    table.Columns.Add(column);
-                }
-
-                //content
-                for (int i = firstRow; i <= sheet.LastRowNum; i++)
-                {
-                    try
-                    {
-                        IRow row = sheet.GetRow(i);
-                        if (sheet.GetRow(i) != null)
-                        {
-                            DataRow dataRow = table.NewRow();
-
-                            for (int j = row.FirstCellNum; j <= cellCount; j++)
-                            {
-                                try
-                                {
-                                    if (row.GetCell(j) != null)
-                                    {
-                                        switch (row.GetCell(j).CellType)
-                                        {
-                                            case CellType.Numeric:
-                                                if (DateUtil.IsCellDateFormatted(row.GetCell(j)))
-                                                    dataRow[j] = DateTime.FromOADate(row.GetCell(j).NumericCellValue);
-                                                else
-                                                    dataRow[j] = Convert.ToDecimal(row.GetCell(j).NumericCellValue);
-                                                break;
-                                            case CellType.Boolean:
-                                                dataRow[j] = Convert.ToString(row.GetCell(j).BooleanCellValue);
-                                                break;
-                                            case CellType.Error:
-                                                dataRow[j] = ErrorEval.GetText(row.GetCell(j).ErrorCellValue);
-                                                break;
-                                            case CellType.Formula:
-                                                switch (row.GetCell(j).CachedFormulaResultType)
-                                                {
-
-                                                    case CellType.Numeric:
-                                                        dataRow[j] = Convert.ToString(row.GetCell(j).NumericCellValue);
-                                                        break;
-                                                    case CellType.Boolean:
-                                                        dataRow[j] = Convert.ToString(row.GetCell(j).BooleanCellValue);
-                                                        break;
-                                                    case CellType.Error:
-                                                        dataRow[j] = ErrorEval.GetText(row.GetCell(j).ErrorCellValue);
-                                                        break;
-                                                    default:
-                                                    case CellType.String:
-                                                        string strFORMULA = row.GetCell(j).StringCellValue;
-                                                        dataRow[j] = strFORMULA?.ToString();
-                                                        break;
-                                                }
-                                                break;
-                                            default:
-                                            case CellType.String:
-                                                string str = row.GetCell(j).StringCellValue;
-                                                dataRow[j] = str?.ToString();
-                                                break;
-                                        }
-                                    }
-                                }
-                                catch
-                                {
-
-                                }
-                            }
-                            table.Rows.Add(dataRow);
+                            dict[headerNames[i]] = fields[i];
                         }
                     }
-                    catch
+                    else
                     {
+                        for (int i = 0; i < fields.Length; i++)
+                        {
+                            if (i < headerNames.Count)
+                                dict[headerNames[i]] = fields[i];
+                            else
+                                dict[$"Column{i}"] = fields[i];
+                        }
+                    }
+                    records.Add(record);
+                }
+                rowIndex++;
+            }
+            return records;
+
+            static List<string> ReplaceEmptyStrings(List<string> list)
+            {
+                string prefix = "Column";
+                int counter = 1;
+
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (string.IsNullOrEmpty(list[i]))
+                    {
+                        list[i] = $"{prefix}{counter}";
+                        counter++;
                     }
                 }
+                return list;
             }
-            catch (Exception ex)
+            static string[] ParseCsvLine(string line)
             {
-                throw new Exception($"import failed,{ex.Message},{ex.InnerException?.Message}");
-            }
-            return table;
-        }
+                List<string> fields = [];
+                bool inQuotes = false;
+                StringBuilder currentField = new();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="targetType"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
-        public static object? ConvertStringToType(string value, Type targetType)
-        {
-            if (targetType.IsAssignableFrom(typeof(string)))
-            {
-                return value;
-            }
-            else if (IsNumericType(targetType))
-            {
-                if (int.TryParse(value, out int intValue) && typeof(int).Name == targetType.Name)
-                    return targetType == typeof(int) ? intValue : (object?)intValue;
-                else if (long.TryParse(value, out long longValue) && typeof(long).Name == targetType.Name)
-                    return targetType == typeof(long) ? longValue : (object?)longValue;
-                else if (double.TryParse(value, out double doubleValue) && typeof(double).Name == targetType.Name)
-                    return targetType == typeof(double) ? doubleValue : (object?)doubleValue;
-                else if (decimal.TryParse(value, out decimal decimalValue) && typeof(decimal).Name == targetType.Name)
-                    return targetType == typeof(decimal) ? decimalValue : (object?)decimalValue;
-                else if (float.TryParse(value, out float floatValue) && typeof(float).Name == targetType.Name)
-                    return targetType == typeof(float) ? floatValue : (object?)floatValue;
-            }
-            else if (targetType.IsAssignableFrom(typeof(DateTime)))
-            {
-                if (DateTime.TryParse(value, out DateTime dateTime))
-                    return targetType == typeof(DateTime) ? dateTime : (DateTime?)dateTime;
-            }
-            else if (targetType.IsAssignableFrom(typeof(bool)))
-            {
-                if (bool.TryParse(value, out bool boolValue))
-                    return targetType == typeof(bool) ? boolValue : (bool?)boolValue;
-            }
-
-            return null;
-
-            static bool IsNumericType(Type t)
-            {
-                if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>))
+                foreach (char c in line)
                 {
-                    // Check if the underlying type of the Nullable is a numeric type
-                    Type? underlyingType = Nullable.GetUnderlyingType(t);
-                    return underlyingType != null && IsNumericType(underlyingType);
+                    if (c == '"')
+                    {
+                        inQuotes = !inQuotes;
+                    }
+                    else if (c == ',' && !inQuotes)
+                    {
+                        fields.Add(currentField.ToString().Trim('"'));
+                        currentField.Clear();
+                    }
+                    else
+                    {
+                        currentField.Append(c);
+                    }
+                }
+                if (currentField.Length > 0 || fields.Count == 0)
+                {
+                    fields.Add(currentField.ToString().Trim('"'));
                 }
 
-                return t == typeof(byte) || t == typeof(sbyte) ||
-                       t == typeof(short) || t == typeof(ushort) ||
-                       t == typeof(int) || t == typeof(uint) ||
-                       t == typeof(long) || t == typeof(ulong) ||
-                       t == typeof(float) || t == typeof(double) ||
-                       t == typeof(decimal);
+                return [.. fields];
             }
         }
-
-        #endregion
-
-        #region create
-
-        /// <summary>
-        /// create excel
-        /// </summary> 
-        /// <returns>SXSSFWorkbook</returns>
-        public SXSSFWorkbook CreateWorkbook()
-        {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            var workbook = new XSSFWorkbook();
-            return new SXSSFWorkbook(workbook, RowAccessSize);
-        }
-        #endregion
     }
 }

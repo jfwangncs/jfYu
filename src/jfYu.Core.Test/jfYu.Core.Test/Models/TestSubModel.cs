@@ -2,6 +2,7 @@
 {
     public class TestSubModel
     {
+        public int Id { get; set; }
         public required string CardNum { get; set; }
         public DateTime ExpiresIn { get; set; }
 

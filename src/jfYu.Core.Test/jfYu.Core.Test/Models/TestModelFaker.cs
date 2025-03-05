@@ -6,10 +6,11 @@ namespace jfYu.Core.Test.Models
     {
         public TestModelFaker()
         {
+            RuleFor(o => o.Id, f => f.Random.Number(1, 10000000));
             RuleFor(o => o.Age, f => f.Random.Number(1, 100));
             RuleFor(o => o.Name, f => f.Name.FirstName());
             RuleFor(o => o.Address, f => f.Address.FullAddress());
-            RuleFor(o => o.DateTime, f => f.Date.Recent());
+            RuleFor(o => o.DateTime, f =>f.Date.Recent().ToUniversalTime());
             RuleFor(u => u.Sub, f => new TestModelSubFaker().Generate());
             RuleFor(u => u.Items, f => [.. new TestModelSubFaker().Generate(f.Random.Number(1, 10))]);
         }
@@ -21,8 +22,9 @@ namespace jfYu.Core.Test.Models
 
         public TestModelSubFaker()
         {
+            RuleFor(o => o.Id, f => f.Random.Number(1, 100000));
             RuleFor(o => o.CardNum, f => f.Random.Number(100000000, 900000000).ToString());
-            RuleFor(o => o.ExpiresIn, f => f.Date.Recent());
+            RuleFor(o => o.ExpiresIn, f => f.Date.Recent().ToUniversalTime());
         }
 
     }

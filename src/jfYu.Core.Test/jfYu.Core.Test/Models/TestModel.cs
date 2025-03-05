@@ -1,12 +1,16 @@
 ﻿using Bogus;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace jfYu.Core.Test.Models
 {
     public class TestModel
     {
+        public int Id { get; set; }
         public string? Name { get; set; }
         public int Age { get; set; }
+
+        [DisplayName("地址")]
         public string? Address { get; set; }
         public DateTime DateTime { get; set; }
         public TestSubModel? Sub { get; set; }

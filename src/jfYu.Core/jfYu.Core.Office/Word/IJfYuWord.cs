@@ -1,4 +1,4 @@
-﻿using NPOI.XWPF.UserModel;
+﻿using jfYu.Core.Office.Word.Constant;
 using System.Collections.Generic;
 
 namespace jfYu.Core.Office.Word
@@ -6,18 +6,11 @@ namespace jfYu.Core.Office.Word
     public interface IJfYuWord
     {
         /// <summary>
-        /// Generate Word doc
+        /// Generates a Word document from a template, replacing with provided values.
         /// </summary>
-        /// <returns></returns>
-        XWPFDocument GenerateWord();
-
-        /// <summary>
-        /// Generate Word By Templat
-        /// </summary>
-        /// <param name="TemplatePath">file path</param>
-        /// <param name="bookmarks">marks</param>
-        /// <param name="filename">save file path</param>
-        /// <exception cref="FileNotFoundException"></exception>
-        void GenerateWordByTemplate(string TemplatePath, Dictionary<string, object> bookmarks, string filename);
+        /// <param name="templatePath">Path to the template file.</param>
+        /// <param name="outputPath">Output path.</param>
+        /// <param name="replacements">list oftheir replacement values.</param>
+        void GenerateWordByTemplate(string templatePath, string outputFilePath, List<JfYuWordReplacement> replacements);
     }
 }

@@ -1,5 +1,7 @@
-﻿using jfYu.Core.Redis.Extensions;
+﻿using jfYu.Core.Office;
+using jfYu.Core.Redis.Extensions;
 using jfYu.Core.Redis.Options;
+using jfYu.Core.Test.MemoryDB;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace jfYu.Core.Test
@@ -20,7 +22,10 @@ namespace jfYu.Core.Test
                     options.MaxDepth = 12;
                 });
             });
+            services.AddJfYuExcel(q => { q.SheetMaxRecord = 10; });
+            services.AddJfYuWord();
 
+            services.AddDbContext<TestDbContext>();
         }
     }
 }

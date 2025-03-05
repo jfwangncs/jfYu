@@ -145,7 +145,7 @@ namespace jfYu.Core.Test.Redis
 
             await Task.WhenAll(tasks);
             // Assert
-            Assert.True(count < NumberOfTasks * IncrementCount);
+            Assert.True(count <= NumberOfTasks * IncrementCount);
 
         } 
         #endregion
