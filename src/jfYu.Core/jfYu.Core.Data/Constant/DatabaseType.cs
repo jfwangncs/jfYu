@@ -1,4 +1,4 @@
-﻿namespace jfYu.Core.Data.Model
+﻿namespace jfYu.Core.Data.Constant
 {
     /// <summary>
     /// Database Types
@@ -8,7 +8,7 @@
 
         SqlServer,
 
-        Mysql,
+        MySql,
 
         Sqlite
     }

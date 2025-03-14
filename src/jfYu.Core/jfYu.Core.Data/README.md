@@ -1,6 +1,6 @@
 
 
-###  代码轻量级读写分离功能
+###  EF Read-Write Separation
 
 MySql,SqlServer,Sqlite 
 
@@ -8,13 +8,14 @@ MySql,SqlServer,Sqlite
 Install-Package jfYu.Core.Data
 ```
 
-配置文件
+Configuration
 
 ```
  "ConnectionStrings": {
     "DatabaseType": "SqlServer",
-    "ConnectionString": "Data Source = 127.0.0.1,9004; database = dbtest; User Id = sa; Password = 123456;"
-    "ReadOnlyConfigs": [
+    "ConnectionString": "Data Source = 127.0.0.1,9004; database = dbtest; User Id = sa; Password = 123456;",
+    "JfYuReadOnly":"JfYuReadOnly",
+    "ReadOnlyDatabases": [
       {
         "DatabaseType": "MySql", 
         "ConnectionString": "server=127.0.0.1;userid=root;pwd=123456;port=9001;database=dbtest;"
@@ -26,71 +27,71 @@ Install-Package jfYu.Core.Data
   }
 ```
 
-创建DbContext
+Create DbContext
 
 ```
     public class User : BaseEntity
     {
         /// <summary>
-        /// 登录名
+        /// UserName
         /// </summary>
-        [DisplayName("登录名"), Required, MaxLength(100)]
-        public string UserName { get; set; }
+        [DisplayName("UserName"), Required, MaxLength(100)]
+        public required string UserName { get; set; }
 
         /// <summary>
-        /// 昵称
+        /// NickName
         /// </summary>
-        [DisplayName("昵称"), Required, MaxLength(100)]
-        public string NickName { get; set; }       
+        [DisplayName("NickName"), Required, MaxLength(100)]
+        public string? NickName { get; set; }
 
         /// <summary>
-        /// 所属部门编号
+        /// DepartmentId
         /// </summary>
-        [DisplayName("所属部门")]
-        public Guid? DepartmentId { get; set; }
+        [DisplayName("DepartmentId")]
+        public int? DepartmentId { get; set; }
 
         /// <summary>
-        /// 所属部门
+        /// Department
         /// </summary>
-        public virtual Department Department { get; set; }
+        public virtual Department? Department { get; set; }
 
     }
 
     public class Department : BaseEntity
-    {        
+    {
         /// <summary>
-        /// 名称
+        /// Name
         /// </summary>
-        [DisplayName("名称"), Required]
-        public string Name { get; set; }
+        [DisplayName("Name"), Required]
+        public required  string Name { get; set; }
 
         /// <summary>
-        /// 简称
+        /// SubName
         /// </summary>
-        [DisplayName("简称"), Required]
-        public string SubName { get; set; }
+        [DisplayName("SubName"), Required]
+        public required string SubName { get; set; }
 
         /// <summary>
-        /// 上级部门编号
+        /// SuperiorId
         /// </summary>
-        [DisplayName("上级部门")]
+        [DisplayName("SuperiorId")]
         public int? SuperiorId { get; set; }
 
         /// <summary>
-        /// 上级部门
+        /// Superior
         /// </summary>
-        [DisplayName("上级部门")]
-        public virtual Department Superior { get; set; }
+        [DisplayName("Superior")]
+        public virtual Department? Superior { get; set; }
 
         /// <summary>
-        /// 部门人员
+        /// Users
         /// </summary>
-        [DisplayName("部门人员")]
-        public virtual List<User> Users { get; set; }
-      
+        [DisplayName("Users")]
+        public virtual List<User>? Users { get; set; }
+
     }
 
-    public class DataContext : DbContext,IJfYuDbContextService
+    public class DataContext : DbContext
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -101,7 +102,7 @@ Install-Package jfYu.Core.Data
 
     }
 
-  //设计时工厂
+  //Design Factory
     class DataContextFactory : IDesignTimeDbContextFactory<DataContext>
     {
         public DataContext CreateDbContext(string[] args)
@@ -116,25 +117,30 @@ Install-Package jfYu.Core.Data
         }
     }
 ```
-迁移数据
+Migration
 ```
-//配置迁移数据库连接字符串
+//set migration connection string
 $env:EFConString="Data Source = xxx; database = test; User Id = sa; Password = xxx;";
-//新建迁移
+//create migration
 dotnet ef migrations add init
-//应用迁移(也可在代码中进行迁移)
+//update database
 dotnet ef  database update
 
 ```
 
-注册
+IOC
 
 ```
 
-  services.AddJfYuDbContextService<DataContext>(new JfYuDBConfig() { DatabaseType = DatabaseType.Sqlite, ConnectionString = "Data Source= data/m1.db;" });
+services.AddJfYuDbContextService<DataContext>(q =>
+        {
+            q.ConnectionString = "server=127.0.0.1;Database=Test;uid=Test;pwd=test;";
+            q.ReadOnlyDatabases = new List<DatabaseConfig>() { new DatabaseConfig() { ConnectionString = "server=127.0.0.2;Database=Test;uid=Test;pwd=test;" } };
+        });
 
 ```
-使用
+
+Usage
 
 ```
 //master
@@ -152,4 +158,22 @@ await _companyService.UpdateAsync(data)
 await _companyService.RemoveAsync(q => q.ID.Equals(data.ID))
 _companyService.GetList(q => q.Name == "test124")
 
+```
+Expand
+
+```
+    public interface IUserService : IService<User, DataContext>
+    {
+        Task<User?> GetByNickNameAsync(string nickName);
+    }
+    public class UserService(DataContext context, ReadonlyDBContext<DataContext> readonlyDBContext)
+    : Service<User, DataContext>(context, readonlyDBContext), IUserService
+    {
+        public async Task<User?> GetByNickNameAsync(string nickName)
+        {
+            return await Context.Set<User>().FirstOrDefaultAsync(u => u.NickName == nickName);
+        }
+    }
+//IOC
+ services.AddScoped<IUserService, UserService>();
 ```

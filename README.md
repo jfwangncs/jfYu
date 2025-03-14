@@ -5,7 +5,7 @@ Welcome to the project! This is an all-in-one toolkit designed for developers, i
 
 - [**Caching**][Github.Cache] - The caching component supports both Redis and local caching. 
 
-- [**Lightweight Read/Write Splitting**][Github.Data] - A simple read/write splitting mechanism, including unified public data operation methods and convenient pagination features.  
+- [**Read/Write Splitting**][Github.Data] - A simple read/write splitting mechanism, including unified public data operation methods and convenient pagination features.  
 
 - [**Network Requests**][Github.jfYuRequest] - Encapsulates HttpRequest and HttpClient, providing an easy way to fetch web content and download files. 
 

@@ -39,7 +39,7 @@ namespace jfYu.Core.Test.Models
 
         public static List<AllTypeTestModel> GenerateTestList()
         {
-            return new List<AllTypeTestModel>(){ new AllTypeTestModel
+            return [ new AllTypeTestModel
                 {
                     Short = short.MaxValue,
                     Ushort = ushort.MaxValue,
@@ -192,7 +192,7 @@ namespace jfYu.Core.Test.Models
                     NullDateTime = null,
                     NullByte = null,
                     NullSbyte = null
-                } };
+                } ];
         }
     }
 }

@@ -1,12 +1,12 @@
-﻿using jfYu.Core.Data.Model;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace jfYu.Core.Data
+namespace jfYu.Core.Data.Constant
 {
 
-    public class JfYuDBConfig : DatabaseConfig
+    public class JfYuDatabaseConfig : DatabaseConfig
     {
-        public List<DatabaseConfig> ReadOnlyConfigs { get; set; } = [];
+        public List<DatabaseConfig> ReadOnlyDatabases { get; set; } = [];
+        public string JfYuReadOnly = nameof(JfYuReadOnly);
     }
 
     /// <summary>

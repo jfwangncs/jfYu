@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace jfYu.Core.Data.Model
 {
@@ -12,7 +13,8 @@ namespace jfYu.Core.Data.Model
         /// Id
         /// </summary>
         [Key]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
 
         /// <summary>
         /// State
@@ -22,12 +24,12 @@ namespace jfYu.Core.Data.Model
         /// <summary>
         /// Created Time
         /// </summary> 
-        public DateTime CreatedTime { get; set; } = DateTime.Now;
+        public DateTime CreatedTime { get; set; } = DateTime.UtcNow;
 
         /// <summary>
         /// Updated Time
         /// </summary>
-        public DateTime UpdatedTime { get; set; } = DateTime.Now;
+        public DateTime UpdatedTime { get; set; } = DateTime.UtcNow;
 
     }
 }

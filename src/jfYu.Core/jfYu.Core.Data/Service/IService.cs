@@ -2,99 +2,107 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace jfYu.Core.Data.Service
 {
     public interface IService<T, TContext> where T : BaseEntity
-         where TContext : DbContext, IJfYuDbContextService
+         where TContext : DbContext
     {
         /// <summary>
-        /// master context
+        /// Master context
         /// </summary>
         public TContext Context { get; }
 
         /// <summary>
-        /// readonly context
+        /// Readonly context
         /// </summary>
         public TContext ReadonlyContext { get; }
 
         /// <summary>
-        /// add
+        /// Adds data
         /// </summary>
         /// <param name="entity">data</param>
-        /// <returns>successful/failed</returns>
+        /// <returns>Number of records</returns>
         Task<int> AddAsync(T entity);
 
         /// <summary>
-        /// add
+        /// Adds list 
         /// </summary>
         /// <param name="list">data</param>
-        /// <returns>successful/failed</returns>
-        Task<int> AddRangeAsync(List<T> list);
+        /// <returns>Number of records</returns>
+        Task<int> AddAsync(List<T> list);
 
         /// <summary>
-        /// update
+        /// Updates
         /// </summary>
         /// <param name="entity">data</param>
-        /// <returns>successful/failed</returns>
+        /// <returns>Number of records</returns>
         Task<int> UpdateAsync(T entity);
 
         /// <summary>
-        /// 更新
+        /// Updates list
         /// </summary>
         /// <param name="list">data</param>
-        /// <returns>successful/failed</returns>
-        Task<int> UpdateRangeAsync(List<T> list);
+        /// <returns>Number of records</returns>
+        Task<int> UpdateAsync(List<T> list);
 
         /// <summary>
-        /// update
+        /// Updates records matching the given predicate, applying a custom action on each 
         /// </summary>
-        /// <param name="predicate">predicate</param>
-        /// <param name="scalar">scalar</param>
-        /// <returns>successful/failed</returns>
-        Task<int> UpdateAsync(Expression<Func<T, bool>>? predicate = null, Action<T>? scalar = null);
-
-
-        /// <summary>
-        /// remove
-        /// </summary>
-        /// <param name="predicate">predicate</param>
-        /// <returns>successful/failed</returns>
-        Task<int> RemoveAsync(Expression<Func<T, bool>>? predicate = null);
-
-        /// <summary>
-        /// hard remove
-        /// </summary>
-        /// <param name="predicate">predicate</param>
-        /// <returns>successful/failed</returns>
-        Task<int> HardRemoveAsync(Expression<Func<T, bool>>? predicate = null);
+        /// <param name="predicate">Condition to filter records.</param>
+        /// <param name="selector">Action to apply on each record, with its index and entity.</param>
+        /// <returns>Number of records</returns>
+        Task<int> UpdateAsync(Expression<Func<T, bool>> predicate, Action<int, T> selector);
 
 
         /// <summary>
-        /// get one
+        /// Soft Removes records matching the given predicate
         /// </summary>
-        /// <param name="predicate">predicate</param>
-        /// <returns>data</returns>
+        /// <param name="predicate">Condition to filter records.</param>
+        /// <returns>Number of records</returns>
+        Task<int> RemoveAsync(Expression<Func<T, bool>> predicate);
+
+        /// <summary>
+        /// Hard Removes records matching the given predicate
+        /// </summary>
+        /// <param name="predicate">Condition to filter records.</param>
+        /// <returns>Number of records</returns>
+        Task<int> HardRemoveAsync(Expression<Func<T, bool>> predicate);
+
+
+        /// <summary>
+        /// Get one record matching the given predicate
+        /// </summary>
+        /// <param name="predicate">Condition to filter records.</param>
+        /// <returns>Data of record</returns>
         Task<T?> GetOneAsync(Expression<Func<T, bool>>? predicate = null);
 
         /// <summary>
-        /// get list
+        /// Get list matching the given predicate
         /// </summary>
-        /// <param name="predicate">predicate</param>
-        /// <returns>list</returns>
-        IQueryable<T> GetList(Expression<Func<T, bool>>? predicate = null);
+        /// <param name="predicate">Condition to filter records.</param>
+        /// <returns>Data of records</returns>
+        Task<IList<T>> GetListAsync(Expression<Func<T, bool>>? predicate = null);
 
         /// <summary>
-        /// getlist
+        /// Get list matching the given predicate, with a projection at Memory
         /// </summary>
-        /// <typeparam name="T1">model</typeparam>
-        /// <param name="predicate">predicate</param>
-        /// <param name="scalar">Partial column，example:q=>new {id=q.id,name=q.name}、q=>new ClassA{id=q.id,name=q.name}</param>
-        /// <returns>list</returns>
-        IQueryable<T1> GetList<T1>(Expression<Func<T, bool>>? predicate = null, Expression<Func<T, T1>>? scalar = null);
- 
+        /// <typeparam name="T1">The type of the result after projection.</typeparam>
+        /// <param name="selector">A function to project the entity to a different type，example:q=>new {id=q.id,name=q.name},q=>new ClassA{id=q.id,name=q.name}</param>
+        /// <param name="predicate">Condition to filter records.</param>
+        /// <returns>Data of records</returns>
+        Task<IList<T1>> GetListAsync<T1>(Func<T, T1> selector, Expression<Func<T, bool>>? predicate = null);
+
+
+        /// <summary>
+        /// Get list matching the given predicate, with a projection at Database
+        /// </summary>
+        /// <typeparam name="T1">The type of the result after projection.</typeparam>
+        /// <param name="selector">A function to project the entity to a different type，example:q=>new {id=q.id,name=q.name},q=>new ClassA{id=q.id,name=q.name}</param>
+        /// <param name="predicate">Condition to filter records.</param>
+        /// <returns>Data of records</returns>
+        Task<IList<T1>> GetSelectListAsync<T1>(Expression<Func<T, T1>> selector, Expression<Func<T, bool>>? predicate = null);
     }
 }

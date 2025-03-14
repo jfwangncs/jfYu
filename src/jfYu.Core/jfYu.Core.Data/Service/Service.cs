@@ -1,4 +1,5 @@
-﻿using jfYu.Core.Data.Model;
+﻿using jfYu.Core.Data.Context;
+using jfYu.Core.Data.Model;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,82 +9,77 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.Data.Service
 {
-    public class Service<T, TContext>(IContextWrite context, ReadonlyDBContext<TContext> readonlyContext) : IService<T, TContext> where T : BaseEntity
-        where TContext : DbContext, IJfYuDbContextService
+    public class Service<T, TContext>(TContext context, ReadonlyDBContext<TContext> readonlyDBContext) : IService<T, TContext> where T : BaseEntity
+        where TContext : DbContext
     {
-        public TContext Context { get; } = (TContext)context;
-        public TContext ReadonlyContext { get; } = (TContext)(readonlyContext?.Current ?? context);
+        public TContext Context { get; } = context;
+        public TContext ReadonlyContext { get; } = readonlyDBContext.Current;
 
         public virtual async Task<int> AddAsync(T entity)
         {
-            entity.CreatedTime = entity.UpdatedTime = DateTime.Now;
+            entity.CreatedTime = entity.UpdatedTime = DateTime.UtcNow;
             await Context.AddAsync(entity);
-            var result = await Context.SaveChangesAsync();
-            Context.Entry(entity).State = EntityState.Detached;
-            return result;
+            return await Context.SaveChangesAsync();
         }
 
-        public virtual async Task<int> AddRangeAsync(List<T> list)
+        public virtual async Task<int> AddAsync(List<T> list)
         {
-            list.ForEach(entity => { entity.CreatedTime = entity.UpdatedTime = DateTime.Now; });
+            list.ForEach(entity => { entity.CreatedTime = entity.UpdatedTime = DateTime.UtcNow; });
             await Context.AddRangeAsync(list);
-            var result = await Context.SaveChangesAsync();
-            list.ForEach(entity => { Context.Entry(entity).State = EntityState.Detached; });
-            return result;
+            return await Context.SaveChangesAsync();
         }
 
         public virtual async Task<int> UpdateAsync(T entity)
         {
-            entity.UpdatedTime = DateTime.Now;
+            entity.UpdatedTime = DateTime.UtcNow;
             Context.Update(entity);
-            var result = await Context.SaveChangesAsync();
-            Context.Entry(entity).State = EntityState.Detached;
-            return result;
-        }
-
-        public virtual async Task<int> UpdateRangeAsync(List<T> list)
-        {
-            list.ForEach(entity =>
-            {
-                entity.UpdatedTime = DateTime.Now;
-                Context.Update(entity);
-            });
-            var result = await Context.SaveChangesAsync();
-            list.ForEach(entity =>
-            {
-                Context.Entry(entity).State = EntityState.Detached;
-            });
-            return result;
-        }
-
-        public virtual async Task<int> UpdateAsync(Expression<Func<T, bool>>? predicate = null, Action<T>? scalar = null)
-        {
-            if (predicate == null || scalar == null)
-                return 0;
-            var data = Context.Set<T>().Where(predicate).ToList();
-            data.ForEach(scalar);
             return await Context.SaveChangesAsync();
         }
-        public virtual async Task<int> RemoveAsync(Expression<Func<T, bool>>? predicate = null)
+
+        public virtual async Task<int> UpdateAsync(List<T> list)
+        {
+            list.ForEach(entity =>
+            {
+                entity.UpdatedTime = DateTime.UtcNow;
+                Context.Update(entity);
+            });
+            return await Context.SaveChangesAsync();
+
+        }
+
+        public virtual async Task<int> UpdateAsync(Expression<Func<T, bool>> predicate, Action<int, T> selector)
+        {
+            if (predicate == null || selector == null)
+                return 0;
+            var data = Context.Set<T>().Where(predicate).ToList();
+            for (int i = 0; i < data.Count; i++)
+            {
+                selector(i, data[i]);
+                data[i].UpdatedTime = DateTime.UtcNow;
+            }
+
+            return await Context.SaveChangesAsync();
+        }
+        public virtual async Task<int> RemoveAsync(Expression<Func<T, bool>> predicate)
         {
             if (predicate == null)
                 return 0;
-            var list = GetList(predicate);
+            var list = await GetListAsync(predicate);
             foreach (var entity in list)
             {
-                entity.UpdatedTime = DateTime.Now;
+                entity.UpdatedTime = DateTime.UtcNow;
                 entity.State = (int)StateEnum.Disable;
                 Context.Update(entity);
             }
             return await Context.SaveChangesAsync();
         }
 
-        public virtual async Task<int> HardRemoveAsync(Expression<Func<T, bool>>? predicate = null)
+        public virtual async Task<int> HardRemoveAsync(Expression<Func<T, bool>> predicate)
         {
             if (predicate == null)
                 return 0;
 
-            var lists = GetList(predicate);
+            var lists = await GetListAsync(predicate);
             foreach (var entity in lists)
             {
                 Context.Remove(entity);
@@ -96,29 +92,40 @@ namespace jfYu.Core.Data.Service
         {
             return predicate switch
             {
-                null => default,
-                _ => await ReadonlyContext.Set<T>().AsNoTracking().FirstOrDefaultAsync(predicate)
+                null => await ReadonlyContext.Set<T>().FirstOrDefaultAsync(),
+                _ => await ReadonlyContext.Set<T>().FirstOrDefaultAsync(predicate)
             };
         }
 
-        public virtual IQueryable<T> GetList(Expression<Func<T, bool>>? predicate = null)
+        public virtual async Task<IList<T>> GetListAsync(Expression<Func<T, bool>>? predicate = null)
         {
             return predicate switch
             {
-                null => ReadonlyContext.Set<T>().AsNoTracking().AsQueryable(),
-                _ => ReadonlyContext.Set<T>().Where(predicate).AsNoTracking().AsQueryable()
+                null => await ReadonlyContext.Set<T>().ToListAsync(),
+                _ => await ReadonlyContext.Set<T>().Where(predicate).ToListAsync()
             };
         }
 
-        public virtual IQueryable<T1> GetList<T1>(Expression<Func<T, bool>>? predicate = null, Expression<Func<T, T1>>? scalar = null)
+        public virtual async Task<IList<T1>> GetListAsync<T1>(Func<T, T1> selector, Expression<Func<T, bool>>? predicate = null)
         {
-            if (scalar == null)
-                return new List<T1>().AsQueryable();
-
+            if (selector == null)
+                return [];
+             
             return predicate switch
             {
-                null => ReadonlyContext.Set<T>().AsNoTracking().Select(scalar).AsQueryable(),
-                _ => ReadonlyContext.Set<T>().Where(predicate).AsNoTracking().Select(scalar).AsQueryable()
+                null => (await ReadonlyContext.Set<T>().ToListAsync()).Select(selector).ToList(),
+                _ => (await ReadonlyContext.Set<T>().Where(predicate).ToListAsync()).Select(selector).ToList()
+            };
+        }
+
+        public virtual async Task<IList<T1>> GetSelectListAsync<T1>(Expression<Func<T, T1>> selector, Expression<Func<T, bool>>? predicate = null)
+        {
+            if (selector == null)
+                return [];
+            return predicate switch
+            {
+                null => await ReadonlyContext.Set<T>().Select(selector).ToListAsync(),
+                _ => await ReadonlyContext.Set<T>().Where(predicate).Select(selector).ToListAsync()
             };
         }
     }
