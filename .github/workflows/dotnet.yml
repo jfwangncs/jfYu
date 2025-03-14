@@ -21,15 +21,10 @@ jobs:
       sqlserver:
         image: mcr.microsoft.com/mssql/server:2022-latest
         ports:
-          - 1433:1433
-        options: >-
-          --health-cmd "/opt/mssql-tools/bin/sqlcmd -U sa -P \$SQL_SERVER_PASSWORD -Q 'SELECT 1;' || exit 1"
-          --health-interval 5s
-          --health-timeout 10s
-          --health-retries 5
+          - 1433:1433       
         env:
           ACCEPT_EULA: Y
-          SA_PASSWORD: ${{ secrets.SQL_SERVER_PASSWORD }}
+          SA_PASSWORD: "StrongP@ssw0rd!"
     defaults:
       run:
         working-directory: src
