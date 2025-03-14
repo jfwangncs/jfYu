@@ -13,7 +13,7 @@ Configuration
 ```
  "ConnectionStrings": {
     "DatabaseType": "SqlServer",
-    "ConnectionString": "Data Source = 127.0.0.1,9004; database = dbtest; User Id = sa; Password = 123456;MultipleActiveResultSets=true;",
+    "ConnectionString": "Data Source = 127.0.0.1,9004; database = dbtest; User Id = sa; Password = 123456;Encrypt=True;TrustServerCertificate=True;",
     "JfYuReadOnly":"JfYuReadOnly",
     "ReadOnlyDatabases": [
       {

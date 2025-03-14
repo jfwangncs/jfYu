@@ -34,7 +34,7 @@ namespace jfYu.Core.Test
 
             var databaseType = DatabaseType.SqlServer;
 
-            var connectionString = "Data Source = 127.0.0.1; database = Test; User Id = sa; Password = StrongP@ssw0rd!;MultipleActiveResultSets=true;";
+            var connectionString = "Data Source = 127.0.0.1; database = Test; User Id = sa; Password = StrongP@ssw0rd!;Encrypt=True;TrustServerCertificate=True;";
 
             services.AddJfYuDbContextService<DataContext>(q =>
             {
