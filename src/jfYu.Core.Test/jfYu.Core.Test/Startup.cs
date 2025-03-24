@@ -19,41 +19,41 @@ namespace jfYu.Core.Test
     {
         public static void ConfigureServices(IServiceCollection services)
         {
-            //var configuration = new ConfigurationBuilder()
-            //.SetBasePath(Directory.GetCurrentDirectory())
-            //.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-            //.AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
-            //.Build();
+            var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
+            .Build();
 
 
-            //services.AddRabbitMQService((q, e) =>
-            //{
-            //    configuration.GetSection("RabbitMQ").Bind(q);
-            //    configuration.GetSection("RabbitMQ:RetryPolicy").Bind(e);
-            //});
+            services.AddRabbitMQService((q, e) =>
+            {
+                configuration.GetSection("RabbitMQ").Bind(q);
+                configuration.GetSection("RabbitMQ:RetryPolicy").Bind(e);
+            });
 
 
-            //services.AddRedisService(options =>
-            //{
-            //    configuration.GetSection("Redis").Bind(options);
-            //    options.UsingNewtonsoft(options =>
-            //    {
-            //        options.MaxDepth = 12;
-            //    });
-            //});
-            //services.AddJfYuExcel(q => { q.SheetMaxRecord = 10; });
-            //services.AddJfYuWord();
-            //services.AddDbContext<TestDbContext>();
+            services.AddRedisService(options =>
+            {
+                configuration.GetSection("Redis").Bind(options);
+                options.UsingNewtonsoft(options =>
+                {
+                    options.MaxDepth = 12;
+                });
+            });
+            services.AddJfYuExcel(q => { q.SheetMaxRecord = 10; });
+            services.AddJfYuWord();
+            services.AddDbContext<TestDbContext>();
 
-            //var dbconfig = configuration.GetSection("JfYuConnectionStrings").Get<JfYuDatabaseConfig>();
+            var dbconfig = configuration.GetSection("JfYuConnectionStrings").Get<JfYuDatabaseConfig>();
 
-            //services.AddJfYuDbContextService<DataContext>(options =>
-            //{
-            //    configuration.GetSection("JfYuConnectionStrings").Bind(options);
-            //});
+            services.AddJfYuDbContextService<DataContext>(options =>
+            {
+                configuration.GetSection("JfYuConnectionStrings").Bind(options);
+            });
 
-            //services.AddScoped<IUserService, UserService>();
-            //InitializeDatabase(dbconfig!.DatabaseType, dbconfig.ConnectionString);
+            services.AddScoped<IUserService, UserService>();
+            InitializeDatabase(dbconfig!.DatabaseType, dbconfig.ConnectionString);
 
             services.AddJfYuHttpClientService(() =>
             {

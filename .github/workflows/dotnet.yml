@@ -25,6 +25,14 @@ jobs:
         env:
           ACCEPT_EULA: Y
           SA_PASSWORD: "StrongP@ssw0rd!"
+      rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+          - 5672:5672  # RabbitMQ 默认的 AMQP 端口
+          - 15672:15672 # RabbitMQ 管理界面端口
+        env:
+          RABBITMQ_DEFAULT_USER: guest
+          RABBITMQ_DEFAULT_PASS: guest
     defaults:
       run:
         working-directory: src
