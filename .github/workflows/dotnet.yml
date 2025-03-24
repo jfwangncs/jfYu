@@ -42,6 +42,8 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
+    - name: Install missing dependencies
+      run: sudo apt-get update && sudo apt-get install -y libdl-dev
     - name: Unit test
       run:  dotnet test      
     - name: Clean old packages
