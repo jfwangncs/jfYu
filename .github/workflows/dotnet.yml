@@ -43,7 +43,7 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Install missing dependencies
-      run: sudo apt-get update && sudo apt-get install -y libdl-dev
+      run: sudo apt-get update && sudo apt-get install -y libc6-dev
     - name: Unit test
       run:  dotnet test      
     - name: Clean old packages
