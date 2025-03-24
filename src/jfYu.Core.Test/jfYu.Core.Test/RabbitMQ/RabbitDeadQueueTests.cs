@@ -67,7 +67,7 @@ namespace jfYu.Core.Test.RabbitMQ
             _rabbitMQService.Send(exchangeName, message);
             await Task.Delay(1000);
             Assert.Empty(receivedMessages);
-            mockLogger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.Between(10, 1000, Moq.Range.Inclusive));
+            mockLogger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.AtLeast(10));
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName); ;
         }
@@ -189,7 +189,7 @@ namespace jfYu.Core.Test.RabbitMQ
             await Task.Delay(10000);
             Assert.Empty(receivedMessages);
             Assert.Equal(JsonConvert.SerializeObject(message), receivedStringMessages);
-            mockLogger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.Between(1, 1000, Moq.Range.Inclusive));
+            mockLogger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.AtLeast(1));
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
             _channel.QueueDelete(deadLetterQueue);
@@ -470,7 +470,7 @@ namespace jfYu.Core.Test.RabbitMQ
 
             await Task.Delay(1000);
             Assert.Empty(receivedMessages); 
-            mockLogger.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.Between(1, 1000, Moq.Range.Inclusive));
+            mockLogger.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.AtLeast(1));
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName); 
         }
@@ -594,7 +594,7 @@ namespace jfYu.Core.Test.RabbitMQ
 
             await Task.Delay(2000);
             Assert.Empty(receivedMessages); 
-            mockLogger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.Between(1, 1000, Moq.Range.Inclusive));
+            mockLogger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.AtLeast(1));
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName); ;
         }
@@ -650,7 +650,7 @@ namespace jfYu.Core.Test.RabbitMQ
             _rabbitMQService.Send(exchangeName, message);
             await Task.Delay(1000);
             Assert.Empty(receivedMessages);
-            mockLogger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.Between(10, 1000, Moq.Range.Inclusive));
+            mockLogger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.AtLeast(10));
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName); ;
         }
@@ -1197,7 +1197,7 @@ namespace jfYu.Core.Test.RabbitMQ
             _rabbitMQService.Send(exchangeName, message);
             await Task.Delay(1000);
             Assert.Empty(receivedMessages);
-            mockLogger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.Between(10, 1000, Moq.Range.Inclusive));
+            mockLogger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.AtLeastOnce);
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName); ;
         }

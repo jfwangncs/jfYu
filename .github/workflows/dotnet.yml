@@ -28,8 +28,8 @@ jobs:
       rabbitmq:
         image: rabbitmq:3-management
         ports:
-          - 5672:5672  # RabbitMQ 默认的 AMQP 端口
-          - 15672:15672 # RabbitMQ 管理界面端口
+          - 5672:5672 
+          - 15672:15672
         env:
           RABBITMQ_DEFAULT_USER: guest
           RABBITMQ_DEFAULT_PASS: guest
@@ -43,7 +43,16 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Install missing dependencies
-      run: sudo apt-get update && sudo apt-get install -y libc6-dev
+      run: |
+        sudo apt-get update && sudo apt-get install -y libc6-dev
+        # 确保 libdl.so 存在
+        if [ ! -f "/usr/lib/x86_64-linux-gnu/libdl.so" ]; then
+          sudo ln -s /usr/lib/x86_64-linux-gnu/libdl.so.2 /usr/lib/x86_64-linux-gnu/libdl.so
+        fi
+
+        # 确保路径正确
+        export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+        echo "LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH" >> $GITHUB_ENV
     - name: Unit test
       run:  dotnet test      
     - name: Clean old packages
