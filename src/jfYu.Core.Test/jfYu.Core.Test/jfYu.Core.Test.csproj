@@ -24,7 +24,9 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\jfYu.Core\jfYu.Core.Data\jfYu.Core.Data.csproj" />
+		<ProjectReference Include="..\..\jfYu.Core\jfYu.Core.jfYuRequest\jfYu.Core.jfYuRequest.csproj" />
 		<ProjectReference Include="..\..\jfYu.Core\jfYu.Core.Office\jfYu.Core.Office.csproj" />
+		<ProjectReference Include="..\..\jfYu.Core\jfYu.Core.RabbitMQ\jfYu.Core.RabbitMQ.csproj" />
 		<ProjectReference Include="..\..\jfYu.Core\jfYu.Core.Redis\jfYu.Core.Redis.csproj" />
 	</ItemGroup>
 
@@ -33,6 +35,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Update="appsettings.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="appsettings.Local.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="Static\example1.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>

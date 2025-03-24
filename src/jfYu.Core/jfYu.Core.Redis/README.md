@@ -41,6 +41,14 @@ Configure
         });
     });
 
+services.AddRedisService(options =>
+    {
+        configuration.GetSection("Redis").Bind(options);
+        options.UsingNewtonsoft(options =>
+        {
+            options.MaxDepth = 12;
+        });
+    });
 await _redisService.AddAsync("key", "value");
 await _redisService.GetAsync("key");
 await _redisService.RemoveAsync("key");

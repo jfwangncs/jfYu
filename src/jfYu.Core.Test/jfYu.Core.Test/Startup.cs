@@ -1,14 +1,17 @@
 ﻿using jfYu.Core.Data.Constant;
 using jfYu.Core.Data.Extension;
+using jfYu.Core.jfYuRequest;
 using jfYu.Core.Office;
+using jfYu.Core.RabbitMQ;
 using jfYu.Core.Redis.Extensions;
-using jfYu.Core.Redis.Options;
 using jfYu.Core.Test.MemoryDB;
 using jfYu.Core.Test.Models.Entity;
 using jfYu.Core.Test.Models.Service;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MySqlConnector;
+using System.Net;
 
 namespace jfYu.Core.Test
 {
@@ -16,35 +19,50 @@ namespace jfYu.Core.Test
     {
         public static void ConfigureServices(IServiceCollection services)
         {
-            services.AddRedisService(options =>
+            //var configuration = new ConfigurationBuilder()
+            //.SetBasePath(Directory.GetCurrentDirectory())
+            //.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            //.AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
+            //.Build();
+
+
+            //services.AddRabbitMQService((q, e) =>
+            //{
+            //    configuration.GetSection("RabbitMQ").Bind(q);
+            //    configuration.GetSection("RabbitMQ:RetryPolicy").Bind(e);
+            //});
+
+
+            //services.AddRedisService(options =>
+            //{
+            //    configuration.GetSection("Redis").Bind(options);
+            //    options.UsingNewtonsoft(options =>
+            //    {
+            //        options.MaxDepth = 12;
+            //    });
+            //});
+            //services.AddJfYuExcel(q => { q.SheetMaxRecord = 10; });
+            //services.AddJfYuWord();
+            //services.AddDbContext<TestDbContext>();
+
+            //var dbconfig = configuration.GetSection("JfYuConnectionStrings").Get<JfYuDatabaseConfig>();
+
+            //services.AddJfYuDbContextService<DataContext>(options =>
+            //{
+            //    configuration.GetSection("JfYuConnectionStrings").Bind(options);
+            //});
+
+            //services.AddScoped<IUserService, UserService>();
+            //InitializeDatabase(dbconfig!.DatabaseType, dbconfig.ConnectionString);
+
+            services.AddJfYuHttpClientService(() =>
             {
-                options.EndPoints.Add(new RedisEndPoint { Host = "localhost" });
-                options.SSL = false;
-                options.DbIndex = 1;
-                options.Prefix = "Mytest:";
-                options.EnableLogs = true;
-                options.UsingNewtonsoft(options =>
+                return new HttpClientHandler
                 {
-                    options.MaxDepth = 12;
-                });
-            });
-            services.AddJfYuExcel(q => { q.SheetMaxRecord = 10; });
-            services.AddJfYuWord();
-            services.AddDbContext<TestDbContext>();
-
-            var databaseType = DatabaseType.SqlServer;
-
-            var connectionString = "Data Source = 127.0.0.1; database = Test; User Id = sa; Password = StrongP@ssw0rd!;Encrypt=True;TrustServerCertificate=True;";
-
-            services.AddJfYuDbContextService<DataContext>(q =>
-            {
-                q.DatabaseType = databaseType;
-
-                q.ConnectionString = connectionString;
+                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli
+                };
             });
 
-            services.AddScoped<IUserService, UserService>();
-            InitializeDatabase(databaseType, connectionString);
         }
 
         public static void InitializeDatabase(DatabaseType databaseType, string connectionString)
@@ -56,8 +74,10 @@ namespace jfYu.Core.Test
                     Database = string.Empty
                 };
                 var rawConnection = new MySqlConnection(builder.ConnectionString);
-                var cmd = new MySqlCommand();
-                cmd.Connection = rawConnection;
+                var cmd = new MySqlCommand
+                {
+                    Connection = rawConnection
+                };
                 rawConnection.Open();
                 cmd.CommandText = "CREATE DATABASE IF NOT EXISTS Test;";
                 cmd.ExecuteNonQuery();
@@ -88,8 +108,10 @@ namespace jfYu.Core.Test
                 };
 
                 var rawConnection = new SqlConnection(builder.ConnectionString);
-                var cmd = new SqlCommand();
-                cmd.Connection = rawConnection;
+                var cmd = new SqlCommand
+                {
+                    Connection = rawConnection
+                };
                 rawConnection.Open();
 
                 cmd.CommandText = "IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'Test') CREATE DATABASE Test;";

@@ -6,14 +6,9 @@ using Microsoft.EntityFrameworkCore;
 namespace jfYu.Core.Test.Data
 {
     [Collection("Data")]
-    public class PagingTest
+    public class PagingTest(DataContext context)
     {
-        private readonly DataContext _context;
-
-        public PagingTest(DataContext context)
-        {
-            _context = context;
-        }
+        private readonly DataContext _context = context;
 
         [Fact]
         public async void NullSource_ThrowException()

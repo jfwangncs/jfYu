@@ -44,7 +44,7 @@ TestResult.xml
 [Dd]ebugPS/
 [Rr]eleasePS/
 dlldata.c
-appsettings.json
+
 appsettings.*.json
 # Benchmark Results
 BenchmarkDotNet.Artifacts/
@@ -329,3 +329,4 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+

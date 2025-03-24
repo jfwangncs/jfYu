@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Net;
 using System.Net.Http;
 
 namespace jfYu.Core.jfYuRequest
@@ -13,9 +15,15 @@ namespace jfYu.Core.jfYuRequest
         /// injection
         /// </summary>
         /// <param name="services"></param>
-        public static void AddJfYuHttpRequestService(this IServiceCollection services)
+        public static void AddJfYuHttpRequestService(this IServiceCollection services, Func<string, string>? requestfilter = null, Func<string, string>? responsefilter = null)
         {
-            services.AddTransient<IJfYuRequest, JfYuHttpRequest>();
+            services.AddScoped<IJfYuRequest, JfYuHttpRequest>();
+            var logFilter = new LogFilter();
+            if (requestfilter != null)
+                logFilter.RequestFunc = requestfilter;
+            if (responsefilter != null)
+                logFilter.ResponseFunc = responsefilter;
+            services.AddSingleton(logFilter);
         }
 
 
@@ -24,15 +32,32 @@ namespace jfYu.Core.jfYuRequest
         /// injection
         /// </summary>
         /// <param name="services"></param>
-        public static void AddJfYuHttpClientService(this IServiceCollection services, HttpClientHandler? httpClientHandler = null)
+        public static void AddJfYuHttpClientService(this IServiceCollection services, Func<HttpClientHandler>? httpClientHandler = null, Func<string, string>? requestfilter = null, Func<string, string>? responsefilter = null)
         {
-            services.AddHttpClient("httpclient").ConfigurePrimaryHttpMessageHandler(() =>
+            var build = services.AddHttpClient("httpclient");
+            services.AddSingleton<CookieContainer>();
+            if (httpClientHandler is not null)
+                build.ConfigurePrimaryHttpMessageHandler(httpClientHandler);
+            else
             {
-                if (httpClientHandler != null)
-                    return httpClientHandler;
-                return new HttpClientHandler();
-            });
+                build.ConfigurePrimaryHttpMessageHandler(sp =>
+                {
+                    var cookieContainer = sp.GetRequiredService<CookieContainer>();
+                    return new HttpClientHandler
+                    {
+                        CookieContainer = cookieContainer,
+                        AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli
+                    };
+                });
+            }
+
             services.AddScoped<IJfYuRequest, JfYuHttpClient>();
+            var logFilter = new LogFilter();
+            if (requestfilter != null)
+                logFilter.RequestFunc = requestfilter;
+            if (responsefilter != null)
+                logFilter.ResponseFunc = responsefilter;
+            services.AddSingleton(logFilter);
         }
 #endif
     }

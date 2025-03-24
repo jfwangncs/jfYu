@@ -1,87 +1,90 @@
 ﻿using RabbitMQ.Client;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace jfYu.Core.RabbitMQ
 {
     public interface IRabbitMQService
     {
-        /// <summary>
-        /// Rabbit clinet
-        /// </summary>
-        ConnectionFactory Factory { get; }
+        IModel Channel { get; }
 
         /// <summary>
-        /// simple mode
+        /// Binds an exchange to another exchange with a routing key.
         /// </summary>
-        /// <param name="queName">queue name</param>
-        /// <param name="msg"></param>
-        /// <returns>successful/failed</returns>
-        bool Send(string queueName, object msg);
+        /// <param name="destination">The destination exchange.</param>
+        /// <param name="source">The source exchange.</param>
+        /// <param name="exchangeType">The type of the exchange.</param>
+        /// <param name="routingKey">The routing key (optional).</param>
+        /// <param name="headers">The headers (optional) if exchangeType="header" must be mandatory.</param>
+        /// <returns>True if the binding is successful, otherwise false.</returns>
+        bool ExchangeBind(string destination, string source, string exchangeType, string routingKey = "", Dictionary<string, object>? headers = null);
 
         /// <summary>
-        /// Publish/Subscribe,Routing,Topics mode
+        /// Binds a queue to an exchange with a routing key.
         /// </summary>
-        /// <param name="exchangeName">exchange name</param>
-        /// <param name="exchangeType">exchange type</param>
-        /// <param name="msg">msg</param>
-        /// <param name="routingKey">key</param>
-        /// <returns>successful/failed</returns>
-        bool Send(string exchangeName, ExchangeType exchangeType, object msg, string routingKey = "");
+        /// <param name="queueName">The name of the queue.</param>
+        /// <param name="exchangeName">The name of the exchange.</param>
+        /// <param name="exchangeType">The type of the exchange.</param>
+        /// <param name="routingKey">The routing key (optional).</param>
+        /// <param name="headers">The headers (optional) if exchangeType="header" must be mandatory.</param>
+        /// <returns>True if the binding is successful, otherwise false.</returns>
+        bool QueueBind(string queueName, string exchangeName, string exchangeType, string routingKey = "", Dictionary<string, object>? headers = null);
 
         /// <summary>
-        /// receive
+        /// Receives messages from a queue with a specified prefetch count (synchronous).
         /// </summary>
-        /// <param name="queueName">queue name</param>
-        /// <param name="func">function</param>
-        void Receive(string queueName, Func<string,bool> func);
+        /// <typeparam name="T">The type of the message.</typeparam>
+        /// <param name="queueName">The name of the queue.</param>
+        /// <param name="func">The function to process the message.</param>
+        /// <param name="prefetchCount">The number of messages to prefetch (default is 1).</param>
+        void Receive(string queueName, Func<string, bool> func, ushort prefetchCount = 1);
 
         /// <summary>
-        /// receive
-        /// </summary>
-        /// <param name="queueName">queue name</param>
-        /// <param name="exchangeName">exchange name</param>
-        /// <param name="exchangeType">exchange type</param>
-        /// <param name="func">function</param>
-        /// <param name="routingKey">routing key</param>
-        void Receive(string queueName, string exchangeName, string exchangeType, Func<string,bool> func, string routingKey = "");
+        /// Receives messages from a queue asynchronously with a specified prefetch count.
+        /// </summary> 
+        /// <param name="queueName">The name of the queue.</param>
+        /// <param name="func">The async function to process the message.</param>
+        /// <param name="prefetchCount">The number of messages to prefetch (default is 1).</param>
+        void Receive(string queueName, Func<string, Task<bool>> func, ushort prefetchCount = 1);
 
         /// <summary>
-        /// receive
+        /// Receives messages from a queue with a specified prefetch count (synchronous).
         /// </summary>
-        /// <param name="queueName">queue name</param>
-        /// <param name="exchangeName">exchange name</param>
-        /// <param name="exchangeType">exchange type</param>
-        /// <param name="func">function</param>
-        /// <param name="routingKey">routing key</param>
-        void Receive(string queueName, string exchangeName, string exchangeType, Func<string, Task<bool>> func, string routingKey = "");
-
+        /// <typeparam name="T">The type of the message.</typeparam>
+        /// <param name="queueName">The name of the queue.</param>
+        /// <param name="func">The function to process the message.</param>
+        /// <param name="prefetchCount">The number of messages to prefetch (default is 1).</param>
+        void Receive<T>(string queueName, Func<T?, bool> func, ushort prefetchCount = 1);
 
         /// <summary>
-        /// receive
+        /// Receives messages from a queue asynchronously with a specified prefetch count.
         /// </summary>
-        /// <param name="queueName">queue name</param>
-        /// <param name="func">function</param>
-        void Receive(string queueName, Func<string, Task<bool>> func);
+        /// <typeparam name="T">The type of the message.</typeparam>
+        /// <param name="queueName">The name of the queue.</param>
+        /// <param name="func">The async function to process the message.</param>
+        /// <param name="prefetchCount">The number of messages to prefetch (default is 1).</param>
+        void Receive<T>(string queueName, Func<T?, Task<bool>> func, ushort prefetchCount = 1);
 
         /// <summary>
-        /// QueueBind
+        /// Sends a message to an exchange with a specific routing key.
         /// </summary>
-        /// <param name="queueName">queue name</param>
-        /// <param name="exchangeName">exchange name</param>
-        /// <param name="exchangeType">exchange type</param>
-        /// <param name="routingKey">routing key</param>
-        /// <returns></returns>
-        bool QueueBind(string queueName, string exchangeName, ExchangeType exchangeType, string routingKey = "");
+        /// <typeparam name="T">The type of the message.</typeparam>
+        /// <param name="exchangeName">The name of the exchange.</param> 
+        /// <param name="msg">The message to send.</param>
+        /// <param name="routingKey">The routing key (optional).</param>
+        /// <param name="headers">The headers (optional) if exchangeType="header" must be mandatory.</param>
+        /// <returns>True if the message is sent successfully, otherwise false.</returns>
+        bool Send<T>(string exchangeName, T msg, string routingKey = "", Dictionary<string, object>? headers = null);
 
         /// <summary>
-        /// ExchangeBind
-        /// </summary>
-        /// <param name="destination">destination exchange name</param>
-        /// <param name="source">source exchange nam</param>
-        /// <param name="exchangeType">exchange type</param>
-        /// <param name="routingKey">routing key</param>
-        /// <returns></returns>
-        bool ExchangeBind(string destination, string source, ExchangeType exchangeType, string routingKey = "");
+        /// Sends a message to an exchange with a specific routing key.
+        /// </summary> 
+        /// <param name="exchangeName">The name of the exchange.</param> 
+        /// <param name="msg">The message to send.</param>
+        /// <param name="routingKey">The routing key (optional).</param>
+        /// <param name="headers">The headers (optional) if exchangeType="header" must be mandatory.</param>
+        /// <returns>True if the message is sent successfully, otherwise false.</returns>
+        bool Send(string exchangeName, string msg, string routingKey = "", Dictionary<string, object>? headers = null);
     }
 }

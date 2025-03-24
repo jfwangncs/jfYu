@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.Extensions.DependencyInjection;
+using RabbitMQ.Client;
 using System;
 
 namespace jfYu.Core.RabbitMQ
@@ -10,17 +11,25 @@ namespace jfYu.Core.RabbitMQ
         /// <summary>
         /// injection
         /// </summary>
-        /// <param name="services"></param>
-        public static void AddRabbitMQService(this IServiceCollection services, RabbitMQConfig config)
+        /// <param name="services">ServiceCollection</param>
+        public static IServiceCollection AddRabbitMQService(this IServiceCollection services, Action<ConnectionFactory, MessageRetryPolicy> configureConnectionFactory)
         {
-            if (config == null)
-                throw new ArgumentNullException(nameof(config));
+            if (configureConnectionFactory == null)
+                throw new ArgumentNullException(nameof(configureConnectionFactory), "The configureConnectionFactory action cannot be null.");
+             
+            var option = new ConnectionFactory();
+            var messageRetryPolicy = new MessageRetryPolicy();
+            configureConnectionFactory(option, messageRetryPolicy);
 
-            if (string.IsNullOrEmpty(config.HostName))
-                throw new ArgumentNullException(nameof(config.HostName));
-
-            services.AddSingleton(config);
-            services.AddScoped<IRabbitMQService, RabbitMQService>();
+            var connection = option.CreateConnection();
+            services.AddSingleton(connection);
+            services.AddSingleton(messageRetryPolicy);
+            services.AddTransient(provider =>
+            {
+                return connection.CreateModel();
+            });
+            services.AddSingleton<IRabbitMQService, RabbitMQService>();
+            return services;
         }
     }
 }

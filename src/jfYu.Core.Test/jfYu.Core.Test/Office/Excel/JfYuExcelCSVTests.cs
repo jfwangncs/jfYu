@@ -1,22 +1,15 @@
 ﻿using jfYu.Core.Office.Excel;
 using jfYu.Core.Office.Excel.Extensions;
 using jfYu.Core.Test.Models;
-using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
-using System.IO;
 using System.Text;
 
 namespace jfYu.Core.Test.Office.Excel
 {
     [Collection("Excel")]
-    public class JfYuExcelCSVTests
+    public class JfYuExcelCSVTests(IJfYuExcel jfYuExcel)
     {
-        private IJfYuExcel _jfYuExcel;
-
-        public JfYuExcelCSVTests(IJfYuExcel jfYuExcel)
-        {
-            _jfYuExcel = jfYuExcel;
-        }
+        private readonly IJfYuExcel _jfYuExcel = jfYuExcel;
 
         [Fact]
         public void WriteCSV_SourceIsNull_ThrowException()
@@ -33,7 +26,7 @@ namespace jfYu.Core.Test.Office.Excel
         [InlineData("!@#$%^&*()_+")]
         public void WriteCSV_PathIsInvalid_ThrowException(string path)
         {
-            List<AllTypeTestModel> source = new List<AllTypeTestModel>();
+            var source = new List<AllTypeTestModel>();
             var ex = Record.Exception(() => _jfYuExcel.Write(source, path));
             Assert.IsAssignableFrom<Exception>(ex);
         }
@@ -46,7 +39,7 @@ namespace jfYu.Core.Test.Office.Excel
                 var s = File.Create(filePath);
                 s.Dispose();
             }
-            List<AllTypeTestModel>? source = new List<AllTypeTestModel>();
+            var source = new List<AllTypeTestModel>();
             var ex = Record.Exception(() => _jfYuExcel.WriteCSV(source, filePath));
             Assert.IsAssignableFrom<Exception>(ex);
             File.Delete(filePath);
@@ -136,7 +129,7 @@ namespace jfYu.Core.Test.Office.Excel
                 File.Delete(filePath);
             var source = AllTypeTestModel.GenerateTestList();
             // Act
-            _jfYuExcel.WriteCSV(source, filePath, new Dictionary<string, string>());
+            _jfYuExcel.WriteCSV(source, filePath, []);
 
             // Assert
             var data = _jfYuExcel.ReadCSV(filePath);
@@ -182,7 +175,7 @@ namespace jfYu.Core.Test.Office.Excel
             if (File.Exists(filePath))
                 File.Delete(filePath);
 
-            using (StreamWriter writer = new StreamWriter(filePath, false, Encoding.UTF8))
+            using (var writer = new StreamWriter(filePath, false, Encoding.UTF8))
             {
                 // 写入 header（单列）
                 writer.WriteLine("HeaderColumn");
@@ -201,8 +194,8 @@ namespace jfYu.Core.Test.Office.Excel
             var d1 = data[0] as IDictionary<string, object>;
             var d2 = data[1] as IDictionary<string, object>;
             Assert.Equal(2, data.Count);
-            Assert.Equal(5, d1.Count);
-            Assert.Equal(8, d2.Count);
+            Assert.Equal(5, d1!.Count);
+            Assert.Equal(8, d2!.Count);
             File.Delete(filePath);
         }
 
@@ -213,7 +206,7 @@ namespace jfYu.Core.Test.Office.Excel
             // Arrange
             if (File.Exists(filePath))
                 File.Delete(filePath);
-            List<TestModelFaker> source = new List<TestModelFaker>();
+            var source = new List<TestModelFaker>();
             // Act
             _jfYuExcel.WriteCSV(source, filePath);
 

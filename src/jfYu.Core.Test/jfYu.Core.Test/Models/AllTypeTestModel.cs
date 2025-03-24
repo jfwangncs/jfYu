@@ -14,7 +14,7 @@ namespace jfYu.Core.Test.Models
         public double Double { get; set; }
         public decimal Decimal { get; set; }
         public bool Bool { get; set; }
-        public string String { get; set; }
+        public string String { get; set; } = null!;
         public DateTime DateTime { get; set; }
         public byte Byte { get; set; }
         public sbyte Sbyte { get; set; }

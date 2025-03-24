@@ -138,6 +138,10 @@ services.AddJfYuDbContextService<DataContext>(q =>
             q.ReadOnlyDatabases = new List<DatabaseConfig>() { new DatabaseConfig() { ConnectionString = "server=127.0.0.2;Database=Test;uid=Test;pwd=test;" } };
         });
 
+ services.AddJfYuDbContextService<DataContext>(options =>
+            {
+                configuration.GetSection("ConnectionStrings").Bind(options);
+            });
 ```
 
 Usage

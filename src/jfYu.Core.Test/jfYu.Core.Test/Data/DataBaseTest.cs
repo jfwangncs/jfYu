@@ -125,10 +125,10 @@ namespace jfYu.Core.Test.Data
             services.AddJfYuDbContextService<DataContext>(q =>
             {
                 q.ConnectionString = "server=127.0.0.1;Database=Test;uid=Test;pwd=test;";
-                q.ReadOnlyDatabases = new List<DatabaseConfig>() {
+                q.ReadOnlyDatabases = [
                     new () { DatabaseType = DatabaseType.SqlServer, ConnectionString = "server=127.0.0.2;Database=Test;uid=Test;pwd=test;" },
                     new () { DatabaseType = DatabaseType.SqlServer, ConnectionString = "server=127.0.0.3;Database=Test;uid=Test;pwd=test;" },
-                    new () { DatabaseType = DatabaseType.Sqlite, ConnectionString = "server=127.0.0.4;Database=Test;uid=Test;pwd=test;" }};
+                    new () { DatabaseType = DatabaseType.Sqlite, ConnectionString = "server=127.0.0.4;Database=Test;uid=Test;pwd=test;" }];
             });
             var serviceProvider = services.BuildServiceProvider();
 

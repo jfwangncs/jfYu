@@ -1,5 +1,4 @@
 ﻿using jfYu.Core.jfYuRequest.Enum;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,11 +14,9 @@ namespace jfYu.Core.jfYuRequest
     {
 
         public string Url { get; set; } = "";
-        public string ContentType { get; set; } = RequestContentType.TextHtml;
+        public string ContentType { get; set; } = RequestContentType.Json;
         public HttpMethod Method { get; set; } = HttpMethod.Get;
-        public Dictionary<string, string> Params { get; set; } = [];
-        public string RawParams { get; set; } = "";
-        public string Authorization { get; set; } = "";  
+        public string Authorization { get; set; } = "";
         public Encoding RequestEncoding { get; set; } = Encoding.UTF8;
         public CookieContainer RequestCookies { get; set; } = new();
         public CookieCollection ResponseCookies { get; set; } = [];
@@ -27,45 +24,44 @@ namespace jfYu.Core.jfYuRequest
         public Dictionary<string, string> Files { get; set; } = [];
         public RequestHeader RequestHeader { get; set; } = new();
         public int Timeout { get; set; } = 30;
-        public bool UsePayload { get; set; } = false;
         public Dictionary<string, string> RequestCustomHeaders { get; set; } = [];
-        public X509Certificate2? Cert { get; set; }
+        public X509Certificate2? Certificate { get; set; }
         public bool CertificateValidation { get; set; } = false;
         public HttpStatusCode StatusCode { get; protected set; }
         public Action<object>? CustomInitFunc { get; set; }
-        public Dictionary<string, List<string>?> ResponseHeader { get; protected set; } = [];
-
-        protected string GetParamString()
+        public Dictionary<string, List<string>> ResponseHeader { get; protected set; } = [];
+        public string RequestData { get; set; } = "";
+        protected const int DefaultBufferSize = 8192;
+        protected static async Task<Stream> DownloadFileInternalAsync(Stream targetStream, Stream responseStream, decimal fileSize, Action<decimal, decimal, decimal>? progress)
         {
             try
             {
-                if (ContentType == RequestContentType.Json)
+                decimal lastSaveSize = 0;
+                byte[] buffer = new byte[DefaultBufferSize];
+                int bytesRead;
+                do
                 {
-                    if (!string.IsNullOrEmpty(RawParams))
+                    bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length);
+                    await targetStream.WriteAsync(buffer, 0, bytesRead);
+                    if (progress != null && fileSize > 0)
                     {
-                        var RawParaDic = RawParams.Split('&');
-                        foreach (var item in RawParaDic)
-                        {
-                            var r = item.Split('=');
-                            Params.Add(r[0], r[1]);
-                        }
+                        decimal currentLength = targetStream.Length;
+                        decimal percentage = currentLength / fileSize * 100;
+                        decimal speed = (currentLength - lastSaveSize) / 1024;
+                        decimal remain = speed == 0 ? 0 : (fileSize - currentLength) / (speed * 1024);
+                        progress.Invoke(percentage, speed, remain);
+                        lastSaveSize = currentLength;
                     }
-                    return JsonConvert.SerializeObject(Params);
                 }
-                else
-                {
-                    string p = "";
-                    foreach (var item in Params)
-                        p += $"{item.Key}={item.Value}&";
-                    p = p.Trim('&') + RawParams;
-                    return p;
-                }
+                while (bytesRead > 0);
+                targetStream.Flush();
+                progress?.Invoke(100M, 0M, 0M);
+                return targetStream;
             }
             catch (Exception)
             {
                 throw;
             }
-
         }
 
         public abstract Task<string> SendAsync();
@@ -73,6 +69,6 @@ namespace jfYu.Core.jfYuRequest
         public abstract Task<bool> DownloadFileAsync(string path, Action<decimal, decimal, decimal>? progress = null);
 
         public abstract Task<MemoryStream?> DownloadFileAsync(Action<decimal, decimal, decimal>? progress = null);
-                
+
     }
 }
