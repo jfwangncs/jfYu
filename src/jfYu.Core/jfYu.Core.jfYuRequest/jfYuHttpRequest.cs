@@ -42,10 +42,10 @@ namespace jfYu.Core.jfYuRequest
                     }
                     foreach (var file in Files)
                     {
-                        var fs = new FileStream(file.Value, FileMode.Open, FileAccess.Read);
-                        var fileContentByte = new byte[fs.Length];
-                        fs.Read(fileContentByte, 0, Convert.ToInt32(fs.Length));
-                        fs.Close();
+                            string filePath = item.Value;
+                            byte[] fileData = File.ReadAllBytes(filePath);
+                        string fileContentStr =$"\r\n--{boundary}\r\n" +
+                            $"Content-Disposition: form-data; name=\"{file.Key}\"; filename=\"{Path.GetFileName(file.Value)}\""
 
                         string fileContentStr = Enter + "--" + boundary + Enter
                        + $"Content-Disposition: form-data; name=\"{file.Key}\"; filename=\"{Path.GetFileName(file.Value)}\""
