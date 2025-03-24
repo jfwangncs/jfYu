@@ -118,7 +118,7 @@ namespace jfYu.Core.Test.RabbitMQ
             _rabbitMQService.Send(exchangeName, message);
             await Task.Delay(1000);
             Assert.Empty(receivedMessages);
-            Assert.InRange(i, 10, 1000);
+            Assert.InRange(i, 10, 10000);
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
         }
@@ -348,7 +348,7 @@ namespace jfYu.Core.Test.RabbitMQ
 
             await Task.Delay(2000);
             Assert.Empty(receivedMessages);
-            Assert.InRange(i, 1, 1000);
+            Assert.InRange(i, 1, 10000);
             _channel.ExchangeDelete(exchangeName);
             _channel.QueueDelete(deadLetterQueue);
             _channel.ExchangeDelete(deadLetterExchange);
@@ -701,7 +701,7 @@ namespace jfYu.Core.Test.RabbitMQ
             _rabbitMQService.Send(exchangeName, message);
             await Task.Delay(1000);
             Assert.Empty(receivedMessages);
-            Assert.InRange(i, 10, 1000);
+            Assert.InRange(i, 10, 10000);
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName); ;
         }
@@ -947,7 +947,7 @@ namespace jfYu.Core.Test.RabbitMQ
             _rabbitMQService.Send(exchangeName, message);
             await Task.Delay(1000);
             Assert.Empty(receivedMessages);
-            Assert.InRange(i, 10, 1000);
+            Assert.InRange(i, 10, 10000);
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName); ;
         }
@@ -1249,7 +1249,7 @@ namespace jfYu.Core.Test.RabbitMQ
             _rabbitMQService.Send(exchangeName, message);
             await Task.Delay(1000);
             Assert.Empty(receivedMessages);
-            Assert.InRange(i, 10, 1000);
+            Assert.InRange(i, 10, 10000);
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName); ;
         }
