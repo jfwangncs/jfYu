@@ -122,10 +122,14 @@ Migration
 //set migration connection string
 $env:EFConString="Data Source = xxx; database = test; User Id = sa; Password = xxx;";
 //create migration
-dotnet ef migrations add init
+dotnet ef migrations add init --project XXXX  
 //update database
-dotnet ef  database update
+dotnet ef  database update --project XXXX
 
+```
+if encountered runtime error 
+```
+<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="x.x.x" />  
 ```
 
 IOC

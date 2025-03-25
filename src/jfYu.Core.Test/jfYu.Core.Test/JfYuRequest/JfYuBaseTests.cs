@@ -14,6 +14,7 @@ namespace jfYu.Core.Test.JfYuRequest
     [Collection("Data")]
     public class JfYuBaseTests
     {
+        #region Send
         public class ServicesNoLogger : TheoryData<IJfYuRequest>
         {
             public ServicesNoLogger()
@@ -470,7 +471,9 @@ namespace jfYu.Core.Test.JfYuRequest
 
             await Assert.ThrowsAsync<WebException>(client.SendAsync);
         }
+        #endregion
 
+        #region Download
         [Theory]
         [ClassData(typeof(ServicesNoLogger))]
         public async Task Test_DownloadStream(IJfYuRequest client)
@@ -610,7 +613,9 @@ namespace jfYu.Core.Test.JfYuRequest
 
             await Assert.ThrowsAsync<ArgumentNullException>(() => client.DownloadFileAsync(path));
         }
+        #endregion
 
+        #region  Logger
         public class ServicesWithLogger : TheoryData<object, IJfYuRequest>
         {
             public ServicesWithLogger()
@@ -665,23 +670,25 @@ namespace jfYu.Core.Test.JfYuRequest
             if (logger is Mock<ILogger<JfYuHttpClient>> logger2)
                 logger2.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.Once);
         }
+        #endregion
 
+        #region Exception With Logger
 
-        public class ServicesFilterWithLogger : TheoryData<object, IJfYuRequest>
+        public class ServicesWrongFilterWithLogger : TheoryData<object, IJfYuRequest>
         {
-            public ServicesFilterWithLogger()
+            public ServicesWrongFilterWithLogger()
             {
                 IJfYuRequest client;
                 IJfYuRequest request;
                 var services = new ServiceCollection();
-                services.AddJfYuHttpRequestService(q => { var x = 0; return (1 / x).ToString(); }, q => { return q; });
+                services.AddJfYuHttpRequestService(q => { q.RequestFunc = z => { var x = 0; return (1 / x).ToString(); }; q.ResponseFunc = z => z; });
                 var mockLogger = new Mock<ILogger<JfYuHttpRequest>>();
                 services.AddSingleton(mockLogger.Object);
                 var serviceProvider = services.BuildServiceProvider();
                 request = serviceProvider.GetRequiredService<IJfYuRequest>();
 
                 var services1 = new ServiceCollection();
-                services1.AddJfYuHttpClientService(null, q => { var x = 0; return (1 / x).ToString(); }, q => { return q; });
+                services1.AddJfYuHttpClientService(null, q => { q.RequestFunc = z => { var x = 0; return (1 / x).ToString(); }; q.ResponseFunc = z => z; });
                 var mockLogger1 = new Mock<ILogger<JfYuHttpClient>>();
                 services1.AddSingleton(mockLogger1.Object);
                 var serviceProvider1 = services1.BuildServiceProvider();
@@ -691,7 +698,7 @@ namespace jfYu.Core.Test.JfYuRequest
             }
         }
         [Theory]
-        [ClassData(typeof(ServicesFilterWithLogger))]
+        [ClassData(typeof(ServicesWrongFilterWithLogger))]
         public async Task Test_Filter_ThrowException(object logger, IJfYuRequest client)
         {
             client.Url = "https://httpbin.org/get";
@@ -763,6 +770,77 @@ namespace jfYu.Core.Test.JfYuRequest
             if (logger is Mock<ILogger<JfYuHttpClient>> logger2)
                 logger2.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.AtLeastOnce);
         }
+
+        #endregion
+
+        public class ServicesFilter : TheoryData<IJfYuRequest>
+        {
+            public ServicesFilter()
+            {
+                IJfYuRequest client;
+                IJfYuRequest request;
+                var services = new ServiceCollection();
+                services.AddJfYuHttpRequestService(q => { q.RequestFunc = z => z; q.ResponseFunc = z => z; });
+                var serviceProvider = services.BuildServiceProvider();
+                request = serviceProvider.GetRequiredService<IJfYuRequest>();
+                var services1 = new ServiceCollection();
+                services1.AddJfYuHttpClientService(null, q => { q.RequestFunc = z => z; q.ResponseFunc = z => z; });
+
+                var serviceProvider1 = services1.BuildServiceProvider();
+                client = serviceProvider1.GetRequiredService<IJfYuRequest>();
+                Add(request);
+                Add(client);
+            }
+        }
+
+        [Theory]
+        [ClassData(typeof(ServicesFilter))]
+        public async Task Test_Get_Filter_Success(IJfYuRequest client)
+        {
+            client.Url = "https://httpbin.org/get?username=testUser&age=30";
+            client.Method = HttpMethod.Get;
+
+            var response = await client.SendAsync();
+            var jsonResponse = JsonSerializer.Deserialize<Dictionary<string, object>>(response);
+            Assert.Equal(HttpStatusCode.OK, client.StatusCode);
+            Assert.Contains("testUser", JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse!["args"].ToString()!)!["username"]!.ToString());
+            Assert.Contains("30", JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse!["args"].ToString()!)!["age"]!.ToString());
+        }
+
+        public class ServicesNoneFilter : TheoryData<IJfYuRequest>
+        {
+            public ServicesNoneFilter()
+            {
+                IJfYuRequest client;
+                IJfYuRequest request;
+                var services = new ServiceCollection();
+                services.AddJfYuHttpRequestService(null);
+                var serviceProvider = services.BuildServiceProvider();
+                request = serviceProvider.GetRequiredService<IJfYuRequest>();
+                var services1 = new ServiceCollection();
+                services1.AddJfYuHttpClientService(null, null);
+
+                var serviceProvider1 = services1.BuildServiceProvider();
+                client = serviceProvider1.GetRequiredService<IJfYuRequest>();
+                Add(request);
+                Add(client);
+            }
+        }
+
+        [Theory]
+        [ClassData(typeof(ServicesNoneFilter))]
+        public async Task Test_Get_NoneFilter_Success(IJfYuRequest client)
+        {
+            client.Url = "https://httpbin.org/get?username=testUser&age=30";
+            client.Method = HttpMethod.Get;
+
+            var response = await client.SendAsync();
+            var jsonResponse = JsonSerializer.Deserialize<Dictionary<string, object>>(response);
+            Assert.Equal(HttpStatusCode.OK, client.StatusCode);
+            Assert.Contains("testUser", JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse!["args"].ToString()!)!["username"]!.ToString());
+            Assert.Contains("30", JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse!["args"].ToString()!)!["age"]!.ToString());
+        }
+
 
     }
 }

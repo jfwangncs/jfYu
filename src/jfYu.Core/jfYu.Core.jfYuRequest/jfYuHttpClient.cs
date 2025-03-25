@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace jfYu.Core.jfYuRequest
 {
 #if NETCORE
-    public class JfYuHttpClient(IHttpClientFactory factory, LogFilter logFilter, CookieContainer cookieContainer, ILogger<JfYuHttpClient>? logger = null) : JfYuBaseRequest
+    public class JfYuHttpClient(IHttpClientFactory factory, CookieContainer cookieContainer, LogFilter logFilter, ILogger<JfYuHttpClient>? logger = null) : JfYuBaseRequest
     {
         private HttpClient? _request;
         private readonly ILogger<JfYuHttpClient>? _logger = logger;

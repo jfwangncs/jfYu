@@ -15,14 +15,11 @@ namespace jfYu.Core.jfYuRequest
         /// injection
         /// </summary>
         /// <param name="services"></param>
-        public static void AddJfYuHttpRequestService(this IServiceCollection services, Func<string, string>? requestfilter = null, Func<string, string>? responsefilter = null)
+        public static void AddJfYuHttpRequestService(this IServiceCollection services, Action<LogFilter>? filter = null)
         {
             services.AddScoped<IJfYuRequest, JfYuHttpRequest>();
             var logFilter = new LogFilter();
-            if (requestfilter != null)
-                logFilter.RequestFunc = requestfilter;
-            if (responsefilter != null)
-                logFilter.ResponseFunc = responsefilter;
+            filter?.Invoke(logFilter);
             services.AddSingleton(logFilter);
         }
 
@@ -32,7 +29,7 @@ namespace jfYu.Core.jfYuRequest
         /// injection
         /// </summary>
         /// <param name="services"></param>
-        public static void AddJfYuHttpClientService(this IServiceCollection services, Func<HttpClientHandler>? httpClientHandler = null, Func<string, string>? requestfilter = null, Func<string, string>? responsefilter = null)
+        public static void AddJfYuHttpClientService(this IServiceCollection services, Func<HttpClientHandler>? httpClientHandler = null, Action<LogFilter>? filter = null)
         {
             var build = services.AddHttpClient("httpclient");
             services.AddSingleton<CookieContainer>();
@@ -53,10 +50,7 @@ namespace jfYu.Core.jfYuRequest
 
             services.AddScoped<IJfYuRequest, JfYuHttpClient>();
             var logFilter = new LogFilter();
-            if (requestfilter != null)
-                logFilter.RequestFunc = requestfilter;
-            if (responsefilter != null)
-                logFilter.ResponseFunc = responsefilter;
+            filter?.Invoke(logFilter);
             services.AddSingleton(logFilter);
         }
 #endif
