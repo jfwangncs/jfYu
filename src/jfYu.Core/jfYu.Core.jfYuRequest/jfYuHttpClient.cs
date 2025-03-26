@@ -1,6 +1,7 @@
 ﻿using jfYu.Core.jfYuRequest.Enum;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
@@ -12,11 +13,11 @@ using System.Threading.Tasks;
 namespace jfYu.Core.jfYuRequest
 {
 #if NETCORE
-    public class JfYuHttpClient(IHttpClientFactory factory, CookieContainer cookieContainer, LogFilter logFilter, ILogger<JfYuHttpClient>? logger = null) : JfYuBaseRequest
+    public class JfYuHttpClient(IHttpClientFactory factory, CookieContainer cookieContainer, LogFilter? logFilter=null, ILogger<JfYuHttpClient>? logger = null) : JfYuBaseRequest
     {
         private HttpClient? _request;
         private readonly ILogger<JfYuHttpClient>? _logger = logger;
-        private readonly LogFilter _logFilter = logFilter;
+        private readonly LogFilter? _logFilter = logFilter;
         private readonly CookieContainer _cookieContainer = cookieContainer;
 
         private void Initialize()
@@ -65,10 +66,12 @@ namespace jfYu.Core.jfYuRequest
         public override async Task<string> SendAsync()
         {
             Initialize();
+            var requestId = Guid.NewGuid().ToString();
             try
             {
                 string html = string.Empty;
-                _logger?.LogInformation("Request Url:{url},Paras:{para},Method:{method}", Url, _logFilter.RequestFunc.Invoke(RequestData), Method);
+                if (_logger != null && _logFilter != null && _logFilter.RequestFunc != null)
+                    _logger.LogInformation("Request [RequestId:{requestId}] Url:{url},Method:{method},Data:{data},Header:{header}", requestId, Url, Method, _logFilter.RequestFunc.Invoke(RequestData), JsonConvert.SerializeObject(_request!.DefaultRequestHeaders.ToDictionary(header => header.Key, header => header.Value.ToList())));
                 HttpResponseMessage? response = null;
                 if (Method.Equals(HttpMethod.Post))
                 {
@@ -111,7 +114,8 @@ namespace jfYu.Core.jfYuRequest
                 _cookieContainer.GetCookies(new Uri(Url)).ToList().ForEach(ResponseCookies.Add);
                 string content = await response.Content.ReadAsStringAsync();
                 html = RequestEncoding.GetString(RequestEncoding.GetBytes(content));
-                _logger?.LogInformation("Response Url:{url},Result:{Result}", Url, _logFilter.ResponseFunc.Invoke(html));
+                if (_logger != null && _logFilter != null && _logFilter.ResponseFunc != null)
+                    _logger.LogInformation("Response [RequestId:{requestId}] Result:{Result}", requestId, _logFilter.ResponseFunc.Invoke(html));
                 return html;
             }
             catch (Exception ex)

@@ -1,5 +1,6 @@
 ﻿using jfYu.Core.jfYuRequest.Enum;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -13,11 +14,11 @@ using System.Threading.Tasks;
 namespace jfYu.Core.jfYuRequest
 {
 
-    public class JfYuHttpRequest(LogFilter logFilter, ILogger<JfYuHttpRequest>? logger = null) : JfYuBaseRequest
+    public class JfYuHttpRequest(LogFilter? logFilter = null, ILogger<JfYuHttpRequest>? logger = null) : JfYuBaseRequest
     {
         private HttpWebRequest? _request;
         private readonly ILogger<JfYuHttpRequest>? _logger = logger;
-        private readonly LogFilter _logFilter = logFilter;
+        private readonly LogFilter? _logFilter = logFilter;
 
         private void Initialize()
         {
@@ -138,10 +139,14 @@ namespace jfYu.Core.jfYuRequest
         public override async Task<string> SendAsync()
         {
             var html = string.Empty;
+            var requestId = Guid.NewGuid().ToString();
             try
             {
                 Initialize();
-                _logger?.LogInformation("Request Url:{url},Data:{data},Method:{method}", Url, _logFilter.RequestFunc.Invoke(RequestData), Method);
+                if (_logger != null && _logFilter != null && _logFilter.RequestFunc != null)
+                    _logger.LogInformation("Request [RequestId:{requestId}] Url:{url},Method:{method},Data:{data},Header:{header}", 
+                        requestId, Url, Method, _logFilter.RequestFunc.Invoke(RequestData), 
+                        JsonConvert.SerializeObject(_request!.Headers.AllKeys.ToDictionary(header => header, header => _request.Headers.GetValues(header)!.ToList())));
                 HttpWebResponse response = (HttpWebResponse)await _request!.GetResponseAsync();
                 StatusCode = response.StatusCode;
                 html = GetResponse(response);
@@ -168,7 +173,8 @@ namespace jfYu.Core.jfYuRequest
                 _logger?.LogError(ex, "An error occurred while sending request.");
                 throw;
             }
-            _logger?.LogInformation("Response Url:{url},Result:{Result}", Url, _logFilter.ResponseFunc.Invoke(html));
+            if (_logger != null && _logFilter != null && _logFilter.ResponseFunc != null)
+                _logger.LogInformation("Response [RequestId:{requestId}] Result:{Result}", requestId, _logFilter.ResponseFunc.Invoke(html));
             return html;
         }
 
