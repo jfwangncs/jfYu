@@ -14,7 +14,7 @@ namespace jfYu.Core.RabbitMQ
         /// </summary>
         /// <param name="destination">The destination exchange.</param>
         /// <param name="source">The source exchange.</param>
-        /// <param name="exchangeType">The type of the exchange.</param>
+        /// <param name="exchangeType">The type of the exchange.<see cref="ExchangeType"/></param>
         /// <param name="routingKey">The routing key (optional).</param>
         /// <param name="headers">The headers (optional) if exchangeType="header" must be mandatory.</param>
         /// <returns>True if the binding is successful, otherwise false.</returns>
@@ -25,7 +25,7 @@ namespace jfYu.Core.RabbitMQ
         /// </summary>
         /// <param name="queueName">The name of the queue.</param>
         /// <param name="exchangeName">The name of the exchange.</param>
-        /// <param name="exchangeType">The type of the exchange.</param>
+        /// <param name="exchangeType">The type of the exchange.<see cref="ExchangeType"/></param>
         /// <param name="routingKey">The routing key (optional).</param>
         /// <param name="headers">The headers (optional) if exchangeType="header" must be mandatory.</param>
         /// <returns>True if the binding is successful, otherwise false.</returns>
