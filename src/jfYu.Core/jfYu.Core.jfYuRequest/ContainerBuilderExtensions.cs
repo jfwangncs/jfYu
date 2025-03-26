@@ -21,6 +21,7 @@ namespace jfYu.Core.jfYuRequest
             var logFilter = new LogFilter();
             filter?.Invoke(logFilter);
             services.AddSingleton(logFilter);
+
         }
 
 
@@ -52,6 +53,7 @@ namespace jfYu.Core.jfYuRequest
             var logFilter = new LogFilter();
             filter?.Invoke(logFilter);
             services.AddSingleton(logFilter);
+
         }
 #endif
     }

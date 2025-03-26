@@ -64,6 +64,39 @@ namespace jfYu.Core.jfYuRequest
             }
         }
 
+        protected static string LogRequest(JfYuLoggingFields LoggingFields, string requestId, string url, string method, string header, string requestData)
+        {
+
+            var logMessage = new StringBuilder($"Request [RequestId:{requestId}]");
+
+            if ((LoggingFields & JfYuLoggingFields.RequestPath) == JfYuLoggingFields.RequestPath)
+                logMessage.Append($" Path={url}");
+
+            if ((LoggingFields & JfYuLoggingFields.RequestMethod) == JfYuLoggingFields.RequestMethod)
+                logMessage.Append($" Method={method}");
+
+            if ((LoggingFields & JfYuLoggingFields.RequestHeaders) == JfYuLoggingFields.RequestHeaders)
+                logMessage.Append($" Headers={header}");
+
+            if ((LoggingFields & JfYuLoggingFields.RequestData) == JfYuLoggingFields.RequestData)
+                logMessage.Append($" Data={requestData}");
+
+            return logMessage.ToString();
+        }
+
+        protected static string LogResponse(JfYuLoggingFields LoggingFields, string requestId, string status, string result)
+        {
+
+            var logMessage = new StringBuilder($"Response [RequestId:{requestId}]");
+
+            if ((LoggingFields & JfYuLoggingFields.ResponseStatus) == JfYuLoggingFields.ResponseStatus)
+                logMessage.Append($" Status={status}");
+
+            if ((LoggingFields & JfYuLoggingFields.Response) == JfYuLoggingFields.Response)
+                logMessage.Append($" Result={result}");
+
+            return logMessage.ToString();
+        }
         public abstract Task<string> SendAsync();
 
         public abstract Task<bool> DownloadFileAsync(string path, Action<decimal, decimal, decimal>? progress = null);

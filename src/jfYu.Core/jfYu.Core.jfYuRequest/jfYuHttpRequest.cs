@@ -14,11 +14,11 @@ using System.Threading.Tasks;
 namespace jfYu.Core.jfYuRequest
 {
 
-    public class JfYuHttpRequest(LogFilter? logFilter = null, ILogger<JfYuHttpRequest>? logger = null) : JfYuBaseRequest
+    public class JfYuHttpRequest(LogFilter logFilter, ILogger<JfYuHttpRequest>? logger = null) : JfYuBaseRequest
     {
         private HttpWebRequest? _request;
         private readonly ILogger<JfYuHttpRequest>? _logger = logger;
-        private readonly LogFilter? _logFilter = logFilter;
+        private readonly LogFilter _logFilter = logFilter;
 
         private void Initialize()
         {
@@ -143,10 +143,7 @@ namespace jfYu.Core.jfYuRequest
             try
             {
                 Initialize();
-                if (_logger != null && _logFilter != null && _logFilter.RequestFunc != null)
-                    _logger.LogInformation("Request [RequestId:{requestId}] Url:{url},Method:{method},Data:{data},Header:{header}", 
-                        requestId, Url, Method, _logFilter.RequestFunc.Invoke(RequestData), 
-                        JsonConvert.SerializeObject(_request!.Headers.AllKeys.ToDictionary(header => header, header => _request.Headers.GetValues(header)!.ToList())));
+                _logger?.LogInformation(LogRequest(_logFilter.LoggingFields, requestId, Url, Method.ToString(), JsonConvert.SerializeObject(_request!.Headers.AllKeys.ToDictionary(header => header, header => _request.Headers.GetValues(header)!.ToList())), _logFilter.RequestFunc.Invoke(RequestData)));
                 HttpWebResponse response = (HttpWebResponse)await _request!.GetResponseAsync();
                 StatusCode = response.StatusCode;
                 html = GetResponse(response);
@@ -173,8 +170,8 @@ namespace jfYu.Core.jfYuRequest
                 _logger?.LogError(ex, "An error occurred while sending request.");
                 throw;
             }
-            if (_logger != null && _logFilter != null && _logFilter.ResponseFunc != null)
-                _logger.LogInformation("Response [RequestId:{requestId}] Result:{Result}", requestId, _logFilter.ResponseFunc.Invoke(html));
+
+            _logger?.LogInformation(LogResponse(_logFilter.LoggingFields, requestId, StatusCode.ToString(), _logFilter.ResponseFunc.Invoke(html)));
             return html;
         }
 

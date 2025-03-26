@@ -623,14 +623,14 @@ namespace jfYu.Core.Test.JfYuRequest
                 IJfYuRequest client;
                 IJfYuRequest request;
                 var services = new ServiceCollection();
-                services.AddJfYuHttpRequestService();
+                services.AddJfYuHttpRequestService(q=>q.LoggingFields= JfYuLoggingFields.RequestData);
                 var mockLogger = new Mock<ILogger<JfYuHttpRequest>>();
                 services.AddSingleton(mockLogger.Object);
                 var serviceProvider = services.BuildServiceProvider();
                 request = serviceProvider.GetRequiredService<IJfYuRequest>();
 
                 var services1 = new ServiceCollection();
-                services1.AddJfYuHttpClientService();
+                services1.AddJfYuHttpClientService(null,q => q.LoggingFields = JfYuLoggingFields.RequestData);
                 var mockLogger1 = new Mock<ILogger<JfYuHttpClient>>();
                 services1.AddSingleton(mockLogger1.Object);
                 var serviceProvider1 = services1.BuildServiceProvider();

@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 namespace jfYu.Core.jfYuRequest
 {
 #if NETCORE
-    public class JfYuHttpClient(IHttpClientFactory factory, CookieContainer cookieContainer, LogFilter? logFilter=null, ILogger<JfYuHttpClient>? logger = null) : JfYuBaseRequest
+    public class JfYuHttpClient(IHttpClientFactory factory, CookieContainer cookieContainer, LogFilter logFilter, ILogger<JfYuHttpClient>? logger = null) : JfYuBaseRequest
     {
         private HttpClient? _request;
         private readonly ILogger<JfYuHttpClient>? _logger = logger;
-        private readonly LogFilter? _logFilter = logFilter;
+        private readonly LogFilter _logFilter = logFilter;
         private readonly CookieContainer _cookieContainer = cookieContainer;
 
         private void Initialize()
@@ -70,8 +70,8 @@ namespace jfYu.Core.jfYuRequest
             try
             {
                 string html = string.Empty;
-                if (_logger != null && _logFilter != null && _logFilter.RequestFunc != null)
-                    _logger.LogInformation("Request [RequestId:{requestId}] Url:{url},Method:{method},Data:{data},Header:{header}", requestId, Url, Method, _logFilter.RequestFunc.Invoke(RequestData), JsonConvert.SerializeObject(_request!.DefaultRequestHeaders.ToDictionary(header => header.Key, header => header.Value.ToList())));
+                _logger?.LogInformation(LogRequest(_logFilter.LoggingFields, requestId, Url, Method.ToString(), JsonConvert.SerializeObject(_request!.DefaultRequestHeaders.ToDictionary(header => header.Key, header => header.Value.ToList())), _logFilter.RequestFunc.Invoke(RequestData)));
+
                 HttpResponseMessage? response = null;
                 if (Method.Equals(HttpMethod.Post))
                 {
@@ -114,8 +114,7 @@ namespace jfYu.Core.jfYuRequest
                 _cookieContainer.GetCookies(new Uri(Url)).ToList().ForEach(ResponseCookies.Add);
                 string content = await response.Content.ReadAsStringAsync();
                 html = RequestEncoding.GetString(RequestEncoding.GetBytes(content));
-                if (_logger != null && _logFilter != null && _logFilter.ResponseFunc != null)
-                    _logger.LogInformation("Response [RequestId:{requestId}] Result:{Result}", requestId, _logFilter.ResponseFunc.Invoke(html));
+                _logger?.LogInformation(LogResponse(_logFilter.LoggingFields, requestId, StatusCode.ToString(), _logFilter.ResponseFunc.Invoke(html)));
                 return html;
             }
             catch (Exception ex)
