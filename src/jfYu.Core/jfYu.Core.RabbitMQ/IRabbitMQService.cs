@@ -5,8 +5,14 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.RabbitMQ
 {
+    /// <summary>
+    /// RabbitMQService interface.
+    /// </summary>
     public interface IRabbitMQService
     {
+        /// <summary>
+        /// Rabbit MQ connection.
+        /// </summary>
         IModel Channel { get; }
 
         /// <summary>
@@ -34,7 +40,6 @@ namespace jfYu.Core.RabbitMQ
         /// <summary>
         /// Receives messages from a queue with a specified prefetch count (synchronous).
         /// </summary>
-        /// <typeparam name="T">The type of the message.</typeparam>
         /// <param name="queueName">The name of the queue.</param>
         /// <param name="func">The function to process the message.</param>
         /// <param name="prefetchCount">The number of messages to prefetch (default is 1).</param>

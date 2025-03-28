@@ -4,7 +4,7 @@
 
 		<TargetFrameworks>net8.0</TargetFrameworks>
 		<LangVersion>12.0</LangVersion>
-		<Version>8.1.0</Version>
+		<Version>8.1.1</Version>
 		<Authors>jfwang</Authors>
 		<Nullable>enable</Nullable>
 		<Description>Separation of reading and writing</Description>
@@ -12,7 +12,8 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/jfwangncs/jfYu</RepositoryUrl>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
-
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -26,6 +27,10 @@
 		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.1" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<None Include="$(OutputPath)**\$(AssemblyName).xml" Pack="true" PackagePath="lib\%(RecursiveDir)" />
+	</ItemGroup>
+	
 	<ItemGroup>
 		<None Include="README.md" Pack="true" PackagePath="\" />
 		<None Include="..\..\..\LICENSE" Pack="true" PackagePath="" />

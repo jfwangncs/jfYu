@@ -9,8 +9,7 @@ namespace jfYu.Core.Redis.Serializer.MessagePack
     /// <remarks>
     /// Initializes a new instance of the <see cref="MsgPackObjectSerializer"/> class.
     /// </remarks>
-    /// <param name="settings">The settings.</param>
-    /// <param name="settings">The encoding.</param>
+    /// <param name="settings">The settings.</param> 
     public class MsgPackObjectSerializer(MessagePackSerializerOptions settings) : ISerializer
     {
 

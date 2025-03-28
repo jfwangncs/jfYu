@@ -7,14 +7,16 @@ namespace jfYu.Core.jfYuRequest
 {
 
     /// <summary>
-    /// 
+    ///  Adds http request services extensions
     /// </summary>
     public static class ContainerBuilderExtensions
     {
+
         /// <summary>
-        /// injection
+        /// Adds and configures the http web request service to the dependency injection container.
         /// </summary>
-        /// <param name="services"></param>
+        /// <param name="services">The IServiceCollection to add the DbContext service to.</param>
+        /// <param name="filter">The log filter.</param>   
         public static void AddJfYuHttpRequestService(this IServiceCollection services, Action<LogFilter>? filter = null)
         {
             services.AddScoped<IJfYuRequest, JfYuHttpRequest>();
@@ -26,10 +28,13 @@ namespace jfYu.Core.jfYuRequest
 
 
 #if NETCORE
+
         /// <summary>
-        /// injection
+        ///  Adds and configures the http client service to the dependency injection container.
         /// </summary>
-        /// <param name="services"></param>
+        /// <param name="services">The IServiceCollection to add the DbContext service to.</param>
+        /// <param name="httpClientHandler">The http client handler</param>
+        /// <param name="filter">The log filter.</param>   
         public static void AddJfYuHttpClientService(this IServiceCollection services, Func<HttpClientHandler>? httpClientHandler = null, Action<LogFilter>? filter = null)
         {
             var build = services.AddHttpClient("httpclient");

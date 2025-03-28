@@ -12,14 +12,18 @@ using System;
 namespace jfYu.Core.Redis.Extensions
 {
     /// <summary>
-    /// 
+    /// Adds Redis services extensions
     /// </summary>
     public static class ContainerBuilderExtensions
     {
         /// <summary>
-        /// injection
+        /// Adds Redis services to the specified IServiceCollection.
         /// </summary>
-        /// <param name="services"></param>
+        /// <param name="services">The IServiceCollection to add services to.</param>
+        /// <param name="setupAction">An action to configure RedisOptions.</param>
+        /// <returns>The IServiceCollection with the added services.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when setupAction is null.</exception>
+        /// <exception cref="NullReferenceException">Thrown when no endpoints are configured.</exception>
         public static IServiceCollection AddRedisService(this IServiceCollection services, Action<RedisOptions>? setupAction)
         {
             ArgumentNullException.ThrowIfNull(setupAction);
@@ -61,10 +65,21 @@ namespace jfYu.Core.Redis.Extensions
             return services;
         }
 
+        /// <summary>
+        /// Configures Redis to use Newtonsoft.Json for serialization.
+        /// </summary>
+        /// <param name="services">The RedisOptions to configure.</param>
+        /// <param name="setupAction">An optional action to configure JsonSerializerSettings.</param>
         public static void UsingNewtonsoft(this RedisOptions services, Action<JsonSerializerSettings>? setupAction = null)
         {
             services.SerializerOptions = new NewtonsoftOptionsExtension(setupAction);
         }
+
+        /// <summary>
+        /// Configures Redis to use MessagePack for serialization.
+        /// </summary>
+        /// <param name="services">The RedisOptions to configure.</param>
+        /// <param name="setupAction">An optional action to configure MessagePackSerializerOptions.</param>
         public static void UsingMsgPack(this RedisOptions services, Action<MessagePackSerializerOptions>? setupAction = null)
         {
             services.SerializerOptions = new MessagePackOptionsExtension(setupAction);

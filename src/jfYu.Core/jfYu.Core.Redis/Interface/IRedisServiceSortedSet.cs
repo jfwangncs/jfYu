@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.Redis.Interface
 {
+    /// <summary>
+    /// The interface for the Redis service.
+    /// </summary>
     public partial interface IRedisService
     {
 
@@ -14,6 +17,7 @@ namespace jfYu.Core.Redis.Interface
         /// <param name="key">The Redis key.</param>
         /// <param name="value">The value to add.</param>
         /// <param name="score">The score associated with the value.</param>
+        /// <param name="when">The command condition.Default is  When.Always</param>
         /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
         Task<bool> SortedSetAddAsync<T>(string key, T value, double score, When when = When.Always, CommandFlags flag = CommandFlags.None);
@@ -60,8 +64,7 @@ namespace jfYu.Core.Redis.Interface
 
         /// <summary>
         /// Returns all the values of the sorted set stored at key, in the range [start, stop].
-        /// </summary>
-        /// <typeparam name="T">The type of the values.</typeparam>
+        /// </summary> 
         /// <param name="key">The Redis key.</param>
         /// <param name="start">The start index of the range.</param>
         /// <param name="stop">The end index of the range.</param>
@@ -72,8 +75,7 @@ namespace jfYu.Core.Redis.Interface
 
         /// <summary>
         /// Returns all the values of the sorted set stored at key, with a score between min and max.
-        /// </summary>
-        /// <typeparam name="T">The type of the values.</typeparam>
+        /// </summary> 
         /// <param name="key">The Redis key.</param>
         /// <param name="min">The minimum score (inclusive).</param>
         /// <param name="max">The maximum score (inclusive).</param>

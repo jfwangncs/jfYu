@@ -406,7 +406,7 @@ namespace jfYu.Core.Test.JfYuRequest
         public async Task Test_CustomInitFunc(IJfYuRequest client)
         {
             client.Url = "https://httpbin.org/headers";
-            client.CustomInitFunc = (obj) =>
+            client.CustomInit = (obj) =>
             {
                 if (client is JfYuHttpClient)
                 {
@@ -432,7 +432,7 @@ namespace jfYu.Core.Test.JfYuRequest
         public async Task Test_CustomInitFunc_ThrowException(IJfYuRequest client)
         {
             client.Url = "https://httpbin.org/get";
-            client.CustomInitFunc = (obj) =>
+            client.CustomInit = (obj) =>
             {
                 var i = 0;
                 var x = 1 / i;
@@ -681,14 +681,14 @@ namespace jfYu.Core.Test.JfYuRequest
                 IJfYuRequest client;
                 IJfYuRequest request;
                 var services = new ServiceCollection();
-                services.AddJfYuHttpRequestService(q => { q.RequestFunc = z => { var x = 0; return (1 / x).ToString(); }; q.ResponseFunc = z => z; });
+                services.AddJfYuHttpRequestService(q => { q.RequestFilter = z => { var x = 0; return (1 / x).ToString(); }; q.ResponseFilter = z => z; });
                 var mockLogger = new Mock<ILogger<JfYuHttpRequest>>();
                 services.AddSingleton(mockLogger.Object);
                 var serviceProvider = services.BuildServiceProvider();
                 request = serviceProvider.GetRequiredService<IJfYuRequest>();
 
                 var services1 = new ServiceCollection();
-                services1.AddJfYuHttpClientService(null, q => { q.RequestFunc = z => { var x = 0; return (1 / x).ToString(); }; q.ResponseFunc = z => z; });
+                services1.AddJfYuHttpClientService(null, q => { q.RequestFilter = z => { var x = 0; return (1 / x).ToString(); }; q.ResponseFilter = z => z; });
                 var mockLogger1 = new Mock<ILogger<JfYuHttpClient>>();
                 services1.AddSingleton(mockLogger1.Object);
                 var serviceProvider1 = services1.BuildServiceProvider();
@@ -718,7 +718,7 @@ namespace jfYu.Core.Test.JfYuRequest
         public async Task Test_Send_Init_ThrowException(object logger, IJfYuRequest client)
         {
             client.Url = "https://httpbin.org/get";
-            client.CustomInitFunc = (obj) =>
+            client.CustomInit = (obj) =>
                 {
                     var i = 0;
                     var x = 1 / i;
@@ -780,11 +780,11 @@ namespace jfYu.Core.Test.JfYuRequest
                 IJfYuRequest client;
                 IJfYuRequest request;
                 var services = new ServiceCollection();
-                services.AddJfYuHttpRequestService(q => { q.RequestFunc = z => z; q.ResponseFunc = z => z; });
+                services.AddJfYuHttpRequestService(q => { q.RequestFilter = z => z; q.ResponseFilter = z => z; });
                 var serviceProvider = services.BuildServiceProvider();
                 request = serviceProvider.GetRequiredService<IJfYuRequest>();
                 var services1 = new ServiceCollection();
-                services1.AddJfYuHttpClientService(null, q => { q.RequestFunc = z => z; q.ResponseFunc = z => z; });
+                services1.AddJfYuHttpClientService(null, q => { q.RequestFilter = z => z; q.ResponseFilter = z => z; });
 
                 var serviceProvider1 = services1.BuildServiceProvider();
                 client = serviceProvider1.GetRequiredService<IJfYuRequest>();

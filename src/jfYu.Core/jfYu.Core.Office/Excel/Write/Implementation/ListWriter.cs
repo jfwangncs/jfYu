@@ -9,11 +9,16 @@ using System.Runtime.CompilerServices;
 
 namespace jfYu.Core.Office.Excel.Write.Implementation
 {
-
+    /// <summary>
+    /// Class for writing a list of data to an Excel workbook.
+    /// </summary>
+    /// <typeparam name="T">The type of data to be written to Excel.</typeparam>
     public class ListWriter<T>(IOptionsMonitor<JfYuExcelOption> configuration) : JfYuWriterBase<T> where T : notnull
     {
         private readonly JfYuExcelOption _configuration = configuration.CurrentValue;
 
+
+        /// <inheritdoc/>
         protected override void WriteDataToWorkbook(IWorkbook workbook, T source, Dictionary<string, string>? titles = null, Action<int>? callback = null)
         {
             if (!source.GetType().IsConstructedGenericType)
@@ -52,6 +57,16 @@ namespace jfYu.Core.Office.Excel.Write.Implementation
             Write(data, workbook, tType, titles, callback);
         }
 
+        /// <summary>
+        /// Writes data to an Excel sheet.
+        /// </summary>
+        /// <param name="data">The data to write.</param>
+        /// <param name="workbook">The workbook to write data to.</param>
+        /// <param name="tType">The type of data.</param>
+        /// <param name="titles">Optional dictionary of column titles.</param>
+        /// <param name="callback">Optional callback action to report progress.</param>
+        /// <param name="needAutoCreateSheet">Indicates whether to automatically create new sheets when the row limit is reached.</param>
+        /// <exception cref="InvalidOperationException">Thrown when a title's value cannot be found.</exception>
         protected void Write(IQueryable data, IWorkbook workbook, Type tType, Dictionary<string, string>? titles, Action<int>? callback = null, bool needAutoCreateSheet = true)
         {
             if (tType.IsSimpleType())

@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>net8.0</TargetFrameworks>
 		<LangVersion>12.0</LangVersion>
-		<Version>8.1.0</Version>
+		<Version>8.1.1</Version>
 		<Authors>jfwang</Authors>
 		<Nullable>enable</Nullable>
 		<Description>read/write microsoft office file</Description>
@@ -11,12 +11,17 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/jfwangncs/jfYu</RepositoryUrl>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />
 		<PackageReference Include="NPOI" Version="2.7.1" />
 		<PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="$(OutputPath)**\$(AssemblyName).xml" Pack="true" PackagePath="lib\%(RecursiveDir)" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="README.md" Pack="true" PackagePath="\" />

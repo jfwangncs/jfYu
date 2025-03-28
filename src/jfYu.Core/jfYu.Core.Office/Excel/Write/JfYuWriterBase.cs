@@ -8,10 +8,17 @@ using System.IO;
 
 namespace jfYu.Core.Office.Excel.Write
 {
+    /// <summary>
+    /// Abstract base class for writing data to an Excel workbook.
+    /// </summary>
+    /// <typeparam name="T">The type of data to be written to Excel.</typeparam>
     public abstract class JfYuWriterBase<T> : IJfYuExcelWrite<T>
     {
+
+        /// <inheritdoc/>
         protected abstract void WriteDataToWorkbook(IWorkbook workbook, T source, Dictionary<string, string>? titles = null, Action<int>? callback = null);
 
+        /// <inheritdoc/>
         public IWorkbook Write(T source, string filePath, Dictionary<string, string>? titles = null, JfYuExcelWriteOperation writeOperation = JfYuExcelWriteOperation.None, Action<int>? callback = null)
         {
             IWorkbook wb;
@@ -48,6 +55,7 @@ namespace jfYu.Core.Office.Excel.Write
             }
         }
 
+        /// <inheritdoc/>
         public void SetValue(Type type, object? value, ICell cell)
         {
             if (value == null || value == DBNull.Value)

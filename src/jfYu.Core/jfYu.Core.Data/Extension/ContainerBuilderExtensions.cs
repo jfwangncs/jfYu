@@ -7,11 +7,18 @@ using System;
 using System.Linq;
 namespace jfYu.Core.Data.Extension
 {
+    /// <summary>
+    ///  Adds JfYuDbContext services extensions
+    /// </summary>
     public static class ContainerBuilderExtensions
     {
         /// <summary>
-        /// injection
-        /// </summary>  
+        /// Adds and configures the JfYu DbContext service to the dependency injection container.
+        /// </summary>
+        /// <typeparam name="T">The type of DbContext to configure (must inherit from DbContext).</typeparam>
+        /// <param name="services">The IServiceCollection to add the DbContext service to.</param>
+        /// <param name="setupAction">An action to configure the JfYuDatabaseConfig options.</param>
+        /// <returns>The modified IServiceCollection instance for chaining.</returns>
         public static IServiceCollection AddJfYuDbContextService<T>(this IServiceCollection services, Action<JfYuDatabaseConfig> setupAction) where T : DbContext
         {
             ArgumentNullException.ThrowIfNull(setupAction, nameof(setupAction));
@@ -53,6 +60,7 @@ namespace jfYu.Core.Data.Extension
 
             return services;
         }
+     
         private static DbContextOptions GetDbContextOptions<T>(DatabaseConfig config, DbContextOptionsBuilder? opt = null) where T : DbContext
         {
             var optionsBuilder = opt ?? new DbContextOptionsBuilder<T>();

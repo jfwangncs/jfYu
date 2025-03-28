@@ -11,12 +11,24 @@ using System.Threading.Tasks;
 namespace jfYu.Core.RabbitMQ
 {
 
+    /// <summary>
+    ///  
+    /// </summary>
+    /// <param name="channel"></param>
+    /// <param name="messageRetryPolicy"></param>
+    /// <param name="logger"></param>
     public class RabbitMQService(IModel channel, MessageRetryPolicy messageRetryPolicy, ILogger<RabbitMQService>? logger = null) : IRabbitMQService
     {
+        /// <summary>
+        /// Rabbit MQ connection.
+        /// </summary>
         public IModel Channel { get; } = channel;
         private readonly MessageRetryPolicy _messageRetryPolicy = messageRetryPolicy;
         private readonly ILogger<RabbitMQService>? _logger = logger;
 
+
+
+        /// <inheritdoc/>
         public bool QueueBind(string queueName, string exchangeName, string exchangeType, string routingKey = "", Dictionary<string, object>? headers = null)
         {
             Channel.ConfirmSelect(); // confirm
@@ -26,6 +38,9 @@ namespace jfYu.Core.RabbitMQ
             return Channel.WaitForConfirms(Channel.ContinuationTimeout);
         }
 
+
+        /// <inheritdoc/>
+
         public bool ExchangeBind(string destination, string source, string exchangeType, string routingKey = "", Dictionary<string, object>? headers = null)
         {
             Channel.ConfirmSelect(); // confirm
@@ -34,6 +49,8 @@ namespace jfYu.Core.RabbitMQ
             Channel.ExchangeBind(destination, source, routingKey, headers);
             return Channel.WaitForConfirms(Channel.ContinuationTimeout);
         }
+
+        /// <inheritdoc/>
         public bool Send(string exchangeName, string msg, string routingKey = "", Dictionary<string, object>? headers = null)
         {
             headers ??= [];
@@ -48,6 +65,8 @@ namespace jfYu.Core.RabbitMQ
             Channel.BasicPublish(exchangeName, routingKey, basicProperties, payload);
             return Channel.WaitForConfirms(Channel.ContinuationTimeout);
         }
+
+        /// <inheritdoc/>
         public bool Send<T>(string exchangeName, T msg, string routingKey = "", Dictionary<string, object>? headers = null)
         {
             headers ??= [];
@@ -62,6 +81,8 @@ namespace jfYu.Core.RabbitMQ
             Channel.BasicPublish(exchangeName, routingKey, basicProperties, payload);
             return Channel.WaitForConfirms(Channel.ContinuationTimeout);
         }
+
+        /// <inheritdoc/>
         public void Receive(string queueName, Func<string, bool> func, ushort prefetchCount = 1)
         {
             Channel.BasicQos(0, prefetchCount, false);
@@ -91,8 +112,10 @@ namespace jfYu.Core.RabbitMQ
             Channel.BasicConsume(queueName, false, consumer);
         }
 
+
+        /// <inheritdoc/>
         public void Receive(string queueName, Func<string, Task<bool>> func, ushort prefetchCount = 1)
-        { 
+        {
             Channel.BasicQos(0, prefetchCount, false);
             var consumer = new AsyncEventingBasicConsumer(Channel);
             consumer.Received += async (ch, ea) =>
@@ -121,6 +144,7 @@ namespace jfYu.Core.RabbitMQ
             Channel.BasicConsume(queueName, false, consumer);
         }
 
+        /// <inheritdoc/>
         public void Receive<T>(string queueName, Func<T?, bool> func, ushort prefetchCount = 1)
         {
 
@@ -153,6 +177,8 @@ namespace jfYu.Core.RabbitMQ
             Channel.BasicConsume(queueName, false, consumer);
         }
 
+
+        /// <inheritdoc/>
         public void Receive<T>(string queueName, Func<T?, Task<bool>> func, ushort prefetchCount = 1)
         {
             Channel.BasicQos(0, prefetchCount, false);
@@ -185,9 +211,7 @@ namespace jfYu.Core.RabbitMQ
         }
 
 
-        /// <summary>
-        /// Send message to dead letter queue
-        /// </summary>
+        /// <inheritdoc/>
         private bool TryToMoveToDeadLetterQueue(BasicDeliverEventArgs ea)
         {
             if (ea.BasicProperties.Headers is null)

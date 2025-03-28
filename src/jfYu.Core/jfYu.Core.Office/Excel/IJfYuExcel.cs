@@ -12,63 +12,69 @@ namespace jfYu.Core.Office.Excel
     public interface IJfYuExcel
     {
         /// <summary>
-        /// Create excel
-        /// </summary> 
-        /// <returns>Excel object</returns>
+        /// Creates a new Excel workbook.
+        /// </summary>
+        /// <param name="excelVersion">The version of the Excel file to create.</param>
+        /// <returns>A new instance of <see cref="IWorkbook"/>.</returns>
         IWorkbook CreateExcel(JfYuExcelVersion excelVersion = JfYuExcelVersion.Xlsx);
 
         /// <summary>
-        /// Read one sheet of excel
+        /// Reads data from an Excel file stream.
         /// </summary>
-        /// <param name="stream">File stream</param>
-        /// <param name="firstRow">Start index,default:1,0 is title</param>
-        /// <param name="sheetIndex">Sheet index</param>
-        /// <returns>The list of sheet</returns>
+        /// <typeparam name="T">The type of data to read.</typeparam>
+        /// <param name="stream">The file stream to read from.</param>
+        /// <param name="firstRow">The first row to start reading from (default is 1).</param>
+        /// <param name="sheetIndex">The index of the sheet to read from (default is 0).</param>
+        /// <returns>The data read from the Excel file.</returns>
         T Read<T>(Stream stream, int firstRow = 1, int sheetIndex = 0);
 
         /// <summary>
-        /// Read one sheet of excel
+        /// Reads data from an Excel file.
         /// </summary>
-        /// <typeparam name="T">Type of model</typeparam>
-        /// <param name="filePath">Excel file path</param>
-        /// <param name="firstRow">Start index,default:1,0 is title</param>
-        /// <param name="sheetIndex">Sheet index</param>
-        /// <returns>The list of sheet</returns>
+        /// <typeparam name="T">The type of data to read.</typeparam>
+        /// <param name="filePath">The file path of the Excel file.</param>
+        /// <param name="firstRow">The first row to start reading from (default is 1).</param>
+        /// <param name="sheetIndex">The index of the sheet to read from (default is 0).</param>
+        /// <returns>The data read from the Excel file.</returns>
+        /// <exception cref="FileNotFoundException">Thrown when the file is not found.</exception>
         T Read<T>(string filePath, int firstRow = 1, int sheetIndex = 0);
 
         /// <summary>
-        /// Update the options for the Excel
+        /// Updates the options for the Excel operations.
         /// </summary>
-        /// <param name="updateAction">Action to update the options</param>
+        /// <param name="updateAction">Action to update the options.</param>
         void UpdateOption(Action<JfYuExcelOption> updateAction);
 
         /// <summary>
-        /// Export data as xlsx
+        /// Writes data to an Excel file.
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="filePath"></param>
-        /// <param name="titles"></param>
-        /// <param name="writeOperation"></param>
-        /// <param name="callback"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The type of data to write.</typeparam>
+        /// <param name="source">The data source.</param>
+        /// <param name="filePath">The file path where the Excel file will be saved.</param>
+        /// <param name="titles">Optional dictionary of column titles.</param>
+        /// <param name="writeOperation">Specifies the write operation to perform (e.g., None, Append).</param>
+        /// <param name="callback">Optional callback action to report progress.</param>
+        /// <returns>Returns the created or modified <see cref="IWorkbook"/> instance.</returns>
         IWorkbook Write<T>(T source, string filePath, Dictionary<string, string>? titles = null, JfYuExcelWriteOperation writeOperation = JfYuExcelWriteOperation.None, Action<int>? callback = null);
 
         /// <summary>
-        /// Export data as CSV
+        /// Writes data to a CSV file.
         /// </summary>
-        /// <typeparam name="T">Type of model</typeparam>
-        /// <param name="source">Data to export</param>
-        /// <param name="filePath">File path to save the CSV</param>
-        /// <param name="titles">Title mapping for the CSV columns</param>
-        /// <param name="callback">Export progress callback</param>
+        /// <typeparam name="T">The type of data to write.</typeparam>
+        /// <param name="source">The data source.</param>
+        /// <param name="filePath">The file path where the CSV file will be saved.</param>
+        /// <param name="titles">Optional dictionary of column titles.</param>
+        /// <param name="callback">Optional callback action to report progress.</param>
+        /// <exception cref="Exception">Thrown when the file already exists.</exception>
         void WriteCSV<T>(List<T> source, string filePath, Dictionary<string, string>? titles = null, Action<int>? callback = null);
 
         /// <summary>
-        /// Read CSV file
+        /// Reads data from a CSV file.
         /// </summary>
-        /// <param name="filePath">CSV file path</param>
-        /// <param name="firstRow">Start index, default: 1, 0 is title</param>
-        /// <returns>The list of CSV rows</returns>
+        /// <param name="filePath">The file path of the CSV file.</param>
+        /// <param name="firstRow">The first row to start reading from (default is 1).</param>
+        /// <returns>A list of dynamic objects representing the data read from the CSV file.</returns>
+        /// <exception cref="FileNotFoundException">Thrown when the file is not found.</exception>
         List<dynamic> ReadCSV(string filePath, int firstRow = 1);
     }
 }

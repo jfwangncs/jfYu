@@ -8,8 +8,19 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.Redis.Implementation
 {
+    /// <summary>
+    /// The implementation of the Redis service.
+    /// </summary>
     public partial class RedisService : IRedisService
     {
+        /// <summary>
+        /// Adds an element to the set.
+        /// </summary>
+        /// <typeparam name="T">The type of the values.</typeparam>
+        /// <param name="key">The Redis key.</param>
+        /// <param name="value">The value associated with the key.</param>
+        /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
+        /// <returns>True if the operation was successful, false otherwise.</returns>
         public async Task<bool> SetAddAsync<T>(string key, T value, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -19,6 +30,7 @@ namespace jfYu.Core.Redis.Implementation
             return await _database.SetAddAsync(key, entryBytes, flag);
         }
 
+        /// <inheritdoc/>
         public async Task<long> SetAddAllAsync<T>(string key, List<T> values, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -30,6 +42,7 @@ namespace jfYu.Core.Redis.Implementation
                     .ToArray(), flag);
         }
 
+        /// <inheritdoc/>
         public async Task<bool> SetRemoveAsync<T>(string key, T value)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -39,6 +52,7 @@ namespace jfYu.Core.Redis.Implementation
             return await _database.SetRemoveAsync(key, entryBytes);
         }
 
+        /// <inheritdoc/>
         public async Task<long> SetRemoveAllAsync<T>(string key, List<T> values, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -51,6 +65,7 @@ namespace jfYu.Core.Redis.Implementation
                    .ToArray(), flag);
         }
 
+        /// <inheritdoc/>
         public async Task<bool> SetContainsAsync<T>(string key, T value, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -60,6 +75,7 @@ namespace jfYu.Core.Redis.Implementation
             return await _database.SetContainsAsync(key, entryBytes);
         }
 
+        /// <inheritdoc/>
         public async Task<List<RedisValue>> SetMembersAsync(string key, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -67,6 +83,7 @@ namespace jfYu.Core.Redis.Implementation
             return [.. await _database.SetMembersAsync(key, flag)];
         }
 
+        /// <inheritdoc/>
         public async Task<long> SetLengthAsync(string key, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -74,6 +91,7 @@ namespace jfYu.Core.Redis.Implementation
             return await _database.SetLengthAsync(key, flag);
         }
 
+        /// <inheritdoc/>
         public async Task<RedisValue> SetRandomMemberAsync(string key, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -81,6 +99,7 @@ namespace jfYu.Core.Redis.Implementation
             return await _database.SetRandomMemberAsync(key, flag);
         }
 
+        /// <inheritdoc/>
         public async Task<List<RedisValue>> SetRandomMembersAsync(string key, int count = 1, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);

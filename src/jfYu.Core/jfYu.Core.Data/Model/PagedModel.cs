@@ -19,7 +19,7 @@ namespace jfYu.Core.Data.Model
         public int TotalCount { get; set; } = 0;
 
         /// <summary>
-        /// data
+        /// Data
         /// </summary>
         public List<T> Data { get; set; } = [];
     }

@@ -3,11 +3,13 @@ using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace jfYu.Core.Redis.Interface
 {
+    /// <summary>
+    /// The interface for the Redis service.
+    /// </summary>
     public partial interface IRedisService
     {
         /// <summary>
@@ -45,6 +47,7 @@ namespace jfYu.Core.Redis.Interface
         /// Removes the value of specified key
         /// </summary>
         /// <param name="key">The Redis key.</param>
+        /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
         Task<bool> RemoveAsync(string key, CommandFlags flag = CommandFlags.None);
 
@@ -150,6 +153,7 @@ namespace jfYu.Core.Redis.Interface
         /// <param name="expiresIn">The time span for which the lock will be held,default 1 minute</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
         Task<bool> LockTakeAsync(string key, TimeSpan? expiresIn=null);
+
         /// <summary>
         /// Attempts to release a distributed lock.
         /// </summary>

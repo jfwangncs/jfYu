@@ -8,10 +8,17 @@ using System.Data.Common;
 
 namespace jfYu.Core.Office.Excel.Write.Implementation
 {
+
+    /// <summary>
+    /// The DbDataReader writer.
+    /// </summary>
+    /// <param name="configuration">The JfYuExcel configuration </param>
     public class DbDataReaderWriter(IOptionsMonitor<JfYuExcelOption> configuration) : JfYuWriterBase<DbDataReader>
     {
         private readonly JfYuExcelOption _configuration = configuration.CurrentValue;
 
+
+        /// <inheritdoc/>
         protected override void WriteDataToWorkbook(IWorkbook workbook, DbDataReader source, Dictionary<string, string>? titles = null, Action<int>? callback = null)
         {
             if (source.IsClosed)                

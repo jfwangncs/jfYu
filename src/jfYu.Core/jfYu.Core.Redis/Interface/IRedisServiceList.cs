@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.Redis.Interface
 {
+    /// <summary>
+    /// The interface for the Redis service.
+    /// </summary>
     public partial interface IRedisService
     {
         /// <summary>
@@ -27,7 +30,6 @@ namespace jfYu.Core.Redis.Interface
         /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
         /// <returns>The number of elements.</returns>
         Task<long> ListAddToLeftAsync<T>(string key, T value, When when = When.Always, CommandFlags flag = CommandFlags.None);
-
 
         /// <summary>
         /// Pop an element from the tail of the list.

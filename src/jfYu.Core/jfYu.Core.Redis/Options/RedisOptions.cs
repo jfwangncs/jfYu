@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace jfYu.Core.Redis.Options
 {
+    /// <summary>
+    /// The Redis options.
+    /// </summary>
     public class RedisOptions
     {
         /// <summary>
@@ -49,6 +52,9 @@ namespace jfYu.Core.Redis.Options
 
     }
 
+    /// <summary>
+    /// The Redis endpoint.
+    /// </summary>
     public class RedisEndPoint
     {
         /// <summary>

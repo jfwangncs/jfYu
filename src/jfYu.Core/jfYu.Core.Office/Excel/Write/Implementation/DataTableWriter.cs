@@ -7,10 +7,16 @@ using System.Data;
 
 namespace jfYu.Core.Office.Excel.Write.Implementation
 {
+    /// <summary>
+    /// The DataTable writer.
+    /// </summary>
+    /// <param name="configuration">The JfYuExcel configuration </param>
     public class DataTableWriter(IOptionsMonitor<JfYuExcelOption> configuration) : JfYuWriterBase<DataTable>
     {
         private readonly JfYuExcelOption _configuration = configuration.CurrentValue;
 
+
+        /// <inheritdoc/>
         protected override void WriteDataToWorkbook(IWorkbook workbook, DataTable source, Dictionary<string, string>? titles = null, Action<int>? callback = null)
         {
             if (titles == null)
@@ -37,7 +43,7 @@ namespace jfYu.Core.Office.Excel.Write.Implementation
                 foreach (var t in titles)
                 {
                     var cell = dataRow.CreateCell(columnIndex);
-                    SetValue(item[t.Key].GetType(), item[t.Key],cell);
+                    SetValue(item[t.Key].GetType(), item[t.Key], cell);
                     columnIndex++;
                 }
                 sheetWriteRowIndex++;

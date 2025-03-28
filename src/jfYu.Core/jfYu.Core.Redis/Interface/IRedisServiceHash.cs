@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.Redis.Interface
 {
+    /// <summary>
+    /// The interface for the Redis service.
+    /// </summary>
     public partial interface IRedisService
     {
         /// <summary>

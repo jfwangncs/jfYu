@@ -10,25 +10,23 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.jfYuRequest
 {
+    /// <summary>
+    /// Interface for JfYuRequest
+    /// </summary>
     public interface IJfYuRequest
     {
-        /// <summary>
-        /// HttpStatusCode
-        /// </summary>
-        public HttpStatusCode StatusCode { get; }
-
         /// <summary>
         /// Url
         /// </summary>
         public string Url { get; set; }
 
         /// <summary>
-        /// ContentType
+        /// ContentType,default:Josn
         /// </summary>
         public string ContentType { get; set; }
 
         /// <summary>
-        /// get/post default:get
+        /// Http Method <see cref="HttpMethod"/> class.
         /// </summary>
         public HttpMethod Method { get; set; }
 
@@ -43,17 +41,17 @@ namespace jfYu.Core.jfYuRequest
         public Encoding RequestEncoding { get; set; }
 
         /// <summary>
-        /// Request cookies
+        /// Request cookies <see cref="CookieContainer"/> class.
         /// </summary>
         public CookieContainer RequestCookies { get; set; }
 
         /// <summary>
-        /// Return cookies
+        /// Return cookies <see cref="CookieCollection"/> class.
         /// </summary>
         public CookieCollection ResponseCookies { get; set; }
 
         /// <summary>
-        /// Proxy only for JfYuHttpRequest
+        /// Proxy only for JfYuHttpRequest <see cref="WebProxy"/> class.
         /// </summary>
         public WebProxy? Proxy { get; set; }
 
@@ -63,12 +61,12 @@ namespace jfYu.Core.jfYuRequest
         public Dictionary<string, string> Files { get; set; }
 
         /// <summary>
-        /// Header
+        /// Header <see cref="RequestHeader"/> class.
         /// </summary>
         public RequestHeader RequestHeader { get; set; }
 
         /// <summary>
-        /// Timeout default:5 seconds
+        /// Timeout default:30 seconds
         /// </summary>
         public int Timeout { get; set; }
 
@@ -78,7 +76,10 @@ namespace jfYu.Core.jfYuRequest
         public Dictionary<string, string> RequestCustomHeaders { get; set; }
 
         /// <summary>
-        /// Request data,you can pass string(XML,Json) or object(automatic convert to json)
+        /// Request data,
+        /// Json:"{\"username\":\"testUser\"}"
+        /// FormData/FormUrlEncoded:"username=testUser"
+        /// Xml:"<user><username>testUser</username></user>"
         /// </summary>
         public string RequestData { get; set; }
 
@@ -93,9 +94,9 @@ namespace jfYu.Core.jfYuRequest
         public bool CertificateValidation { get; set; }
 
         /// <summary>
-        /// Custom init func.for jfYuHttpRequest:object as HttpWebRequest,for jfYuHttpClient:object as HttpClient
+        /// Custom init.for jfYuHttpRequest:object as HttpWebRequest,for jfYuHttpClient:object as HttpClient
         /// </summary>
-        Action<object>? CustomInitFunc { get; set; }
+        Action<object>? CustomInit { get; set; }
 
         /// <summary>
         /// Response Header
@@ -103,25 +104,30 @@ namespace jfYu.Core.jfYuRequest
         public Dictionary<string, List<string>> ResponseHeader { get; }
 
         /// <summary>
-        /// Get response
-        /// </summary> 
-        /// <returns></returns>
+        /// HttpStatusCode
+        /// </summary>
+        public HttpStatusCode StatusCode { get; }
+
+        /// <summary>
+        /// Sends the HTTP request asynchronously.
+        /// </summary>
+        /// <returns>The response content.</returns>
         Task<string> SendAsync();
 
 
         /// <summary>
-        /// Download file
+        /// Downloads a file asynchronously.
         /// </summary>
-        /// <param name="path">file save location</param>
-        /// <param name="progress">Optional progress delegate function first：Percentage of the download completed.，the second： download speed (e.g., in KB/s).,third ：estimated remaining time (e.g., in seconds)</param>
-        /// <returns>successful/failed</returns>
+        /// <param name="path">The file save location.</param>
+        /// <param name="progress">The progress delegate function.</param>
+        /// <returns>True if the download is successful, otherwise false.</returns>
         Task<bool> DownloadFileAsync(string path, Action<decimal, decimal, decimal>? progress = null);
 
         /// <summary>
-        /// Download file
-        /// </summary> 
-        /// <param name="progress">Optional progress delegate function first：Percentage of the download completed.，the second： download speed (e.g., in KB/s),third ：estimated remaining time (e.g., in seconds)</param>
-        /// <returns>file stream</returns>
+        /// Downloads a file to a memory stream asynchronously.
+        /// </summary>
+        /// <param name="progress">The progress delegate function.</param>
+        /// <returns>The memory stream containing the downloaded file.</returns>
         Task<MemoryStream?> DownloadFileAsync(Action<decimal, decimal, decimal>? progress = null);
 
     }

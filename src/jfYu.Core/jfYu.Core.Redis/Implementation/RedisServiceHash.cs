@@ -4,9 +4,13 @@ using System;
 using System.Threading.Tasks;
 
 namespace jfYu.Core.Redis.Implementation
-{
+{   
+    /// <summary>
+    /// The implementation of the Redis service.
+    /// </summary>
     public partial class RedisService : IRedisService
     {
+        /// <inheritdoc/>
         public async Task<bool> HashSetAsync<T>(string key, string hashKey, T value, When when = When.Always, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -17,6 +21,7 @@ namespace jfYu.Core.Redis.Implementation
             return await _database.HashSetAsync(key, hashKey, entryBytes, when, flag);
         }
 
+        /// <inheritdoc/>
         public async Task<T?> HashGetAsync<T>(string key, string hashKey, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -26,6 +31,7 @@ namespace jfYu.Core.Redis.Implementation
             return redisValue.HasValue ? _serializer.Deserialize<T>(redisValue!) : default;
         }
 
+        /// <inheritdoc/>
         public async Task<HashEntry[]> HashGetAllAsync(string key, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -33,6 +39,7 @@ namespace jfYu.Core.Redis.Implementation
             return await _database.HashGetAllAsync(key, flag);
         }
 
+        /// <inheritdoc/>
         public async Task<bool> HashDeleteAsync(string key, string hashKey, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -41,6 +48,7 @@ namespace jfYu.Core.Redis.Implementation
             return await _database.HashDeleteAsync(key, hashKey, flag);
         }
 
+        /// <inheritdoc/>
         public async Task<bool> HashExistsAsync(string key, string hashKey, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);

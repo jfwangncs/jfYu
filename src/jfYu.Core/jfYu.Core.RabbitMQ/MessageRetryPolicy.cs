@@ -1,7 +1,8 @@
-﻿using System;
-
-namespace jfYu.Core.RabbitMQ
+﻿namespace jfYu.Core.RabbitMQ
 {
+    /// <summary>
+    /// Rabbit MQ message retry policy.
+    /// </summary>
     public class MessageRetryPolicy
     {
 

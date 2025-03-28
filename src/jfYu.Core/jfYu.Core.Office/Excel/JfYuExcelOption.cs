@@ -1,5 +1,8 @@
 ﻿namespace jfYu.Core.Office.Excel
 {
+    /// <summary>
+    /// JfYuExcelOption
+    /// </summary>
     public class JfYuExcelOption
     {
         /// <summary>

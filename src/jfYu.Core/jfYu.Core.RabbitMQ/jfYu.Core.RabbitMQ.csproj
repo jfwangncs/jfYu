@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>net8.0</TargetFrameworks>
 		<LangVersion>12.0</LangVersion>
-		<Version>8.0.7</Version>
+		<Version>8.0.8</Version>
 		<Authors>jfwang</Authors>
 		<Nullable>enable</Nullable>
 		<Description>RabbitMQ</Description> 
@@ -23,18 +23,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="$(OutputPath)\net8.0\$(AssemblyName).xml" Pack="true" PackagePath="lib\net8.0" />
+		<None Include="$(OutputPath)**\$(AssemblyName).xml" Pack="true" PackagePath="lib\%(RecursiveDir)" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<None Include="README.md" Pack="true" PackagePath="\" />
 		<None Include="..\..\..\LICENSE" Pack="true" PackagePath="" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="bin\Debug\net8.0\\jfYu.Core.RabbitMQ.xml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
 	</ItemGroup>
 
 </Project>

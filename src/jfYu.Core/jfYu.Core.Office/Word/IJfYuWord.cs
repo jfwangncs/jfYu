@@ -3,14 +3,17 @@ using System.Collections.Generic;
 
 namespace jfYu.Core.Office.Word
 {
+    /// <summary>
+    /// Interface for generating Word documents from templates.
+    /// </summary>
     public interface IJfYuWord
     {
         /// <summary>
-        /// Generates a Word document from a template, replacing with provided values.
+        /// Generates a Word document based on a template and a list of replacements.
         /// </summary>
-        /// <param name="templatePath">Path to the template file.</param>
-        /// <param name="outputPath">Output path.</param>
-        /// <param name="replacements">list oftheir replacement values.</param>
+        /// <param name="templatePath">The path to the Word template file.</param>
+        /// <param name="outputFilePath">The path where the generated Word file will be saved.</param>
+        /// <param name="replacements">A list of replacements to be applied to the template.</param>
         void GenerateWordByTemplate(string templatePath, string outputFilePath, List<JfYuWordReplacement> replacements);
     }
 }

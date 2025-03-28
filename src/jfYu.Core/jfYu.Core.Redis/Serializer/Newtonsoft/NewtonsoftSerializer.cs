@@ -1,8 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using System;
+﻿using Newtonsoft.Json;
 using System.Text;
-using System.Xml.Linq;
 
 namespace jfYu.Core.Redis.Serializer.Newtonsoft
 {

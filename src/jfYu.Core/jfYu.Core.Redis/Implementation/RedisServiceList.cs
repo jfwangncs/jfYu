@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.Redis.Implementation
 {
+    /// <summary>
+    /// The implementation of the Redis service.
+    /// </summary>
     public partial class RedisService : IRedisService
     {
+        /// <inheritdoc/>
         public async Task<long> ListAddAsync<T>(string key, T value, When when = When.Always, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -17,6 +21,7 @@ namespace jfYu.Core.Redis.Implementation
             return await _database.ListRightPushAsync(key, entryBytes, when, flag);
         }
 
+        /// <inheritdoc/>
         public async Task<long> ListAddToLeftAsync<T>(string key, T value, When when = When.Always, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -26,6 +31,7 @@ namespace jfYu.Core.Redis.Implementation
             return await _database.ListLeftPushAsync(key, entryBytes, when, flag);
         }
 
+        /// <inheritdoc/>
         public async Task<T?> ListPopFromRightAsync<T>(string key, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -34,6 +40,7 @@ namespace jfYu.Core.Redis.Implementation
             return !valueBytes.HasValue ? default : Serializer.Deserialize<T>(valueBytes!);
         }
 
+        /// <inheritdoc/>
         public async Task<T?> ListPopFromLeftAsync<T>(string key, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -42,6 +49,7 @@ namespace jfYu.Core.Redis.Implementation
             return !valueBytes.HasValue ? default : Serializer.Deserialize<T>(valueBytes!);
         }
 
+        /// <inheritdoc/>
         public async Task<long> ListLengthAsync(string key, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -49,6 +57,7 @@ namespace jfYu.Core.Redis.Implementation
             return await _database.ListLengthAsync(key, flag);
         }
 
+        /// <inheritdoc/>
         public async Task<long> ListRemoveAsync(string key, string value, int count)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -56,9 +65,9 @@ namespace jfYu.Core.Redis.Implementation
             Log(nameof(ListRemoveAsync), key);
             var entryBytes = _serializer.Serialize(value);
             return await _database.ListRemoveAsync(key, entryBytes, count);
-
         }
 
+        /// <inheritdoc/>
         public async Task<List<RedisValue>> ListGetRangeAsync(string key, int start = 0, int stop = -1, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);

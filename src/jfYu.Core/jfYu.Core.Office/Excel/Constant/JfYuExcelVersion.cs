@@ -5,8 +5,19 @@
     /// </summary>
     public enum JfYuExcelVersion
     {
+        /// <summary>
+        /// Xlsx
+        /// </summary>
         Xlsx,
+
+        /// <summary>
+        /// xls
+        /// </summary>
         Xls,
+
+        /// <summary>
+        /// Csv
+        /// </summary>
         Csv
     }
 }

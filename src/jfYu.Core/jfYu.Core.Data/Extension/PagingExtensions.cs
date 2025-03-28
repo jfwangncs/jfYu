@@ -7,22 +7,21 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.Data.Extension
 {
-
     /// <summary>
-    /// Pagination
+    /// Paging extensions
     /// </summary>
     public static class PagingExtensions
     {
         /// <summary>
-        /// Pagination
+        /// Converts an IQueryable into a paged result synchronously.
         /// </summary>
-        /// <typeparam name="T">model</typeparam>
-        /// <param name="source">source</param>
-        /// <param name="pageIndex">page index</param>
-        /// <param name="pageSize">page size</param>
-        /// <returns>data</returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <typeparam name="T">The type of elements in the source.</typeparam>
+        /// <param name="source">The IQueryable to be paginated.</param>
+        /// <param name="pageIndex">The page index (1-based). Default is 1.</param>
+        /// <param name="pageSize">The number of items per page. Default is 20.</param>
+        /// <returns>A PagedData object containing the paginated data, total count, and total pages.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if the source is null.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if pageIndex or pageSize is less than or equal to 0.</exception>
         public static PagedData<T> ToPaged<T>(this IQueryable<T> source, int pageIndex = 1, int pageSize = 20)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -39,16 +38,17 @@ namespace jfYu.Core.Data.Extension
             return new PagedData<T>() { TotalPages = totalPages, Data = list, TotalCount = totalCount };
         }
 
+
         /// <summary>
-        /// Pagination
+        /// Converts an IQueryable into a paged result asynchronously.
         /// </summary>
-        /// <typeparam name="T">model</typeparam>
-        /// <param name="source">source</param>
-        /// <param name="pageIndex">page index</param>
-        /// <param name="pageSize">page size</param>
-        /// <returns>data</returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <typeparam name="T">The type of elements in the source.</typeparam>
+        /// <param name="source">The IQueryable to be paginated.</param>
+        /// <param name="pageIndex">The page index (1-based). Default is 1.</param>
+        /// <param name="pageSize">The number of items per page. Default is 20.</param>
+        /// <returns>A Task returning a PagedData object containing the paginated data, total count, and total pages.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if the source is null.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if pageIndex or pageSize is less than or equal to 0.</exception>
         public static async Task<PagedData<T>> ToPagedAsync<T>(this IQueryable<T> source, int pageIndex = 1, int pageSize = 20)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -64,17 +64,20 @@ namespace jfYu.Core.Data.Extension
             int totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
             return new PagedData<T>() { TotalPages = totalPages, Data = list, TotalCount = totalCount };
         }
+
         /// <summary>
-        /// Pagination
+        /// Converts an IQueryable into a paged result with data transformation synchronously.
         /// </summary>
-        /// <typeparam name="T">model</typeparam>
-        /// <param name="source">source</param>
-        /// <param name="func">function</param>
-        /// <param name="pageIndex">page index</param>
-        /// <param name="pageSize">page size</param>
-        /// <returns>data</returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="InvalidOperationException"></exception>       
+        /// <typeparam name="T">The type of elements in the source.</typeparam>
+        /// <typeparam name="Q">The type of elements after transformation.</typeparam>
+        /// <param name="source">The IQueryable to be paginated.</param>
+        /// <param name="func">A function to transform the paginated data.</param>
+        /// <param name="pageIndex">The page index (1-based). Default is 1.</param>
+        /// <param name="pageSize">The number of items per page. Default is 20.</param>
+        /// <returns>A PagedData object containing the transformed paginated data, total count, and total pages.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if the source or func is null.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if pageIndex or pageSize is less than or equal to 0.</exception>
+
         public static PagedData<Q> ToPaged<T, Q>(this IQueryable<T> source, Func<IEnumerable<T>, IEnumerable<Q>> func, int pageIndex = 1, int pageSize = 20)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -91,17 +94,19 @@ namespace jfYu.Core.Data.Extension
             return new PagedData<Q>() { TotalPages = totalPages, Data = func(list).ToList(), TotalCount = totalCount };
         }
 
+
         /// <summary>
-        /// Pagination
+        /// Converts an IQueryable into a paged result with data transformation asynchronously.
         /// </summary>
-        /// <typeparam name="T">model</typeparam>
-        /// <param name="source">source</param>
-        /// <param name="func">function</param>
-        /// <param name="pageIndex">page index</param>
-        /// <param name="pageSize">page size</param>
-        /// <returns>data</returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="InvalidOperationException"></exception>       
+        /// <typeparam name="T">The type of elements in the source.</typeparam>
+        /// <typeparam name="Q">The type of elements after transformation.</typeparam>
+        /// <param name="source">The IQueryable to be paginated.</param>
+        /// <param name="func">A function to transform the paginated data.</param>
+        /// <param name="pageIndex">The page index (1-based). Default is 1.</param>
+        /// <param name="pageSize">The number of items per page. Default is 20.</param>
+        /// <returns>A Task returning a PagedData object containing the transformed paginated data, total count, and total pages.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if the source or func is null.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if pageIndex or pageSize is less than or equal to 0.</exception>
         public static async Task<PagedData<Q>> ToPagedAsync<T, Q>(this IQueryable<T> source, Func<IEnumerable<T>, IEnumerable<Q>> func, int pageIndex = 1, int pageSize = 20)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -117,7 +122,5 @@ namespace jfYu.Core.Data.Extension
             int totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
             return new PagedData<Q>() { TotalPages = totalPages, Data = func(list).ToList(), TotalCount = totalCount };
         }
-
-
     }
 }

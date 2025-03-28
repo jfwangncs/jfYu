@@ -14,7 +14,8 @@ config
     "Password": "123456",
     "VirtualHost": "/",
     "HeartBeat": "60",
-    "Port": "9808"
+    "Port": "9808",
+    "DispatchConsumersAsync";true //if you want to use async consumer
   }
 ```
 

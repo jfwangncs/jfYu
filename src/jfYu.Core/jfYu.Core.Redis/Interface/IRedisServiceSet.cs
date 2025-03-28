@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.Redis.Interface
 {
+    /// <summary>
+    /// The interface for the Redis service.
+    /// </summary>
     public partial interface IRedisService
     {
         /// <summary>
@@ -59,7 +62,7 @@ namespace jfYu.Core.Redis.Interface
         /// </summary>
         /// <param name="key">The Redis key.</param> 
         /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
-        /// <returns>values</returns>
+        /// <returns>Values</returns>
         Task<List<RedisValue>> SetMembersAsync(string key, CommandFlags flag = CommandFlags.None);
 
         /// <summary>
@@ -83,6 +86,7 @@ namespace jfYu.Core.Redis.Interface
         /// </summary>
         /// <param name="key">The Redis key.</param>
         /// <param name="count">the count of members</param> 
+        /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
         /// <returns>The random values of the set.</returns>
         Task<List<RedisValue>> SetRandomMembersAsync(string key, int count, CommandFlags flag = CommandFlags.None);
     }

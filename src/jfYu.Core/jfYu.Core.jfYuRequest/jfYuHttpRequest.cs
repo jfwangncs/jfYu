@@ -14,12 +14,32 @@ using System.Threading.Tasks;
 namespace jfYu.Core.jfYuRequest
 {
 
-    public class JfYuHttpRequest(LogFilter logFilter, ILogger<JfYuHttpRequest>? logger = null) : JfYuBaseRequest
+    /// <summary>
+    /// Represents an HTTP request with logging and additional features.(Using HttpWebRequest)
+    /// </summary>
+    public class JfYuHttpRequest : JfYuBaseRequest
     {
+        /// <summary>
+        /// The HTTP web request.
+        /// </summary>
         private HttpWebRequest? _request;
-        private readonly ILogger<JfYuHttpRequest>? _logger = logger;
-        private readonly LogFilter _logFilter = logFilter;
+ 
+        private readonly ILogger<JfYuHttpRequest>? _logger;
 
+        private readonly LogFilter _logFilter;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JfYuHttpRequest"/> class.
+        /// </summary>
+        /// <param name="logFilter">The log filter.</param>
+        /// <param name="logger">The logger.</param>
+        public JfYuHttpRequest(LogFilter logFilter, ILogger<JfYuHttpRequest>? logger = null)
+        {
+            _logFilter = logFilter;
+            _logger = logger;
+        }
+
+        /// <inheritdoc/>
         private void Initialize()
         {
             _request = (HttpWebRequest)WebRequest.Create(Url);
@@ -83,7 +103,7 @@ namespace jfYu.Core.jfYuRequest
                 _request.CookieContainer = RequestCookies;
                 _request.Timeout = Timeout * 1000;
                 _request.UserAgent = RequestHeader.UserAgent;
-                _request.Headers.Add(HttpRequestHeader.AcceptEncoding, RequestHeader.AcceptEncoding);//定义gzip压缩页面支持
+                _request.Headers.Add(HttpRequestHeader.AcceptEncoding, RequestHeader.AcceptEncoding);// Define gzip compression support
                 _request.Headers.Add(HttpRequestHeader.AcceptLanguage, RequestHeader.AcceptLanguage);
                 _request.Headers.Add(HttpRequestHeader.CacheControl, RequestHeader.CacheControl);
                 _request.Headers.Add(HttpRequestHeader.Pragma, RequestHeader.Pragma);
@@ -114,7 +134,7 @@ namespace jfYu.Core.jfYuRequest
                     _request.Headers.Add(item.Key, item.Value);
                 }
 
-                CustomInitFunc?.Invoke(_request);
+                CustomInit?.Invoke(_request);
             }
             catch (Exception ex)
             {
@@ -122,6 +142,12 @@ namespace jfYu.Core.jfYuRequest
                 throw;
             }
         }
+
+        /// <summary>
+        /// Gets the response content as a string.
+        /// </summary>
+        /// <param name="response">The HTTP web response.</param>
+        /// <returns>The response content.</returns>
         private string GetResponse(HttpWebResponse response)
         {
             if (response.ContentEncoding.ToLower().Contains("br") || response.ContentEncoding.ToLower().Contains("brotli"))
@@ -136,6 +162,7 @@ namespace jfYu.Core.jfYuRequest
         }
 
 
+        /// <inheritdoc/>
         public override async Task<string> SendAsync()
         {
             var html = string.Empty;
@@ -143,7 +170,7 @@ namespace jfYu.Core.jfYuRequest
             try
             {
                 Initialize();
-                _logger?.LogInformation(LogRequest(_logFilter.LoggingFields, requestId, Url, Method.ToString(), JsonConvert.SerializeObject(_request!.Headers.AllKeys.ToDictionary(header => header, header => _request.Headers.GetValues(header)!.ToList())), _logFilter.RequestFunc.Invoke(RequestData)));
+                _logger?.LogInformation("{Message}",LogRequest(_logFilter.LoggingFields, requestId, Url, Method.ToString(), JsonConvert.SerializeObject(_request!.Headers.AllKeys.ToDictionary(header => header, header => _request.Headers.GetValues(header)!.ToList())), _logFilter.RequestFilter.Invoke(RequestData)));
                 HttpWebResponse response = (HttpWebResponse)await _request!.GetResponseAsync();
                 StatusCode = response.StatusCode;
                 html = GetResponse(response);
@@ -171,10 +198,12 @@ namespace jfYu.Core.jfYuRequest
                 throw;
             }
 
-            _logger?.LogInformation(LogResponse(_logFilter.LoggingFields, requestId, StatusCode.ToString(), _logFilter.ResponseFunc.Invoke(html)));
+            _logger?.LogInformation("{Message}", LogResponse(_logFilter.LoggingFields, requestId, StatusCode.ToString(), _logFilter.ResponseFilter.Invoke(html)));
             return html;
         }
 
+
+        /// <inheritdoc/>
         public override async Task<bool> DownloadFileAsync(string path, Action<decimal, decimal, decimal>? progress = null)
         {
             if (string.IsNullOrEmpty(path))
@@ -199,9 +228,10 @@ namespace jfYu.Core.jfYuRequest
                 _logger?.LogError(ex, "An error occurred while downloading the file.");
                 throw;
             }
-
         }
 
+
+        /// <inheritdoc/>
         public override async Task<MemoryStream?> DownloadFileAsync(Action<decimal, decimal, decimal>? progress = null)
         {
             Initialize();

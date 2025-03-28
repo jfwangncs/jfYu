@@ -14,6 +14,9 @@ using System.Text;
 
 namespace jfYu.Core.Office.Excel.Extensions
 {
+    /// <summary>
+    /// The extension methods for Excel operations.
+    /// </summary>
     public static class JfYuExcelExtension
     {
         /// <summary>

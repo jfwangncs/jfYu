@@ -7,9 +7,13 @@ using System.Linq;
 
 namespace jfYu.Core.Office.Word
 {
+    /// <summary>
+    /// Class for generating Word documents from templates.
+    /// </summary>
     public class JfYuWord : IJfYuWord
     {
 
+        /// <inheritdoc/>
         public void GenerateWordByTemplate(string templatePath, string outputFilePath, List<JfYuWordReplacement> replacements)
         {
             if (!File.Exists(templatePath))

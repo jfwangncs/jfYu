@@ -13,13 +13,33 @@ using System.Threading.Tasks;
 namespace jfYu.Core.jfYuRequest
 {
 #if NETCORE
+
+    /// <summary>
+    /// Represents an HTTP request with logging and additional features.(Using HttpClient)
+    /// </summary>
+    /// <param name="factory"> Initializes a new instance of the <see cref="IHttpClientFactory"/> class.</param>
+    /// <param name="cookieContainer">The cookie container</param>
+    /// <param name="logFilter">The log filter.</param>
+    /// <param name="logger">The logger.</param>
     public class JfYuHttpClient(IHttpClientFactory factory, CookieContainer cookieContainer, LogFilter logFilter, ILogger<JfYuHttpClient>? logger = null) : JfYuBaseRequest
     {
+
+        /// <summary>
+        /// The HTTP web request.
+        /// </summary>
         private HttpClient? _request;
+
         private readonly ILogger<JfYuHttpClient>? _logger = logger;
+
         private readonly LogFilter _logFilter = logFilter;
+
+        /// <summary>
+        /// The cookie container
+        /// </summary>
+
         private readonly CookieContainer _cookieContainer = cookieContainer;
 
+        /// <inheritdoc/>
         private void Initialize()
         {
             try
@@ -54,7 +74,7 @@ namespace jfYu.Core.jfYuRequest
                     _request.DefaultRequestHeaders.TryAddWithoutValidation(item.Key, item.Value);
                 }
 
-                CustomInitFunc?.Invoke(_request);
+                CustomInit?.Invoke(_request);
             }
             catch (Exception ex)
             {
@@ -63,6 +83,8 @@ namespace jfYu.Core.jfYuRequest
             }
         }
 
+
+        /// <inheritdoc/>
         public override async Task<string> SendAsync()
         {
             Initialize();
@@ -70,7 +92,7 @@ namespace jfYu.Core.jfYuRequest
             try
             {
                 string html = string.Empty;
-                _logger?.LogInformation(LogRequest(_logFilter.LoggingFields, requestId, Url, Method.ToString(), JsonConvert.SerializeObject(_request!.DefaultRequestHeaders.ToDictionary(header => header.Key, header => header.Value.ToList())), _logFilter.RequestFunc.Invoke(RequestData)));
+                _logger?.LogInformation("{Message}", LogRequest(_logFilter.LoggingFields, requestId, Url, Method.ToString(), JsonConvert.SerializeObject(_request!.DefaultRequestHeaders.ToDictionary(header => header.Key, header => header.Value.ToList())), _logFilter.RequestFilter.Invoke(RequestData)));
 
                 HttpResponseMessage? response = null;
                 if (Method.Equals(HttpMethod.Post))
@@ -114,7 +136,7 @@ namespace jfYu.Core.jfYuRequest
                 _cookieContainer.GetCookies(new Uri(Url)).ToList().ForEach(ResponseCookies.Add);
                 string content = await response.Content.ReadAsStringAsync();
                 html = RequestEncoding.GetString(RequestEncoding.GetBytes(content));
-                _logger?.LogInformation(LogResponse(_logFilter.LoggingFields, requestId, StatusCode.ToString(), _logFilter.ResponseFunc.Invoke(html)));
+                _logger?.LogInformation("{Message}", LogResponse(_logFilter.LoggingFields, requestId, StatusCode.ToString(), _logFilter.ResponseFilter.Invoke(html)));
                 return html;
             }
             catch (Exception ex)
@@ -124,6 +146,8 @@ namespace jfYu.Core.jfYuRequest
             }
         }
 
+
+        /// <inheritdoc/>
         public override async Task<bool> DownloadFileAsync(string path, Action<decimal, decimal, decimal>? progress = null)
         {
             if (string.IsNullOrEmpty(path))
@@ -152,6 +176,8 @@ namespace jfYu.Core.jfYuRequest
             }
         }
 
+
+        /// <inheritdoc/>
         public override async Task<MemoryStream?> DownloadFileAsync(Action<decimal, decimal, decimal>? progress = null)
         {
             Initialize();

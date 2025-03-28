@@ -9,12 +9,17 @@ using System.Data.Common;
 
 namespace jfYu.Core.Office
 {
+    /// <summary>
+    /// Provides extension methods for registering JfYu services in the dependency injection container.
+    /// </summary>
     public static class ContainerBuilderExtensions
     {
         /// <summary>
-        /// Injection
+        /// Adds JfYu Excel services to the specified IServiceCollection.
         /// </summary>
-        /// <param name="services"></param>
+        /// <param name="services">The IServiceCollection to add services to.</param>
+        /// <param name="setupAction">An optional action to configure JfYuExcelOption.</param>
+        /// <returns>The IServiceCollection with the added services.</returns>
         public static IServiceCollection AddJfYuExcel(this IServiceCollection services, Action<JfYuExcelOption>? setupAction = null)
         {
             var options = new JfYuExcelOption(); 
@@ -33,9 +38,10 @@ namespace jfYu.Core.Office
         }
 
         /// <summary>
-        /// Injection
+        /// Adds JfYu Word services to the specified IServiceCollection.
         /// </summary>
-        /// <param name="services"></param>
+        /// <param name="services">The IServiceCollection to add services to.</param>
+        /// <returns>The IServiceCollection with the added services.</returns>
         public static IServiceCollection AddJfYuWord(this IServiceCollection services)
         {
             services.AddScoped<IJfYuWord, JfYuWord>();
