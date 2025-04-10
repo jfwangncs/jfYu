@@ -15,7 +15,7 @@ config
     "VirtualHost": "/",
     "HeartBeat": "60",
     "Port": "9808",
-    "DispatchConsumersAsync";true //if you want to use async consumer
+    "DispatchConsumersAsync":true //if you want to use async consumer
   }
 ```
 
