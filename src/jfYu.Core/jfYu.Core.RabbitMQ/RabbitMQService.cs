@@ -32,7 +32,7 @@ namespace jfYu.Core.RabbitMQ
         /// <inheritdoc/>
         public bool QueueBind(string queueName, string exchangeName, string exchangeType, string routingKey = "", Dictionary<string, object>? headers = null)
         {
-           var _channel = Connection.CreateModel();
+            var _channel = Connection.CreateModel();
             _channel.ConfirmSelect(); // confirm
             _channel.ExchangeDeclare(exchangeName, exchangeType, true);
             _channel.QueueDeclare(queueName, true, false, false, null);
@@ -102,7 +102,7 @@ namespace jfYu.Core.RabbitMQ
                         _channel.BasicAck(ea.DeliveryTag, false);
                     else
                         if (_messageRetryPolicy.EnableDeadQueue)
-                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(_channel,ea));
+                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
                 }
@@ -110,7 +110,7 @@ namespace jfYu.Core.RabbitMQ
                 {
                     _logger?.LogError(ex, "Receive message have error.");
                     if (_messageRetryPolicy.EnableDeadQueue)
-                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(_channel,ea));
+                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
                 }
@@ -135,7 +135,7 @@ namespace jfYu.Core.RabbitMQ
                         _channel.BasicAck(ea.DeliveryTag, false);
                     else
                       if (_messageRetryPolicy.EnableDeadQueue)
-                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(_channel,ea));
+                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
                 }
@@ -143,7 +143,7 @@ namespace jfYu.Core.RabbitMQ
                 {
                     _logger?.LogError(ex, "Receive message have error.");
                     if (_messageRetryPolicy.EnableDeadQueue)
-                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(_channel,ea));
+                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
                 }
@@ -170,7 +170,7 @@ namespace jfYu.Core.RabbitMQ
                         _channel.BasicAck(ea.DeliveryTag, false);
                     else
                         if (_messageRetryPolicy.EnableDeadQueue)
-                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(_channel,ea));
+                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
                 }
@@ -178,7 +178,7 @@ namespace jfYu.Core.RabbitMQ
                 {
                     _logger?.LogError(ex, "Receive message have error.");
                     if (_messageRetryPolicy.EnableDeadQueue)
-                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(_channel,ea));
+                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
                 }
@@ -204,7 +204,7 @@ namespace jfYu.Core.RabbitMQ
                         _channel.BasicAck(ea.DeliveryTag, false);
                     else
                          if (_messageRetryPolicy.EnableDeadQueue)
-                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(_channel,ea));
+                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
                 }
@@ -212,7 +212,7 @@ namespace jfYu.Core.RabbitMQ
                 {
                     _logger?.LogError(ex, "Receive message have error.");
                     if (_messageRetryPolicy.EnableDeadQueue)
-                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(_channel,ea));
+                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
                 }
@@ -224,14 +224,16 @@ namespace jfYu.Core.RabbitMQ
 
 
         /// <inheritdoc/>
-        private bool TryToMoveToDeadLetterQueue(IModel channel, BasicDeliverEventArgs ea)
-        { 
+        private bool TryToMoveToDeadLetterQueue(BasicDeliverEventArgs ea)
+        {
+
             if (ea.BasicProperties.Headers is null)
                 return false;
 
             try
             {
-
+                using var channel = Connection.CreateModel();
+                channel.ConfirmSelect();
                 int retryCount = -1;
                 var originalRoutingKey = "";
                 var originalExchangeName = "";
