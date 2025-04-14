@@ -49,7 +49,7 @@ namespace jfYu.Core.Test.RabbitMQ
             var serviceProvider = services.BuildServiceProvider();
 
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
 
@@ -101,7 +101,7 @@ namespace jfYu.Core.Test.RabbitMQ
             var serviceProvider = services.BuildServiceProvider();
 
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
 
@@ -160,7 +160,7 @@ namespace jfYu.Core.Test.RabbitMQ
 
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             var _retry = serviceProvider.GetRequiredService<MessageRetryPolicy>();
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
@@ -230,7 +230,7 @@ namespace jfYu.Core.Test.RabbitMQ
 
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             var _retry = serviceProvider.GetRequiredService<MessageRetryPolicy>();
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
@@ -312,7 +312,7 @@ namespace jfYu.Core.Test.RabbitMQ
             services.AddSingleton(mockLogger.Object);
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             var _retry = serviceProvider.GetRequiredService<MessageRetryPolicy>();
 
             _channel.QueueDelete(queueName);
@@ -382,7 +382,7 @@ namespace jfYu.Core.Test.RabbitMQ
 
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             var _retry = serviceProvider.GetRequiredService<MessageRetryPolicy>();
 
             _channel.QueueDelete(queueName);
@@ -444,7 +444,7 @@ namespace jfYu.Core.Test.RabbitMQ
             services.AddSingleton(mockLogger.Object);
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             var _retry = serviceProvider.GetRequiredService<MessageRetryPolicy>();
 
             _channel.QueueDelete(queueName);
@@ -504,7 +504,7 @@ namespace jfYu.Core.Test.RabbitMQ
              
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             var _retry = serviceProvider.GetRequiredService<MessageRetryPolicy>();
 
             _channel.QueueDelete(queueName);
@@ -567,7 +567,7 @@ namespace jfYu.Core.Test.RabbitMQ
             services.AddSingleton(mockLogger.Object);
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             var _retry = serviceProvider.GetRequiredService<MessageRetryPolicy>();
 
             _channel.QueueDelete(queueName);
@@ -633,7 +633,7 @@ namespace jfYu.Core.Test.RabbitMQ
             var serviceProvider = services.BuildServiceProvider();
 
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
 
@@ -684,7 +684,7 @@ namespace jfYu.Core.Test.RabbitMQ
             var serviceProvider = services.BuildServiceProvider();
 
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
 
@@ -741,7 +741,7 @@ namespace jfYu.Core.Test.RabbitMQ
 
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             var _retry = serviceProvider.GetRequiredService<MessageRetryPolicy>();
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
@@ -811,7 +811,7 @@ namespace jfYu.Core.Test.RabbitMQ
 
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             var _retry = serviceProvider.GetRequiredService<MessageRetryPolicy>();
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
@@ -880,7 +880,7 @@ namespace jfYu.Core.Test.RabbitMQ
             var serviceProvider = services.BuildServiceProvider();
 
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
 
@@ -930,7 +930,7 @@ namespace jfYu.Core.Test.RabbitMQ
             var serviceProvider = services.BuildServiceProvider();
 
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
 
@@ -988,7 +988,7 @@ namespace jfYu.Core.Test.RabbitMQ
 
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             var _retry = serviceProvider.GetRequiredService<MessageRetryPolicy>();
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
@@ -1059,7 +1059,7 @@ namespace jfYu.Core.Test.RabbitMQ
 
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             var _retry = serviceProvider.GetRequiredService<MessageRetryPolicy>();
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
@@ -1122,7 +1122,7 @@ namespace jfYu.Core.Test.RabbitMQ
 
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             var _retry = serviceProvider.GetRequiredService<MessageRetryPolicy>();
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
@@ -1181,7 +1181,7 @@ namespace jfYu.Core.Test.RabbitMQ
             var serviceProvider = services.BuildServiceProvider();
 
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
 
@@ -1232,7 +1232,7 @@ namespace jfYu.Core.Test.RabbitMQ
             var serviceProvider = services.BuildServiceProvider();
 
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
 
@@ -1290,7 +1290,7 @@ namespace jfYu.Core.Test.RabbitMQ
 
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             var _retry = serviceProvider.GetRequiredService<MessageRetryPolicy>();
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
@@ -1361,7 +1361,7 @@ namespace jfYu.Core.Test.RabbitMQ
 
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
-            var _channel = _rabbitMQService.Channel;
+            var _channel = _rabbitMQService.Connection.CreateModel();
             var _retry = serviceProvider.GetRequiredService<MessageRetryPolicy>();
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);

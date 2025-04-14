@@ -14,7 +14,7 @@ namespace jfYu.Core.Test.RabbitMQ
         public RabbitExchangeTypeTests(IRabbitMQService rabbitMQService)
         {
             _rabbitMQService = rabbitMQService;
-            _channel = _rabbitMQService.Channel;
+            _channel = _rabbitMQService.Connection.CreateModel();
         }
 
         public class NullStringExpectData : TheoryData<string, string>
