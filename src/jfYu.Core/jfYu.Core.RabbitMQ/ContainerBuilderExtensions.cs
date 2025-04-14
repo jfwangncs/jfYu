@@ -25,11 +25,10 @@ namespace jfYu.Core.RabbitMQ
 
             var factory = new ConnectionFactory();
             var retryPolicy = new MessageRetryPolicy();
-            configure(factory, retryPolicy);
+            configure(factory, retryPolicy);          
             services.AddScoped(_ => factory.CreateConnection());
-            services.AddSingleton(retryPolicy);
-            services.AddScoped(provider => provider.GetRequiredService<IConnection>().CreateModel());
-            services.AddScoped<IRabbitMQService, RabbitMQService>();
+            services.AddSingleton(retryPolicy); 
+            services.AddScoped<IRabbitMQService, RabbitMQService>();             
             return services;
         }
     }

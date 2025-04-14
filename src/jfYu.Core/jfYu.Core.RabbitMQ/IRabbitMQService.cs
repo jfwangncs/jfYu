@@ -13,7 +13,7 @@ namespace jfYu.Core.RabbitMQ
         /// <summary>
         /// Rabbit MQ connection.
         /// </summary>
-        IModel Channel { get; }
+        IConnection Connection { get; }
 
         /// <summary>
         /// Binds an exchange to another exchange with a routing key.

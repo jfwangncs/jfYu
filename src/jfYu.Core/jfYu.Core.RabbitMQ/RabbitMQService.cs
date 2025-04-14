@@ -14,15 +14,16 @@ namespace jfYu.Core.RabbitMQ
     /// <summary>
     ///  
     /// </summary>
-    /// <param name="channel"></param>
+    /// <param name="connection"></param>
     /// <param name="messageRetryPolicy"></param>
     /// <param name="logger"></param>
-    public class RabbitMQService(IModel channel, MessageRetryPolicy messageRetryPolicy, ILogger<RabbitMQService>? logger = null) : IRabbitMQService
+    public class RabbitMQService(IConnection connection, MessageRetryPolicy messageRetryPolicy, ILogger<RabbitMQService>? logger = null) : IRabbitMQService
     {
         /// <summary>
         /// Rabbit MQ connection.
         /// </summary>
-        public IModel Channel { get; } = channel;
+        public IConnection Connection { get; } = connection;
+
         private readonly MessageRetryPolicy _messageRetryPolicy = messageRetryPolicy;
         private readonly ILogger<RabbitMQService>? _logger = logger;
 
@@ -31,11 +32,12 @@ namespace jfYu.Core.RabbitMQ
         /// <inheritdoc/>
         public bool QueueBind(string queueName, string exchangeName, string exchangeType, string routingKey = "", Dictionary<string, object>? headers = null)
         {
-            Channel.ConfirmSelect(); // confirm
-            Channel.ExchangeDeclare(exchangeName, exchangeType, true);
-            Channel.QueueDeclare(queueName, true, false, false, null);
-            Channel.QueueBind(queueName, exchangeName, routingKey, headers);
-            return Channel.WaitForConfirms(Channel.ContinuationTimeout);
+           var _channel = Connection.CreateModel();
+            _channel.ConfirmSelect(); // confirm
+            _channel.ExchangeDeclare(exchangeName, exchangeType, true);
+            _channel.QueueDeclare(queueName, true, false, false, null);
+            _channel.QueueBind(queueName, exchangeName, routingKey, headers);
+            return _channel.WaitForConfirms(_channel.ContinuationTimeout);
         }
 
 
@@ -43,113 +45,120 @@ namespace jfYu.Core.RabbitMQ
 
         public bool ExchangeBind(string destination, string source, string exchangeType, string routingKey = "", Dictionary<string, object>? headers = null)
         {
-            Channel.ConfirmSelect(); // confirm
-            Channel.ExchangeDeclare(destination, exchangeType, true);
-            Channel.ExchangeDeclare(source, exchangeType, true);
-            Channel.ExchangeBind(destination, source, routingKey, headers);
-            return Channel.WaitForConfirms(Channel.ContinuationTimeout);
+            var _channel = Connection.CreateModel();
+            _channel.ConfirmSelect(); // confirm
+            _channel.ExchangeDeclare(destination, exchangeType, true);
+            _channel.ExchangeDeclare(source, exchangeType, true);
+            _channel.ExchangeBind(destination, source, routingKey, headers);
+            return _channel.WaitForConfirms(_channel.ContinuationTimeout);
         }
 
         /// <inheritdoc/>
         public bool Send(string exchangeName, string msg, string routingKey = "", Dictionary<string, object>? headers = null)
         {
+            var _channel = Connection.CreateModel();
             headers ??= [];
             headers.TryAdd("x-retry-count", 0);
             headers.TryAdd("x-exchange-name", exchangeName);
             headers.TryAdd("x-exchange-routing-key", routingKey);
-            Channel.ConfirmSelect();
-            var basicProperties = Channel.CreateBasicProperties();
+            _channel.ConfirmSelect();
+            var basicProperties = _channel.CreateBasicProperties();
             basicProperties.Persistent = true;
             basicProperties.Headers = headers;
             var payload = Encoding.UTF8.GetBytes(msg);
-            Channel.BasicPublish(exchangeName, routingKey, basicProperties, payload);
-            return Channel.WaitForConfirms(Channel.ContinuationTimeout);
+            _channel.BasicPublish(exchangeName, routingKey, basicProperties, payload);
+            return _channel.WaitForConfirms(_channel.ContinuationTimeout);
         }
 
         /// <inheritdoc/>
         public bool Send<T>(string exchangeName, T msg, string routingKey = "", Dictionary<string, object>? headers = null)
         {
+            var _channel = Connection.CreateModel();
             headers ??= [];
             headers.TryAdd("x-retry-count", 0);
             headers.TryAdd("x-exchange-name", exchangeName);
             headers.TryAdd("x-exchange-routing-key", routingKey);
-            Channel.ConfirmSelect();
-            var basicProperties = Channel.CreateBasicProperties();
+            _channel.ConfirmSelect();
+            var basicProperties = _channel.CreateBasicProperties();
             basicProperties.Persistent = true;
             basicProperties.Headers = headers;
             var payload = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(msg));
-            Channel.BasicPublish(exchangeName, routingKey, basicProperties, payload);
-            return Channel.WaitForConfirms(Channel.ContinuationTimeout);
+            _channel.BasicPublish(exchangeName, routingKey, basicProperties, payload);
+            return _channel.WaitForConfirms(_channel.ContinuationTimeout);
         }
 
         /// <inheritdoc/>
         public void Receive(string queueName, Func<string, bool> func, ushort prefetchCount = 1)
         {
-            Channel.BasicQos(0, prefetchCount, false);
-            var consumer = new EventingBasicConsumer(Channel);
+            var _channel = Connection.CreateModel();
+            _channel.BasicQos(0, prefetchCount, false);
+            var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (ch, ea) =>
             {
                 try
                 {
                     string message = Encoding.UTF8.GetString(ea.Body.ToArray());
                     if (func(message))
-                        Channel.BasicAck(ea.DeliveryTag, false);
+                        _channel.BasicAck(ea.DeliveryTag, false);
                     else
                         if (_messageRetryPolicy.EnableDeadQueue)
-                        Channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
+                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(_channel,ea));
                     else
-                        Channel.BasicReject(ea.DeliveryTag, true);
+                        _channel.BasicReject(ea.DeliveryTag, true);
                 }
                 catch (Exception ex)
                 {
                     _logger?.LogError(ex, "Receive message have error.");
                     if (_messageRetryPolicy.EnableDeadQueue)
-                        Channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
+                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(_channel,ea));
                     else
-                        Channel.BasicReject(ea.DeliveryTag, true);
-                };
+                        _channel.BasicReject(ea.DeliveryTag, true);
+                }
+                ;
             };
-            Channel.BasicConsume(queueName, false, consumer);
+            _channel.BasicConsume(queueName, false, consumer);
         }
 
 
         /// <inheritdoc/>
         public void Receive(string queueName, Func<string, Task<bool>> func, ushort prefetchCount = 1)
         {
-            Channel.BasicQos(0, prefetchCount, false);
-            var consumer = new AsyncEventingBasicConsumer(Channel);
+            var _channel = Connection.CreateModel();
+            _channel.BasicQos(0, prefetchCount, false);
+            var consumer = new AsyncEventingBasicConsumer(_channel);
             consumer.Received += async (ch, ea) =>
             {
                 try
                 {
                     string message = Encoding.UTF8.GetString(ea.Body.ToArray());
                     if (await func(message))
-                        Channel.BasicAck(ea.DeliveryTag, false);
+                        _channel.BasicAck(ea.DeliveryTag, false);
                     else
                       if (_messageRetryPolicy.EnableDeadQueue)
-                        Channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
+                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(_channel,ea));
                     else
-                        Channel.BasicReject(ea.DeliveryTag, true);
+                        _channel.BasicReject(ea.DeliveryTag, true);
                 }
                 catch (Exception ex)
                 {
                     _logger?.LogError(ex, "Receive message have error.");
                     if (_messageRetryPolicy.EnableDeadQueue)
-                        Channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
+                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(_channel,ea));
                     else
-                        Channel.BasicReject(ea.DeliveryTag, true);
-                };
+                        _channel.BasicReject(ea.DeliveryTag, true);
+                }
+                ;
 
             };
-            Channel.BasicConsume(queueName, false, consumer);
+            _channel.BasicConsume(queueName, false, consumer);
         }
 
         /// <inheritdoc/>
         public void Receive<T>(string queueName, Func<T?, bool> func, ushort prefetchCount = 1)
         {
-
-            Channel.BasicQos(0, prefetchCount, false);
-            var consumer = new EventingBasicConsumer(Channel);
+            var _channel = Connection.CreateModel();
+            _channel.BasicQos(0, prefetchCount, false);
+            var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (ch, ea) =>
             {
 
@@ -158,31 +167,33 @@ namespace jfYu.Core.RabbitMQ
 
                     string message = Encoding.UTF8.GetString(ea.Body.ToArray());
                     if (func(JsonConvert.DeserializeObject<T>(message)))
-                        Channel.BasicAck(ea.DeliveryTag, false);
+                        _channel.BasicAck(ea.DeliveryTag, false);
                     else
                         if (_messageRetryPolicy.EnableDeadQueue)
-                        Channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
+                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(_channel,ea));
                     else
-                        Channel.BasicReject(ea.DeliveryTag, true);
+                        _channel.BasicReject(ea.DeliveryTag, true);
                 }
                 catch (Exception ex)
                 {
                     _logger?.LogError(ex, "Receive message have error.");
                     if (_messageRetryPolicy.EnableDeadQueue)
-                        Channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
+                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(_channel,ea));
                     else
-                        Channel.BasicReject(ea.DeliveryTag, true);
-                };
+                        _channel.BasicReject(ea.DeliveryTag, true);
+                }
+                ;
             };
-            Channel.BasicConsume(queueName, false, consumer);
+            _channel.BasicConsume(queueName, false, consumer);
         }
 
 
         /// <inheritdoc/>
         public void Receive<T>(string queueName, Func<T?, Task<bool>> func, ushort prefetchCount = 1)
         {
-            Channel.BasicQos(0, prefetchCount, false);
-            var consumer = new AsyncEventingBasicConsumer(Channel);
+            var _channel = Connection.CreateModel();
+            _channel.BasicQos(0, prefetchCount, false);
+            var consumer = new AsyncEventingBasicConsumer(_channel);
             consumer.Received += async (ch, ea) =>
             {
 
@@ -190,30 +201,31 @@ namespace jfYu.Core.RabbitMQ
                 {
                     string message = Encoding.UTF8.GetString(ea.Body.ToArray());
                     if (await func(JsonConvert.DeserializeObject<T>(message)))
-                        Channel.BasicAck(ea.DeliveryTag, false);
+                        _channel.BasicAck(ea.DeliveryTag, false);
                     else
                          if (_messageRetryPolicy.EnableDeadQueue)
-                        Channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
+                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(_channel,ea));
                     else
-                        Channel.BasicReject(ea.DeliveryTag, true);
+                        _channel.BasicReject(ea.DeliveryTag, true);
                 }
                 catch (Exception ex)
                 {
                     _logger?.LogError(ex, "Receive message have error.");
                     if (_messageRetryPolicy.EnableDeadQueue)
-                        Channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
+                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(_channel,ea));
                     else
-                        Channel.BasicReject(ea.DeliveryTag, true);
-                };
+                        _channel.BasicReject(ea.DeliveryTag, true);
+                }
+                ;
 
             };
-            Channel.BasicConsume(queueName, false, consumer);
+            _channel.BasicConsume(queueName, false, consumer);
         }
 
 
         /// <inheritdoc/>
-        private bool TryToMoveToDeadLetterQueue(BasicDeliverEventArgs ea)
-        {
+        private bool TryToMoveToDeadLetterQueue(IModel channel, BasicDeliverEventArgs ea)
+        { 
             if (ea.BasicProperties.Headers is null)
                 return false;
 
@@ -238,20 +250,20 @@ namespace jfYu.Core.RabbitMQ
                 {
                     //send to dead letter queue
                     _logger?.LogInformation("Message tried to exceed the retry limit:{maxRetryCount}，send it to dead queue:{queueName}.", _messageRetryPolicy.MaxRetryCount, _messageRetryPolicy.DeadLetterQueue);
-                    var basicProperties = Channel.CreateBasicProperties();
+                    var basicProperties = channel.CreateBasicProperties();
                     basicProperties.Persistent = true;
                     basicProperties.Headers = ea.BasicProperties.Headers;
                     basicProperties.Headers["x-original-routing-key"] = ea.RoutingKey;
-                    Channel.BasicPublish(_messageRetryPolicy.DeadLetterExchange, "", basicProperties, ea.Body);
-                    return Channel.WaitForConfirms(Channel.ContinuationTimeout);
+                    channel.BasicPublish(_messageRetryPolicy.DeadLetterExchange, "", basicProperties, ea.Body);
+                    return channel.WaitForConfirms(channel.ContinuationTimeout);
                 }
                 else
                 {
                     //retry message 
                     retryCount++;
                     ea.BasicProperties.Headers["x-retry-count"] = retryCount;
-                    Channel.BasicPublish(originalExchangeName, originalRoutingKey, ea.BasicProperties, ea.Body);
-                    return Channel.WaitForConfirms(Channel.ContinuationTimeout);
+                    channel.BasicPublish(originalExchangeName, originalRoutingKey, ea.BasicProperties, ea.Body);
+                    return channel.WaitForConfirms(channel.ContinuationTimeout);
                 }
 
             }
