@@ -43,7 +43,7 @@ namespace jfYu.Core.RabbitMQ
         /// <param name="queueName">The name of the queue.</param>
         /// <param name="func">The function to process the message.</param>
         /// <param name="prefetchCount">The number of messages to prefetch (default is 1).</param>
-        void Receive(string queueName, Func<string, bool> func, ushort prefetchCount = 1);
+        IModel Receive(string queueName, Func<string, bool> func, ushort prefetchCount = 1);
 
         /// <summary>
         /// Receives messages from a queue asynchronously with a specified prefetch count.
@@ -51,7 +51,7 @@ namespace jfYu.Core.RabbitMQ
         /// <param name="queueName">The name of the queue.</param>
         /// <param name="func">The async function to process the message.</param>
         /// <param name="prefetchCount">The number of messages to prefetch (default is 1).</param>
-        void Receive(string queueName, Func<string, Task<bool>> func, ushort prefetchCount = 1);
+        IModel Receive(string queueName, Func<string, Task<bool>> func, ushort prefetchCount = 1);
 
         /// <summary>
         /// Receives messages from a queue with a specified prefetch count (synchronous).
@@ -60,7 +60,7 @@ namespace jfYu.Core.RabbitMQ
         /// <param name="queueName">The name of the queue.</param>
         /// <param name="func">The function to process the message.</param>
         /// <param name="prefetchCount">The number of messages to prefetch (default is 1).</param>
-        void Receive<T>(string queueName, Func<T?, bool> func, ushort prefetchCount = 1);
+        IModel Receive<T>(string queueName, Func<T?, bool> func, ushort prefetchCount = 1);
 
         /// <summary>
         /// Receives messages from a queue asynchronously with a specified prefetch count.
@@ -69,7 +69,7 @@ namespace jfYu.Core.RabbitMQ
         /// <param name="queueName">The name of the queue.</param>
         /// <param name="func">The async function to process the message.</param>
         /// <param name="prefetchCount">The number of messages to prefetch (default is 1).</param>
-        void Receive<T>(string queueName, Func<T?, Task<bool>> func, ushort prefetchCount = 1);
+        IModel Receive<T>(string queueName, Func<T?, Task<bool>> func, ushort prefetchCount = 1);
 
         /// <summary>
         /// Sends a message to an exchange with a specific routing key.

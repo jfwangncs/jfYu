@@ -32,7 +32,7 @@ namespace jfYu.Core.RabbitMQ
         /// <inheritdoc/>
         public bool QueueBind(string queueName, string exchangeName, string exchangeType, string routingKey = "", Dictionary<string, object>? headers = null)
         {
-            var _channel = Connection.CreateModel();
+            using var _channel = Connection.CreateModel();
             _channel.ConfirmSelect(); // confirm
             _channel.ExchangeDeclare(exchangeName, exchangeType, true);
             _channel.QueueDeclare(queueName, true, false, false, null);
@@ -45,7 +45,7 @@ namespace jfYu.Core.RabbitMQ
 
         public bool ExchangeBind(string destination, string source, string exchangeType, string routingKey = "", Dictionary<string, object>? headers = null)
         {
-            var _channel = Connection.CreateModel();
+            using var _channel = Connection.CreateModel();
             _channel.ConfirmSelect(); // confirm
             _channel.ExchangeDeclare(destination, exchangeType, true);
             _channel.ExchangeDeclare(source, exchangeType, true);
@@ -56,7 +56,7 @@ namespace jfYu.Core.RabbitMQ
         /// <inheritdoc/>
         public bool Send(string exchangeName, string msg, string routingKey = "", Dictionary<string, object>? headers = null)
         {
-            var _channel = Connection.CreateModel();
+            using var _channel = Connection.CreateModel();
             headers ??= [];
             headers.TryAdd("x-retry-count", 0);
             headers.TryAdd("x-exchange-name", exchangeName);
@@ -73,7 +73,7 @@ namespace jfYu.Core.RabbitMQ
         /// <inheritdoc/>
         public bool Send<T>(string exchangeName, T msg, string routingKey = "", Dictionary<string, object>? headers = null)
         {
-            var _channel = Connection.CreateModel();
+            using var _channel = Connection.CreateModel();
             headers ??= [];
             headers.TryAdd("x-retry-count", 0);
             headers.TryAdd("x-exchange-name", exchangeName);
@@ -88,7 +88,7 @@ namespace jfYu.Core.RabbitMQ
         }
 
         /// <inheritdoc/>
-        public void Receive(string queueName, Func<string, bool> func, ushort prefetchCount = 1)
+        public IModel Receive(string queueName, Func<string, bool> func, ushort prefetchCount = 1)
         {
             var _channel = Connection.CreateModel();
             _channel.BasicQos(0, prefetchCount, false);
@@ -113,14 +113,15 @@ namespace jfYu.Core.RabbitMQ
                         _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
-                } 
+                }
             };
             _channel.BasicConsume(queueName, false, consumer);
+            return _channel;
         }
 
 
         /// <inheritdoc/>
-        public void Receive(string queueName, Func<string, Task<bool>> func, ushort prefetchCount = 1)
+        public IModel Receive(string queueName, Func<string, Task<bool>> func, ushort prefetchCount = 1)
         {
             var _channel = Connection.CreateModel();
             _channel.BasicQos(0, prefetchCount, false);
@@ -149,10 +150,11 @@ namespace jfYu.Core.RabbitMQ
 
             };
             _channel.BasicConsume(queueName, false, consumer);
+            return _channel;
         }
 
         /// <inheritdoc/>
-        public void Receive<T>(string queueName, Func<T?, bool> func, ushort prefetchCount = 1)
+        public IModel Receive<T>(string queueName, Func<T?, bool> func, ushort prefetchCount = 1)
         {
             var _channel = Connection.CreateModel();
             _channel.BasicQos(0, prefetchCount, false);
@@ -179,14 +181,15 @@ namespace jfYu.Core.RabbitMQ
                         _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
-                } 
+                }
             };
             _channel.BasicConsume(queueName, false, consumer);
+            return _channel;
         }
 
 
         /// <inheritdoc/>
-        public void Receive<T>(string queueName, Func<T?, Task<bool>> func, ushort prefetchCount = 1)
+        public IModel Receive<T>(string queueName, Func<T?, Task<bool>> func, ushort prefetchCount = 1)
         {
             var _channel = Connection.CreateModel();
             _channel.BasicQos(0, prefetchCount, false);
@@ -212,10 +215,11 @@ namespace jfYu.Core.RabbitMQ
                         _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
-                } 
+                }
 
             };
             _channel.BasicConsume(queueName, false, consumer);
+            return _channel;
         }
 
 
