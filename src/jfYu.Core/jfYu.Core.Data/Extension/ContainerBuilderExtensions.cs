@@ -50,7 +50,7 @@ namespace jfYu.Core.Data.Extension
             {
                 if (options.ReadOnlyDatabases.Count < 1)
                     return new ReadonlyDBContext<T>(provider.GetRequiredService<T>());
-                var randomKey = new Random().Next(options.ReadOnlyDatabases.Count);
+                var randomKey = Random.Shared.Next(options.ReadOnlyDatabases.Count);
                 return new ReadonlyDBContext<T>(provider.GetRequiredKeyedService<T>($"{options.JfYuReadOnly}{randomKey}"));
             });
 

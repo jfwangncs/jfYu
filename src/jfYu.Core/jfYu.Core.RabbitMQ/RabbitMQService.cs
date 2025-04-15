@@ -113,8 +113,7 @@ namespace jfYu.Core.RabbitMQ
                         _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
-                }
-                ;
+                } 
             };
             _channel.BasicConsume(queueName, false, consumer);
         }
@@ -147,7 +146,6 @@ namespace jfYu.Core.RabbitMQ
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
                 }
-                ;
 
             };
             _channel.BasicConsume(queueName, false, consumer);
@@ -181,8 +179,7 @@ namespace jfYu.Core.RabbitMQ
                         _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
-                }
-                ;
+                } 
             };
             _channel.BasicConsume(queueName, false, consumer);
         }
@@ -215,8 +212,7 @@ namespace jfYu.Core.RabbitMQ
                         _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
-                }
-                ;
+                } 
 
             };
             _channel.BasicConsume(queueName, false, consumer);
