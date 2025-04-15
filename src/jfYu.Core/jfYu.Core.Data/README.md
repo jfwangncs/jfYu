@@ -23,6 +23,7 @@ Configuration
       {
         "DatabaseType": "Sqlite",  
         "ConnectionString": "Data Source= data/m2.db;Password = 123456;"
+      }
     ]   
   }
 ```
