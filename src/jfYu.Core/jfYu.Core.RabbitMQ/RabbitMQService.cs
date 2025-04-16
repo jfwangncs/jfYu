@@ -95,20 +95,22 @@ namespace jfYu.Core.RabbitMQ
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (ch, ea) =>
             {
+                string message = Encoding.UTF8.GetString(ea.Body.ToArray());
                 try
-                {
-                    string message = Encoding.UTF8.GetString(ea.Body.ToArray());
+                {                    
                     if (func(message))
                         _channel.BasicAck(ea.DeliveryTag, false);
                     else
+                    {
                         if (_messageRetryPolicy.EnableDeadQueue)
-                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
-                    else
-                        _channel.BasicReject(ea.DeliveryTag, true);
+                            _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
+                        else
+                            _channel.BasicReject(ea.DeliveryTag, true);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    _logger?.LogError(ex, "Receive message have error.");
+                    _logger?.LogError(ex, "Receive message have error.message:{message}", message);
                     if (_messageRetryPolicy.EnableDeadQueue)
                         _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else
@@ -128,20 +130,22 @@ namespace jfYu.Core.RabbitMQ
             var consumer = new AsyncEventingBasicConsumer(_channel);
             consumer.Received += async (ch, ea) =>
             {
+                string message = Encoding.UTF8.GetString(ea.Body.ToArray());
                 try
                 {
-                    string message = Encoding.UTF8.GetString(ea.Body.ToArray());
                     if (await func(message))
                         _channel.BasicAck(ea.DeliveryTag, false);
                     else
-                      if (_messageRetryPolicy.EnableDeadQueue)
-                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
-                    else
-                        _channel.BasicReject(ea.DeliveryTag, true);
+                    {
+                        if (_messageRetryPolicy.EnableDeadQueue)
+                            _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
+                        else
+                            _channel.BasicReject(ea.DeliveryTag, true);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    _logger?.LogError(ex, "Receive message have error.");
+                    _logger?.LogError(ex, "Receive message have error.message:{message}", message);
                     if (_messageRetryPolicy.EnableDeadQueue)
                         _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else
@@ -161,22 +165,22 @@ namespace jfYu.Core.RabbitMQ
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (ch, ea) =>
             {
-
+                string message = Encoding.UTF8.GetString(ea.Body.ToArray());
                 try
                 {
-
-                    string message = Encoding.UTF8.GetString(ea.Body.ToArray());
                     if (func(JsonConvert.DeserializeObject<T>(message)))
                         _channel.BasicAck(ea.DeliveryTag, false);
                     else
+                    {
                         if (_messageRetryPolicy.EnableDeadQueue)
-                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
-                    else
-                        _channel.BasicReject(ea.DeliveryTag, true);
+                            _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
+                        else
+                            _channel.BasicReject(ea.DeliveryTag, true);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    _logger?.LogError(ex, "Receive message have error.");
+                    _logger?.LogError(ex, "Receive message have error.message:{message}", message);
                     if (_messageRetryPolicy.EnableDeadQueue)
                         _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else
@@ -196,21 +200,22 @@ namespace jfYu.Core.RabbitMQ
             var consumer = new AsyncEventingBasicConsumer(_channel);
             consumer.Received += async (ch, ea) =>
             {
-
+                string message = Encoding.UTF8.GetString(ea.Body.ToArray());
                 try
                 {
-                    string message = Encoding.UTF8.GetString(ea.Body.ToArray());
                     if (await func(JsonConvert.DeserializeObject<T>(message)))
                         _channel.BasicAck(ea.DeliveryTag, false);
                     else
-                         if (_messageRetryPolicy.EnableDeadQueue)
-                        _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
-                    else
-                        _channel.BasicReject(ea.DeliveryTag, true);
+                    {
+                        if (_messageRetryPolicy.EnableDeadQueue)
+                            _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
+                        else
+                            _channel.BasicReject(ea.DeliveryTag, true);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    _logger?.LogError(ex, "Receive message have error.");
+                    _logger?.LogError(ex, "Receive message have error.message:{message}", message);
                     if (_messageRetryPolicy.EnableDeadQueue)
                         _channel.BasicReject(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea));
                     else

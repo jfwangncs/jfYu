@@ -349,6 +349,7 @@ namespace jfYu.Core.Test.RabbitMQ
             await Task.Delay(2000);
             Assert.Empty(receivedMessages);
             Assert.InRange(i, 1, 10000);
+            _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
             _channel.QueueDelete(deadLetterQueue);
             _channel.ExchangeDelete(deadLetterExchange);
