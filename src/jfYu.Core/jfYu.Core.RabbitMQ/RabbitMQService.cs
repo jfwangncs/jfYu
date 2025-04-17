@@ -97,7 +97,7 @@ namespace jfYu.Core.RabbitMQ
             {
                 string message = Encoding.UTF8.GetString(ea.Body.ToArray());
                 try
-                {                    
+                {
                     if (func(message))
                         _channel.BasicAck(ea.DeliveryTag, false);
                     else
@@ -116,6 +116,10 @@ namespace jfYu.Core.RabbitMQ
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
                 }
+                _channel.ModelShutdown += (sender, args) =>
+                {
+                    _logger?.LogWarning($"[Channel have shutdown] reason: {args.ReplyCode} - {args.ReplyText}-{message}");
+                };
             };
             _channel.BasicConsume(queueName, false, consumer);
             return _channel;
@@ -151,7 +155,10 @@ namespace jfYu.Core.RabbitMQ
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
                 }
-
+                _channel.ModelShutdown += (sender, args) =>
+                {
+                    _logger?.LogWarning($"[Channel have shutdown] reason: {args.ReplyCode} - {args.ReplyText}-{message}");
+                };
             };
             _channel.BasicConsume(queueName, false, consumer);
             return _channel;
@@ -186,6 +193,10 @@ namespace jfYu.Core.RabbitMQ
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
                 }
+                _channel.ModelShutdown += (sender, args) =>
+                {
+                    _logger?.LogWarning($"[Channel have shutdown] reason: {args.ReplyCode} - {args.ReplyText}-{message}");
+                };
             };
             _channel.BasicConsume(queueName, false, consumer);
             return _channel;
@@ -221,7 +232,10 @@ namespace jfYu.Core.RabbitMQ
                     else
                         _channel.BasicReject(ea.DeliveryTag, true);
                 }
-
+                _channel.ModelShutdown += (sender, args) =>
+                {
+                    _logger?.LogWarning($"[Channel have shutdown] reason: {args.ReplyCode} - {args.ReplyText}-{message}");
+                };
             };
             _channel.BasicConsume(queueName, false, consumer);
             return _channel;
