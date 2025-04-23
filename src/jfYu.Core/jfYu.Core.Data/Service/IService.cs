@@ -90,15 +90,6 @@ namespace jfYu.Core.Data.Service
         Task<IList<T>> GetListAsync(Expression<Func<T, bool>>? predicate = null);
 
         /// <summary>
-        /// Gets a list of entities matching the given predicate and projects them to a different type in memory.
-        /// </summary>
-        /// <typeparam name="T1">The type of the result after projection.</typeparam>
-        /// <param name="selector">A function to project the entity to a different type.</param>
-        /// <param name="predicate">Condition to filter records.</param>
-        /// <returns>A list of projected entities.</returns>
-        Task<IList<T1>> GetListAsync<T1>(Func<T, T1> selector, Expression<Func<T, bool>>? predicate = null);
-
-        /// <summary>
         /// Gets a list of entities matching the given predicate and projects them to a different type in the database.
         /// </summary>
         /// <typeparam name="T1">The type of the result after projection.</typeparam>

@@ -1,13 +1,13 @@
-﻿using jfYu.Core.jfYuRequest.Enum;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Http;
+using System.Net;
 using System.Threading.Tasks;
+using jfYu.Core.jfYuRequest.Enum;
 
 namespace jfYu.Core.jfYuRequest
 {
@@ -66,7 +66,7 @@ namespace jfYu.Core.jfYuRequest
                 if (!string.IsNullOrEmpty(Authorization))
                     _request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Authorization.Replace("Bearer ", ""));
                 ;
-                RequestCookies.GetCookies(new Uri(Url)).ToList().ForEach(x => _cookieContainer.SetCookies(new Uri(Url), x.Name + "=" + x.Value));
+                RequestCookies.GetCookies(new Uri(Url)).ToList().ForEach(x => _cookieContainer.SetCookies(new Uri(Url), $"{x.Name}={x.Value}"));
                 foreach (var item in RequestCustomHeaders)
                 {
                     _request.DefaultRequestHeaders.TryAddWithoutValidation(item.Key, item.Value);
@@ -94,7 +94,7 @@ namespace jfYu.Core.jfYuRequest
                 HttpResponseMessage? response = null;
                 if (Method.Equals(HttpMethod.Post))
                 {
-                    if (ContentType == RequestContentType.FormData)
+                    if (string.Compare(ContentType, RequestContentType.FormData, StringComparison.Ordinal) == 0)
                     {
                         using var formData = new MultipartFormDataContent();
                         if (!string.IsNullOrEmpty(RequestData))

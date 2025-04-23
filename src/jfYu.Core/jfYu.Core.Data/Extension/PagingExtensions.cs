@@ -27,10 +27,10 @@ namespace jfYu.Core.Data.Extension
             ArgumentNullException.ThrowIfNull(source);
 
             if (pageIndex <= 0)
-                throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
+                throw new ArgumentOutOfRangeException(nameof(pageIndex), $"{nameof(pageIndex)} must be a positive integer greater than 0.");
 
             if (pageSize <= 0)
-                throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
+                throw new ArgumentOutOfRangeException(nameof(pageSize), $"{nameof(pageSize)} must be a positive integer greater than 0.");
 
             int totalCount = source.Count();
             var list = source.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToList();
@@ -53,10 +53,10 @@ namespace jfYu.Core.Data.Extension
             ArgumentNullException.ThrowIfNull(source);
 
             if (pageIndex <= 0)
-                throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
+                throw new ArgumentOutOfRangeException(nameof(pageIndex), $"{nameof(pageIndex)} must be a positive integer greater than 0.");
 
             if (pageSize <= 0)
-                throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
+                throw new ArgumentOutOfRangeException(nameof(pageSize), $"{nameof(pageSize)} must be a positive integer greater than 0.");
 
             int totalCount = await source.CountAsync().ConfigureAwait(false);
             var list = await source.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToListAsync().ConfigureAwait(false);
@@ -82,15 +82,15 @@ namespace jfYu.Core.Data.Extension
             ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(func);
             if (pageIndex <= 0)
-                throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
+                throw new ArgumentOutOfRangeException(nameof(pageIndex), $"{nameof(pageIndex)} must be a positive integer greater than 0.");
 
             if (pageSize <= 0)
-                throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
+                throw new ArgumentOutOfRangeException(nameof(pageSize), $"{nameof(pageSize)} must be a positive integer greater than 0.");
 
             int totalCount = source.Count();
             var list = source.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToList();
             int totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
-            return new PagedData<Q>() { TotalPages = totalPages, Data = func(list).ToList(), TotalCount = totalCount };
+            return new PagedData<Q>() { TotalPages = totalPages, Data = [.. func(list)], TotalCount = totalCount };
         }
 
         /// <summary>
@@ -110,15 +110,15 @@ namespace jfYu.Core.Data.Extension
             ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(func);
             if (pageIndex <= 0)
-                throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
+                throw new ArgumentOutOfRangeException(nameof(pageIndex), $"{nameof(pageIndex)} must be a positive integer greater than 0.");
 
             if (pageSize <= 0)
-                throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
+                throw new ArgumentOutOfRangeException(nameof(pageSize), $"{nameof(pageSize)} must be a positive integer greater than 0.");
 
             int totalCount = await source.CountAsync().ConfigureAwait(false);
             var list = await source.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToListAsync().ConfigureAwait(false);
             int totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
-            return new PagedData<Q>() { TotalPages = totalPages, Data = func(list).ToList(), TotalCount = totalCount };
+            return new PagedData<Q>() { TotalPages = totalPages, Data = [.. func(list)], TotalCount = totalCount };
         }
     }
 }

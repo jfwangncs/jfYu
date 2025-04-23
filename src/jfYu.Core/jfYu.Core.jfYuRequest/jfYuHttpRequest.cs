@@ -47,10 +47,10 @@ namespace jfYu.Core.jfYuRequest
 
             if (!Method.Equals(HttpMethod.Get))
             {
-                if (ContentType == RequestContentType.FormData)
+                if (string.Compare(ContentType, RequestContentType.FormData, StringComparison.Ordinal) == 0)
                 {
                     var memStream = new MemoryStream();
-                    string boundary = "--" + DateTime.Now.Ticks.ToString("x");
+                    string boundary = $"--{DateTime.Now.Ticks:x}";
                     if (!string.IsNullOrEmpty(RequestData))
                     {
                         var paras = RequestData;
@@ -82,7 +82,7 @@ namespace jfYu.Core.jfYuRequest
                     memStream.Write(endBoundary, 0, endBoundary.Length);
                     byte[] tempBuffer = memStream.ToArray();
                     _request.ContentLength = tempBuffer.Length;
-                    _request.ContentType = "multipart/form-data;boundary=" + boundary;
+                    _request.ContentType = $"multipart/form-data;boundary={boundary}";
                     using var reqStream = _request.GetRequestStream();
                     reqStream.Write(tempBuffer, 0, tempBuffer.Length);
                 }
@@ -169,7 +169,7 @@ namespace jfYu.Core.jfYuRequest
             {
                 Initialize();
                 _logger?.LogInformation("{Message}", LogRequest(_logFilter.LoggingFields, requestId, Url, Method.ToString(), JsonConvert.SerializeObject(_request!.Headers.AllKeys.ToDictionary(header => header, header => _request.Headers.GetValues(header)!.ToList())), _logFilter.RequestFilter.Invoke(RequestData)));
-                HttpWebResponse response = (HttpWebResponse)await _request!.GetResponseAsync();
+                HttpWebResponse response = (HttpWebResponse)await _request!.GetResponseAsync().ConfigureAwait(false);
                 StatusCode = response.StatusCode;
                 html = GetResponse(response);
                 ResponseCookies = response.Cookies;
@@ -208,7 +208,7 @@ namespace jfYu.Core.jfYuRequest
             Initialize();
             try
             {
-                HttpWebResponse response = (HttpWebResponse)await _request!.GetResponseAsync();
+                HttpWebResponse response = (HttpWebResponse)await _request!.GetResponseAsync().ConfigureAwait(false);
                 StatusCode = response.StatusCode;
                 using Stream responseStream = response.GetResponseStream();
                 ResponseCookies = response.Cookies;

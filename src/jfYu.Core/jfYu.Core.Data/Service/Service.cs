@@ -44,7 +44,8 @@ namespace jfYu.Core.Data.Service
         {
             entity.UpdatedTime = DateTime.UtcNow;
             Context.Update(entity);
-            return await Context.SaveChangesAsync().ConfigureAwait(false);
+            int saveChanges = await Context.SaveChangesAsync().ConfigureAwait(false);
+            return saveChanges;
         }
 
         /// <inheritdoc/>
@@ -53,9 +54,10 @@ namespace jfYu.Core.Data.Service
             list.ForEach(entity =>
             {
                 entity.UpdatedTime = DateTime.UtcNow;
-                Context.Update(entity);
             });
-            return await Context.SaveChangesAsync().ConfigureAwait(false);
+            Context.UpdateRange(list);
+            int saveChanges = await Context.SaveChangesAsync().ConfigureAwait(false);
+            return saveChanges;
         }
 
         /// <inheritdoc/>
@@ -63,7 +65,7 @@ namespace jfYu.Core.Data.Service
         {
             if (predicate == null || selector == null)
                 return 0;
-            var data = Context.Set<T>().Where(predicate).ToList();
+            var data = await Context.Set<T>().Where(predicate).ToListAsync().ConfigureAwait(false);
             for (int i = 0; i < data.Count; i++)
             {
                 selector(i, data[i]);
@@ -120,20 +122,7 @@ namespace jfYu.Core.Data.Service
                 null => await ReadonlyContext.Set<T>().ToListAsync().ConfigureAwait(false),
                 _ => await ReadonlyContext.Set<T>().Where(predicate).ToListAsync().ConfigureAwait(false)
             };
-        }
-
-        /// <inheritdoc/>
-        public virtual async Task<IList<T1>> GetListAsync<T1>(Func<T, T1> selector, Expression<Func<T, bool>>? predicate = null)
-        {
-            if (selector == null)
-                return [];
-
-            return predicate switch
-            {
-                null => (await ReadonlyContext.Set<T>().ToListAsync().ConfigureAwait(false)).Select(selector).ToList(),
-                _ => (await ReadonlyContext.Set<T>().Where(predicate).ToListAsync().ConfigureAwait(false)).Select(selector).ToList()
-            };
-        }
+        }      
 
         /// <inheritdoc/>
         public virtual async Task<IList<T1>> GetSelectListAsync<T1>(Expression<Func<T, T1>> selector, Expression<Func<T, bool>>? predicate = null)

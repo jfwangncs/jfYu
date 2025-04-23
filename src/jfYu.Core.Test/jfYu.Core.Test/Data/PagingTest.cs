@@ -13,9 +13,9 @@ namespace jfYu.Core.Test.Data
         [Fact]
         public async Task NullSource_ThrowException()
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await PagingExtensions.ToPagedAsync<TestModel>(null!));
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await PagingExtensions.ToPagedAsync<TestModel, TestSubModel>(null!, q => { return []; }));
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await PagingExtensions.ToPagedAsync<TestModel, TestSubModel>(new List<TestModel>().AsQueryable(), null!));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await PagingExtensions.ToPagedAsync<TestModel>(null!).ConfigureAwait(true)).ConfigureAwait(true);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await PagingExtensions.ToPagedAsync<TestModel, TestSubModel>(null!, q => { return []; }).ConfigureAwait(true)).ConfigureAwait(true);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await PagingExtensions.ToPagedAsync<TestModel, TestSubModel>(new List<TestModel>().AsQueryable(), null!).ConfigureAwait(true)).ConfigureAwait(true);
 
             Assert.Throws<ArgumentNullException>(() => PagingExtensions.ToPaged<TestModel>(null!));
             Assert.Throws<ArgumentNullException>(() => PagingExtensions.ToPaged<TestModel, TestSubModel>(null!, q => { return []; }));
@@ -23,23 +23,23 @@ namespace jfYu.Core.Test.Data
         }
 
         [Fact]
-        public async Task PgaeIndexLessThan0_ThrowException()
+        public async Task PageIndexLessThan0_ThrowException()
         {
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await PagingExtensions.ToPagedAsync(new List<TestModel>().AsQueryable(), -1));
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await PagingExtensions.ToPagedAsync(new List<TestModel>().AsQueryable(), q => { return new List<TestSubModel>(); }, -1));
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await PagingExtensions.ToPagedAsync(new List<TestModel>().AsQueryable(), -1).ConfigureAwait(true)).ConfigureAwait(true);
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await PagingExtensions.ToPagedAsync(new List<TestModel>().AsQueryable(), q => { return new List<TestSubModel>(); }, -1).ConfigureAwait(true)).ConfigureAwait(true);
 
-            Assert.Throws<InvalidOperationException>(() => PagingExtensions.ToPaged(new List<TestModel>().AsQueryable(), -1));
-            Assert.Throws<InvalidOperationException>(() => PagingExtensions.ToPaged(new List<TestModel>().AsQueryable(), q => { return new List<TestSubModel>(); }, -1));
+            Assert.Throws<ArgumentOutOfRangeException>(() => PagingExtensions.ToPaged(new List<TestModel>().AsQueryable(), -1));
+            Assert.Throws<ArgumentOutOfRangeException>(() => PagingExtensions.ToPaged(new List<TestModel>().AsQueryable(), q => { return new List<TestSubModel>(); }, -1));
         }
 
         [Fact]
-        public async Task PgaeSizeLessThan0_ThrowException()
+        public async Task PageSizeLessThan0_ThrowException()
         {
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await PagingExtensions.ToPagedAsync(new List<TestModel>().AsQueryable(), 1, -1));
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await PagingExtensions.ToPagedAsync(new List<TestModel>().AsQueryable(), q => { return new List<TestSubModel>(); }, 1, -1));
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await PagingExtensions.ToPagedAsync(new List<TestModel>().AsQueryable(), 1, -1).ConfigureAwait(true)).ConfigureAwait(true);
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await PagingExtensions.ToPagedAsync(new List<TestModel>().AsQueryable(), q => { return new List<TestSubModel>(); }, 1, -1).ConfigureAwait(true)).ConfigureAwait(true);
 
-            Assert.Throws<InvalidOperationException>(() => PagingExtensions.ToPaged(new List<TestModel>().AsQueryable(), 1, -1));
-            Assert.Throws<InvalidOperationException>(() => PagingExtensions.ToPaged(new List<TestModel>().AsQueryable(), q => { return new List<TestSubModel>(); }, 1, -1));
+            Assert.Throws<ArgumentOutOfRangeException>(() => PagingExtensions.ToPaged(new List<TestModel>().AsQueryable(), 1, -1));
+            Assert.Throws<ArgumentOutOfRangeException>(() => PagingExtensions.ToPaged(new List<TestModel>().AsQueryable(), q => { return new List<TestSubModel>(); }, 1, -1));
         }
 
         #region ToPaged
@@ -110,11 +110,11 @@ namespace jfYu.Core.Test.Data
         [Fact]
         public async Task ToPagedAsync_Page1_Correctly()
         {
-            _context.Users.ExecuteDelete();
+            _context.Users.ExecuteDelete(); 
             _context.Users.AddRange(new EFUserFaker().Generate(8));
             _context.SaveChanges();
 
-            var result = await _context.Users.ToPagedAsync();
+            var result = await _context.Users.ToPagedAsync().ConfigureAwait(true);
 
             Assert.Equal(8, result.TotalCount);
             Assert.Equal(1, result.TotalPages);
@@ -127,7 +127,7 @@ namespace jfYu.Core.Test.Data
             _context.Users.ExecuteDelete();
             _context.Users.AddRange(new EFUserFaker().Generate(8));
             _context.SaveChanges();
-            var result = await _context.Users.ToPagedAsync(1, 5);
+            var result = await _context.Users.ToPagedAsync(1, 5).ConfigureAwait(true);
 
             Assert.Equal(8, result.TotalCount);
             Assert.Equal(2, result.TotalPages);
@@ -140,7 +140,7 @@ namespace jfYu.Core.Test.Data
             _context.Users.ExecuteDelete();
             _context.Users.AddRange(new EFUserFaker().Generate(13));
             _context.SaveChanges();
-            var result = await _context.Users.ToPagedAsync(2, 10);
+            var result = await _context.Users.ToPagedAsync(2, 10).ConfigureAwait(true);
 
             Assert.Equal(13, result.TotalCount);
             Assert.Equal(2, result.TotalPages);
@@ -162,7 +162,7 @@ namespace jfYu.Core.Test.Data
                     x.Add(new TestSubModel() { Id = item.Id, CardNum = item.UserName, ExpiresIn = item.CreatedTime });
                 }
                 return x;
-            }, 2, 10);
+            }, 2, 10).ConfigureAwait(true);
 
             Assert.Equal(13, result.TotalCount);
             Assert.Equal(2, result.TotalPages);

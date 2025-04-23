@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace jfYu.Core.Test.Data
 {
     [Collection("Data")]
-    public class DataBaseTest
+    public class BaseTest
     {
         public class NullSetupActionExpectData : TheoryData<Action<JfYuDatabaseConfig>?>
         {
@@ -25,14 +25,14 @@ namespace jfYu.Core.Test.Data
 
         [Theory]
         [ClassData(typeof(NullSetupActionExpectData))]
-        public void AddRedisService_SetupActionIsNull_ThrowsException(Action<JfYuDatabaseConfig> action)
+        public void AddService_SetupActionIsNull_ThrowsException(Action<JfYuDatabaseConfig> action)
         {
             var services = new ServiceCollection();
             Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContextService<DataContext>(action));
         }
 
         [Fact]
-        public void AddRedisService_MainDatabase_Correctly()
+        public void AddService_MainDatabase_Correctly()
         {
             var services = new ServiceCollection();
             services.AddJfYuDbContextService<DataContext>(q =>
@@ -49,7 +49,7 @@ namespace jfYu.Core.Test.Data
         }
 
         [Fact]
-        public void AddRedisService_MainDatabase1_Correctly()
+        public void AddService_MainDatabase1_Correctly()
         {
             var services = new ServiceCollection();
             services.AddJfYuDbContextService<DataContext>(q =>
@@ -69,7 +69,7 @@ namespace jfYu.Core.Test.Data
         }
 
         [Fact]
-        public void AddRedisService_MainDatabaseWithReadOnly1_Correctly()
+        public void AddService_MainDatabaseWithReadOnly1_Correctly()
         {
             var services = new ServiceCollection();
             services.AddJfYuDbContextService<DataContext>(q =>
@@ -92,7 +92,7 @@ namespace jfYu.Core.Test.Data
         }
 
         [Fact]
-        public void AddRedisService_MainDatabaseWithReadOnly2_Correctly()
+        public void AddService_MainDatabaseWithReadOnly2_Correctly()
         {
             var services = new ServiceCollection();
             services.AddJfYuDbContextService<DataContext>(q =>
@@ -120,7 +120,7 @@ namespace jfYu.Core.Test.Data
         }
 
         [Fact]
-        public void AddRedisService_MainDatabaseWithReadOnly3_Correctly()
+        public void AddService_MainDatabaseWithReadOnly3_Correctly()
         {
             var services = new ServiceCollection();
             services.AddJfYuDbContextService<DataContext>(q =>

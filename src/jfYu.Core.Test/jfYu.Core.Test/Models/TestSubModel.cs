@@ -3,7 +3,7 @@
     public class TestSubModel
     {
         public int Id { get; set; }
-        public string CardNum { get; set; }
+        public string CardNum { get; set; } = "";
         public DateTime ExpiresIn { get; set; }
 
         public override bool Equals(object? obj)
@@ -22,7 +22,7 @@
                 return true;
             }
 
-            if ((object)x == null || (object)y == null)
+            if (x is null || y is null)
             {
                 return false;
             }

@@ -178,7 +178,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(LockTakeAsync), key);
-            return await _database.LockTakeAsync(key, LockToken, expiresIn ?? TimeSpan.FromMinutes(1)).ConfigureAwait(false)
+            return await _database.LockTakeAsync(key, LockToken, expiresIn ?? TimeSpan.FromMinutes(1)).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
