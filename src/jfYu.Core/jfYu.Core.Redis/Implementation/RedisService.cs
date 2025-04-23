@@ -29,7 +29,7 @@ namespace jfYu.Core.Redis.Implementation
         public IConnectionMultiplexer Client => _client;
 
         /// <summary>
-        /// Redis IDatabase 
+        /// Redis IDatabase
         /// </summary>
         public IDatabase Database => _database;
 
@@ -39,7 +39,7 @@ namespace jfYu.Core.Redis.Implementation
         public ISerializer Serializer => _serializer;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="redisConfiguration"></param>
         /// <param name="client"></param>
@@ -77,7 +77,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(RemoveAsync), key);
-            return await _database.KeyDeleteAsync(key, flag);
+            return await _database.KeyDeleteAsync(key, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -95,7 +95,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(GetAsync), key);
-            var valueBytes = await _database.StringGetAsync(key, flag);
+            var valueBytes = await _database.StringGetAsync(key, flag).ConfigureAwait(false);
             return !valueBytes.HasValue ? default : Serializer.Deserialize<T>(valueBytes!);
         }
 
@@ -103,10 +103,10 @@ namespace jfYu.Core.Redis.Implementation
         public async Task<T?> GetAsync<T>(string key, TimeSpan expiresIn, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
-            var result = await GetAsync<T>(key, flag);
+            var result = await GetAsync<T>(key, flag).ConfigureAwait(false);
             Log(nameof(GetAsync), key);
             if (!EqualityComparer<T?>.Default.Equals(result, default))
-                await _database.KeyExpireAsync(key, expiresIn);
+                await _database.KeyExpireAsync(key, expiresIn).ConfigureAwait(false);
 
             return result;
         }
@@ -118,7 +118,7 @@ namespace jfYu.Core.Redis.Implementation
             ArgumentNullException.ThrowIfNull(value);
             Log(nameof(AddAsync), key);
             var entryBytes = _serializer.Serialize(value);
-            return await _database.StringSetAsync(key, entryBytes, expiresIn, when, flag);
+            return await _database.StringSetAsync(key, entryBytes, expiresIn, when, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -128,7 +128,7 @@ namespace jfYu.Core.Redis.Implementation
             ArgumentNullException.ThrowIfNull(value);
             Log(nameof(AddAsync), key);
             var entryBytes = _serializer.Serialize(value);
-            return await _database.StringSetAsync(key, entryBytes, null, when, flag);
+            return await _database.StringSetAsync(key, entryBytes, null, when, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -136,7 +136,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(ExpireAsync), key);
-            return await _database.KeyExpireAsync(key, expiresIn);
+            return await _database.KeyExpireAsync(key, expiresIn).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -144,7 +144,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(IncrementAsync), key);
-            return await _database.StringIncrementAsync(key, value, flag);
+            return await _database.StringIncrementAsync(key, value, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -152,7 +152,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(IncrementAsync), key);
-            return await _database.StringIncrementAsync(key, value, flag);
+            return await _database.StringIncrementAsync(key, value, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -160,7 +160,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(DecrementAsync), key);
-            return await _database.StringDecrementAsync(key, value, flag);
+            return await _database.StringDecrementAsync(key, value, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -168,7 +168,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(DecrementAsync), key);
-            return await _database.StringDecrementAsync(key, value, flag);
+            return await _database.StringDecrementAsync(key, value, flag).ConfigureAwait(false);
         }
 
         private static readonly RedisValue LockToken = Environment.MachineName;
@@ -178,7 +178,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(LockTakeAsync), key);
-            return await _database.LockTakeAsync(key, LockToken, expiresIn ?? TimeSpan.FromMinutes(1));
+            return await _database.LockTakeAsync(key, LockToken, expiresIn ?? TimeSpan.FromMinutes(1)).ConfigureAwait(false)
         }
 
         /// <inheritdoc/>
@@ -187,7 +187,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(LockReleaseAsync), key);
-            return await _database.LockReleaseAsync(key, LockToken);
+            return await _database.LockReleaseAsync(key, LockToken).ConfigureAwait(false);
         }
     }
 }

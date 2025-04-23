@@ -1,5 +1,4 @@
-﻿using Bogus.Extensions.UnitedKingdom;
-using jfYu.Core.RabbitMQ;
+﻿using jfYu.Core.RabbitMQ;
 using jfYu.Core.Test.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,14 +8,13 @@ using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
 using RabbitMQ.Client;
 using System.Text;
-using System.Threading.Channels;
 
 namespace jfYu.Core.Test.RabbitMQ
 {
     public class RabbitDeadQueueTests
     {
-
         #region ReceiveT
+
         [Fact]
         public async Task Receive_ThrowException_ButDeadQueueEnableFalse()
         {
@@ -131,7 +129,6 @@ namespace jfYu.Core.Test.RabbitMQ
             const string deadLetterQueue = $"{nameof(Receive_ThrowException_DeadQueueEnabled)}_Dead_Letter_Queue";
             const string deadLetterExchange = $"{nameof(Receive_ThrowException_DeadQueueEnabled)}_Dead_Letter_Exchange";
 
-
             var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -227,7 +224,6 @@ namespace jfYu.Core.Test.RabbitMQ
                 e.DeadLetterExchange = deadLetterExchange;
             });
 
-
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
             var _channel = _rabbitMQService.Connection.CreateModel();
@@ -275,6 +271,7 @@ namespace jfYu.Core.Test.RabbitMQ
                 Add(new Dictionary<string, object>() { { "x-retry-count", "1xxx" } });
             }
         }
+
         [Theory]
         [ClassData(typeof(HeaderHaveErrorExpectData))]
         public async Task Receive_HeaderHaveError_DeadQueueEnabled(Dictionary<string, object> headers)
@@ -354,6 +351,7 @@ namespace jfYu.Core.Test.RabbitMQ
             _channel.QueueDelete(deadLetterQueue);
             _channel.ExchangeDelete(deadLetterExchange);
         }
+
         [Fact]
         public async Task Receive_WarnWithNullLog_DeadQueueEnabled()
         {
@@ -413,11 +411,12 @@ namespace jfYu.Core.Test.RabbitMQ
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName); ;
         }
+
         [Fact]
         public async Task Receive_WithLogWarn_DeadQueueEnabled()
         {
             const string exchangeName = $"{nameof(Receive_WithLogWarn_DeadQueueEnabled)}_Exchange";
-            const string queueName = $"{nameof(Receive_WithLogWarn_DeadQueueEnabled)}_Queue"; 
+            const string queueName = $"{nameof(Receive_WithLogWarn_DeadQueueEnabled)}_Queue";
 
             var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
@@ -437,7 +436,7 @@ namespace jfYu.Core.Test.RabbitMQ
                 q.Password = rabbitConfig.Password;
 
                 e.EnableDeadQueue = true;
-                e.RetryDelayMilliseconds = 1000; 
+                e.RetryDelayMilliseconds = 1000;
             });
 
             var mockLogger = new Mock<ILogger<RabbitMQService>>();
@@ -449,16 +448,16 @@ namespace jfYu.Core.Test.RabbitMQ
             var _retry = serviceProvider.GetRequiredService<MessageRetryPolicy>();
 
             _channel.QueueDelete(queueName);
-            _channel.ExchangeDelete(exchangeName); 
+            _channel.ExchangeDelete(exchangeName);
 
-            _rabbitMQService.QueueBind(queueName, exchangeName, ExchangeType.Direct); 
+            _rabbitMQService.QueueBind(queueName, exchangeName, ExchangeType.Direct);
             string? receivedMessages = "";
             int i = 0;
             _rabbitMQService.Receive<TestModel>(queueName, q =>
             {
                 i += 1;
                 return false;
-            });         
+            });
             var message = new TestModelFaker().Generate(1).FirstOrDefault();
 
             _channel.ConfirmSelect();
@@ -470,10 +469,10 @@ namespace jfYu.Core.Test.RabbitMQ
             _channel.WaitForConfirms();
 
             await Task.Delay(1000);
-            Assert.Empty(receivedMessages); 
+            Assert.Empty(receivedMessages);
             mockLogger.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.AtLeast(1));
             _channel.QueueDelete(queueName);
-            _channel.ExchangeDelete(exchangeName); 
+            _channel.ExchangeDelete(exchangeName);
         }
 
         [Fact]
@@ -502,7 +501,7 @@ namespace jfYu.Core.Test.RabbitMQ
                 e.EnableDeadQueue = true;
                 e.RetryDelayMilliseconds = 1000;
             });
-             
+
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
             var _channel = _rabbitMQService.Connection.CreateModel();
@@ -540,7 +539,7 @@ namespace jfYu.Core.Test.RabbitMQ
         public async Task Receive_WithLogError_DeadQueueEnabled()
         {
             const string exchangeName = $"{nameof(Receive_WithLogWarn_DeadQueueEnabled)}_Exchange";
-            const string queueName = $"{nameof(Receive_WithLogWarn_DeadQueueEnabled)}_Queue"; 
+            const string queueName = $"{nameof(Receive_WithLogWarn_DeadQueueEnabled)}_Queue";
 
             var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
@@ -560,7 +559,7 @@ namespace jfYu.Core.Test.RabbitMQ
                 q.Password = rabbitConfig.Password;
 
                 e.EnableDeadQueue = true;
-                e.RetryDelayMilliseconds = 1000; 
+                e.RetryDelayMilliseconds = 1000;
             });
 
             var mockLogger = new Mock<ILogger<RabbitMQService>>();
@@ -572,9 +571,9 @@ namespace jfYu.Core.Test.RabbitMQ
             var _retry = serviceProvider.GetRequiredService<MessageRetryPolicy>();
 
             _channel.QueueDelete(queueName);
-            _channel.ExchangeDelete(exchangeName); 
+            _channel.ExchangeDelete(exchangeName);
 
-            _rabbitMQService.QueueBind(queueName, exchangeName, ExchangeType.Direct); 
+            _rabbitMQService.QueueBind(queueName, exchangeName, ExchangeType.Direct);
             string? receivedMessages = "";
             int i = 0;
             _rabbitMQService.Receive<TestModel>(queueName, q =>
@@ -582,7 +581,7 @@ namespace jfYu.Core.Test.RabbitMQ
                 i += 1;
                 return false;
             });
- 
+
             var message = new TestModelFaker().Generate(1).FirstOrDefault();
 
             _channel.ConfirmSelect();
@@ -594,14 +593,16 @@ namespace jfYu.Core.Test.RabbitMQ
             _channel.WaitForConfirms();
 
             await Task.Delay(2000);
-            Assert.Empty(receivedMessages); 
+            Assert.Empty(receivedMessages);
             mockLogger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.AtLeast(1));
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName); ;
         }
-        #endregion
+
+        #endregion ReceiveT
 
         #region ReceiveString
+
         [Fact]
         public async Task ReceiveString_ThrowException_ButDeadQueueEnableFalse()
         {
@@ -715,7 +716,6 @@ namespace jfYu.Core.Test.RabbitMQ
             const string deadLetterQueue = $"{nameof(ReceiveString_ThrowException_DeadQueueEnabled)}_Dead_Letter_Queue";
             const string deadLetterExchange = $"{nameof(ReceiveString_ThrowException_DeadQueueEnabled)}_Dead_Letter_Exchange";
 
-
             var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -738,7 +738,6 @@ namespace jfYu.Core.Test.RabbitMQ
                 e.DeadLetterQueue = deadLetterQueue;
                 e.DeadLetterExchange = deadLetterExchange;
             });
-
 
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
@@ -809,7 +808,6 @@ namespace jfYu.Core.Test.RabbitMQ
                 e.DeadLetterExchange = deadLetterExchange;
             });
 
-
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
             var _channel = _rabbitMQService.Connection.CreateModel();
@@ -845,9 +843,11 @@ namespace jfYu.Core.Test.RabbitMQ
             _channel.QueueDelete(deadLetterQueue);
             _channel.ExchangeDelete(deadLetterExchange);
         }
-        #endregion
+
+        #endregion ReceiveString
 
         #region ReceiveAsync
+
         [Fact]
         public async Task ReceiveAsync_ThrowException_ButDeadQueueEnableFalse()
         {
@@ -961,7 +961,6 @@ namespace jfYu.Core.Test.RabbitMQ
             const string deadLetterQueue = $"{nameof(ReceiveAsync_ThrowException_DeadQueueEnabled)}_Dead_Letter_Queue";
             const string deadLetterExchange = $"{nameof(ReceiveAsync_ThrowException_DeadQueueEnabled)}_Dead_Letter_Exchange";
 
-
             var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -985,7 +984,6 @@ namespace jfYu.Core.Test.RabbitMQ
                 e.DeadLetterQueue = deadLetterQueue;
                 e.DeadLetterExchange = deadLetterExchange;
             });
-
 
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
@@ -1057,7 +1055,6 @@ namespace jfYu.Core.Test.RabbitMQ
                 e.DeadLetterExchange = deadLetterExchange;
             });
 
-
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
             var _channel = _rabbitMQService.Connection.CreateModel();
@@ -1120,7 +1117,6 @@ namespace jfYu.Core.Test.RabbitMQ
                 q.DispatchConsumersAsync = true;
             });
 
-
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
             var _channel = _rabbitMQService.Connection.CreateModel();
@@ -1135,7 +1131,6 @@ namespace jfYu.Core.Test.RabbitMQ
                 await Task.Delay(1);
                 receivedMessages = q;
                 return true;
-
             });
             var message = new TestModelFaker().Generate(1).FirstOrDefault();
 
@@ -1146,9 +1141,11 @@ namespace jfYu.Core.Test.RabbitMQ
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
         }
-        #endregion
+
+        #endregion ReceiveAsync
 
         #region ReceiveAsync
+
         [Fact]
         public async Task ReceiveAsyncString_ThrowException_ButDeadQueueEnableFalse()
         {
@@ -1263,7 +1260,6 @@ namespace jfYu.Core.Test.RabbitMQ
             const string deadLetterQueue = $"{nameof(ReceiveAsyncString_ThrowException_DeadQueueEnabled)}_Dead_Letter_Queue";
             const string deadLetterExchange = $"{nameof(ReceiveAsyncString_ThrowException_DeadQueueEnabled)}_Dead_Letter_Exchange";
 
-
             var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -1287,7 +1283,6 @@ namespace jfYu.Core.Test.RabbitMQ
                 e.DeadLetterQueue = deadLetterQueue;
                 e.DeadLetterExchange = deadLetterExchange;
             });
-
 
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
@@ -1359,7 +1354,6 @@ namespace jfYu.Core.Test.RabbitMQ
                 e.DeadLetterExchange = deadLetterExchange;
             });
 
-
             var serviceProvider = services.BuildServiceProvider();
             var _rabbitMQService = serviceProvider.GetRequiredService<IRabbitMQService>();
             var _channel = _rabbitMQService.Connection.CreateModel();
@@ -1397,6 +1391,7 @@ namespace jfYu.Core.Test.RabbitMQ
             _channel.QueueDelete(deadLetterQueue);
             _channel.ExchangeDelete(deadLetterExchange);
         }
-        #endregion
+
+        #endregion ReceiveAsync
     }
 }

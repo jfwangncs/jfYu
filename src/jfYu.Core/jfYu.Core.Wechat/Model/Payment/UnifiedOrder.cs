@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace jfYu.Core.Wechat.Model.Payment
-{    
+{
     public class UnifiedOrder
     {
         /// <summary>
@@ -106,7 +106,6 @@ namespace jfYu.Core.Wechat.Model.Payment
         [JsonProperty(PropertyName = "notify_url")]
         public string NotifyUrl { get; set; } = null!;
 
-
         /// <summary>
         /// JSAPI--JSAPI支付（或小程序支付）、NATIVE--Native支付、APP--app支付，MWEB--H5支付
         /// </summary>
@@ -144,10 +143,9 @@ namespace jfYu.Core.Wechat.Model.Payment
         public string ProfitSharing { get; set; } = "N";
 
         /// <summary>
-        /// 该字段常用于线下活动时的场景信息上报，支持上报实际门店信息，商户也可以按需求自己上报相关信息。该字段为JSON对象数据，对象格式为{"store_info":{"id": "门店ID","name": "名称","area_code": "编码","address": "地址" }} 
+        /// 该字段常用于线下活动时的场景信息上报，支持上报实际门店信息，商户也可以按需求自己上报相关信息。该字段为JSON对象数据，对象格式为{"store_info":{"id": "门店ID","name": "名称","area_code": "编码","address": "地址" }}
         /// </summary>
         [JsonProperty(PropertyName = "scene_info")]
         public string SceneInfo { get; set; } = null!;
-
     }
 }

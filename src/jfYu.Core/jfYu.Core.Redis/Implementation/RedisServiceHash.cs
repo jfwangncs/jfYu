@@ -4,7 +4,7 @@ using System;
 using System.Threading.Tasks;
 
 namespace jfYu.Core.Redis.Implementation
-{   
+{
     /// <summary>
     /// The implementation of the Redis service.
     /// </summary>
@@ -18,7 +18,7 @@ namespace jfYu.Core.Redis.Implementation
             ArgumentNullException.ThrowIfNull(value);
             Log(nameof(HashSetAsync), key);
             var entryBytes = _serializer.Serialize(value);
-            return await _database.HashSetAsync(key, hashKey, entryBytes, when, flag);
+            return await _database.HashSetAsync(key, hashKey, entryBytes, when, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -27,7 +27,7 @@ namespace jfYu.Core.Redis.Implementation
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             ArgumentException.ThrowIfNullOrWhiteSpace(hashKey);
             Log(nameof(HashGetAsync), key);
-            var redisValue = await _database.HashGetAsync(key, hashKey, flag);
+            var redisValue = await _database.HashGetAsync(key, hashKey, flag).ConfigureAwait(false);
             return redisValue.HasValue ? _serializer.Deserialize<T>(redisValue!) : default;
         }
 
@@ -36,7 +36,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(HashGetAllAsync), key);
-            return await _database.HashGetAllAsync(key, flag);
+            return await _database.HashGetAllAsync(key, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -45,7 +45,7 @@ namespace jfYu.Core.Redis.Implementation
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             ArgumentException.ThrowIfNullOrWhiteSpace(hashKey);
             Log(nameof(HashDeleteAsync), key);
-            return await _database.HashDeleteAsync(key, hashKey, flag);
+            return await _database.HashDeleteAsync(key, hashKey, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -54,7 +54,7 @@ namespace jfYu.Core.Redis.Implementation
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             ArgumentException.ThrowIfNullOrWhiteSpace(hashKey);
             Log(nameof(HashExistsAsync), key);
-            return await _database.HashExistsAsync(key, hashKey, flag);
+            return await _database.HashExistsAsync(key, hashKey, flag).ConfigureAwait(false);
         }
     }
 }

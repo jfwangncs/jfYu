@@ -25,9 +25,9 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             ArgumentNullException.ThrowIfNull(value);
-            Log( nameof(SetAddAsync), key);
+            Log(nameof(SetAddAsync), key);
             var entryBytes = _serializer.Serialize(value);
-            return await _database.SetAddAsync(key, entryBytes, flag);
+            return await _database.SetAddAsync(key, entryBytes, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -35,11 +35,11 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             values.ThrowListIfNullOrEmpty();
-            Log( nameof(SetAddAllAsync), key);
+            Log(nameof(SetAddAllAsync), key);
             return await _database.SetAddAsync(key, values
                     .Select(item => Serializer.Serialize(item))
                     .Select(x => (RedisValue)x)
-                    .ToArray(), flag);
+                    .ToArray(), flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -47,9 +47,9 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             ArgumentNullException.ThrowIfNull(value);
-            Log( nameof(SetRemoveAsync), key);
+            Log(nameof(SetRemoveAsync), key);
             var entryBytes = _serializer.Serialize(value);
-            return await _database.SetRemoveAsync(key, entryBytes);
+            return await _database.SetRemoveAsync(key, entryBytes).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -58,11 +58,11 @@ namespace jfYu.Core.Redis.Implementation
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             values.ThrowListIfNullOrEmpty();
             values.ForEach(value => ArgumentNullException.ThrowIfNull(value));
-            Log( nameof(SetRemoveAllAsync), key);
+            Log(nameof(SetRemoveAllAsync), key);
             return await _database.SetRemoveAsync(key, values
                    .Select(item => Serializer.Serialize(item))
                    .Select(x => (RedisValue)x)
-                   .ToArray(), flag);
+                   .ToArray(), flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -70,41 +70,41 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             ArgumentNullException.ThrowIfNull(value);
-            Log( nameof(SetContainsAsync), key);
+            Log(nameof(SetContainsAsync), key);
             var entryBytes = _serializer.Serialize(value);
-            return await _database.SetContainsAsync(key, entryBytes);
+            return await _database.SetContainsAsync(key, entryBytes).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
         public async Task<List<RedisValue>> SetMembersAsync(string key, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
-            Log( nameof(SetMembersAsync), key);
-            return [.. await _database.SetMembersAsync(key, flag)];
+            Log(nameof(SetMembersAsync), key);
+            return [.. await _database.SetMembersAsync(key, flag).ConfigureAwait(false)];
         }
 
         /// <inheritdoc/>
         public async Task<long> SetLengthAsync(string key, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
-            Log( nameof(SetLengthAsync), key);
-            return await _database.SetLengthAsync(key, flag);
+            Log(nameof(SetLengthAsync), key);
+            return await _database.SetLengthAsync(key, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
         public async Task<RedisValue> SetRandomMemberAsync(string key, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
-            Log( nameof(SetRandomMemberAsync), key);
-            return await _database.SetRandomMemberAsync(key, flag);
+            Log(nameof(SetRandomMemberAsync), key);
+            return await _database.SetRandomMemberAsync(key, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
         public async Task<List<RedisValue>> SetRandomMembersAsync(string key, int count = 1, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
-            Log( nameof(SetRandomMembersAsync), key);
-            return [.. await _database.SetRandomMembersAsync(key, count, flag)];
+            Log(nameof(SetRandomMembersAsync), key);
+            return [.. await _database.SetRandomMembersAsync(key, count, flag).ConfigureAwait(false)];
         }
     }
 }

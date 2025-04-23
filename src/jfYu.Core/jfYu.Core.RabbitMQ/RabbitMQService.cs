@@ -7,12 +7,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-
 namespace jfYu.Core.RabbitMQ
 {
-
     /// <summary>
-    ///  
+    ///
     /// </summary>
     /// <param name="connection"></param>
     /// <param name="messageRetryPolicy"></param>
@@ -27,8 +25,6 @@ namespace jfYu.Core.RabbitMQ
         private readonly MessageRetryPolicy _messageRetryPolicy = messageRetryPolicy;
         private readonly ILogger<RabbitMQService>? _logger = logger;
 
-
-
         /// <inheritdoc/>
         public bool QueueBind(string queueName, string exchangeName, string exchangeType, string routingKey = "", Dictionary<string, object>? headers = null)
         {
@@ -39,7 +35,6 @@ namespace jfYu.Core.RabbitMQ
             _channel.QueueBind(queueName, exchangeName, routingKey, headers);
             return _channel.WaitForConfirms(_channel.ContinuationTimeout);
         }
-
 
         /// <inheritdoc/>
 
@@ -125,7 +120,6 @@ namespace jfYu.Core.RabbitMQ
             return _channel;
         }
 
-
         /// <inheritdoc/>
         public IModel Receive(string queueName, Func<string, Task<bool>> func, ushort prefetchCount = 1)
         {
@@ -137,7 +131,7 @@ namespace jfYu.Core.RabbitMQ
                 string message = Encoding.UTF8.GetString(ea.Body.ToArray());
                 try
                 {
-                    if (await func(message))
+                    if (await func(message).ConfigureAwait(false))
                         _channel.BasicAck(ea.DeliveryTag, false);
                     else
                     {
@@ -202,7 +196,6 @@ namespace jfYu.Core.RabbitMQ
             return _channel;
         }
 
-
         /// <inheritdoc/>
         public IModel Receive<T>(string queueName, Func<T?, Task<bool>> func, ushort prefetchCount = 1)
         {
@@ -214,7 +207,7 @@ namespace jfYu.Core.RabbitMQ
                 string message = Encoding.UTF8.GetString(ea.Body.ToArray());
                 try
                 {
-                    if (await func(JsonConvert.DeserializeObject<T>(message)))
+                    if (await func(JsonConvert.DeserializeObject<T>(message)).ConfigureAwait(false))
                         _channel.BasicAck(ea.DeliveryTag, false);
                     else
                     {
@@ -241,11 +234,9 @@ namespace jfYu.Core.RabbitMQ
             return _channel;
         }
 
-
         /// <inheritdoc/>
         private bool TryToMoveToDeadLetterQueue(BasicDeliverEventArgs ea)
         {
-
             if (ea.BasicProperties.Headers is null)
                 return false;
 
@@ -280,13 +271,12 @@ namespace jfYu.Core.RabbitMQ
                 }
                 else
                 {
-                    //retry message 
+                    //retry message
                     retryCount++;
                     ea.BasicProperties.Headers["x-retry-count"] = retryCount;
                     channel.BasicPublish(originalExchangeName, originalRoutingKey, ea.BasicProperties, ea.Body);
                     return channel.WaitForConfirms(channel.ContinuationTimeout);
                 }
-
             }
             catch (Exception)
             {

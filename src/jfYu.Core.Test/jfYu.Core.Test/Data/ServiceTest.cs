@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace jfYu.Core.Test.Data
 {
-
     [Collection("Data")]
     public class ServiceTest(IUserService userService)
     {
@@ -48,6 +47,7 @@ namespace jfYu.Core.Test.Data
             var data = await userService.GetListAsync();
             Assert.Equal(8, data.Count);
         }
+
         [Fact]
         public async void UpdateAsync_Id_Correctly()
         {
@@ -104,7 +104,6 @@ namespace jfYu.Core.Test.Data
             Assert.Equal(data.UserName, user.UserName);
             Assert.Equal(data.NickName, user.NickName);
 
-
             user.State = (int)StateEnum.Enabled;
             user.DepartmentId = 567;
             user.UserName = "Test213";
@@ -146,6 +145,7 @@ namespace jfYu.Core.Test.Data
                 Assert.Equal(data[i].NickName, users[i].NickName);
             }
         }
+
         [Fact]
         public async void UpdateAsync_Predicate_Correctly()
         {
@@ -226,7 +226,6 @@ namespace jfYu.Core.Test.Data
             Assert.Equal(0, result);
         }
 
-
         [Fact]
         public async void RemoveAsync_Correctly()
         {
@@ -246,6 +245,7 @@ namespace jfYu.Core.Test.Data
                 Assert.Equal((int)StateEnum.Disable, users[i].State);
             }
         }
+
         [Fact]
         public async void HardRemoveAsync_PredicateReturnEmptyOrNull_Correctly()
         {
@@ -328,7 +328,6 @@ namespace jfYu.Core.Test.Data
 
             Assert.Empty(result);
         }
-
 
         [Fact]
         public async void GetSelectListAsyncAsync_Correctly()

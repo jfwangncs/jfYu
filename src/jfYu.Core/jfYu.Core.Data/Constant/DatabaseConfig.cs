@@ -13,7 +13,7 @@ namespace jfYu.Core.Data.Constant
         public List<DatabaseConfig> ReadOnlyDatabases { get; set; } = [];
 
         /// <summary>
-        /// Read-only database key identifier 
+        /// Read-only database key identifier
         /// </summary>
         public string JfYuReadOnly = nameof(JfYuReadOnly);
     }
@@ -32,6 +32,5 @@ namespace jfYu.Core.Data.Constant
         /// ConnectionString
         /// </summary>
         public string ConnectionString { get; set; } = "";
-
     }
 }

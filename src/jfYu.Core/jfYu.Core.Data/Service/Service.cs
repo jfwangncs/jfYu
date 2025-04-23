@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.Data.Service
 {
-
     /// <summary>
     /// Services
     /// </summary>
@@ -18,7 +17,6 @@ namespace jfYu.Core.Data.Service
     public class Service<T, TContext>(TContext context, ReadonlyDBContext<TContext> readonlyDBContext) : IService<T, TContext> where T : BaseEntity
             where TContext : DbContext
     {
-
         /// <inheritdoc/>
         public TContext Context { get; } = context;
 
@@ -29,16 +27,16 @@ namespace jfYu.Core.Data.Service
         public virtual async Task<int> AddAsync(T entity)
         {
             entity.CreatedTime = entity.UpdatedTime = DateTime.UtcNow;
-            await Context.AddAsync(entity);
-            return await Context.SaveChangesAsync();
+            await Context.AddAsync(entity).ConfigureAwait(false);
+            return await Context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
         public virtual async Task<int> AddAsync(List<T> list)
         {
             list.ForEach(entity => { entity.CreatedTime = entity.UpdatedTime = DateTime.UtcNow; });
-            await Context.AddRangeAsync(list);
-            return await Context.SaveChangesAsync();
+            await Context.AddRangeAsync(list).ConfigureAwait(false);
+            return await Context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -46,7 +44,7 @@ namespace jfYu.Core.Data.Service
         {
             entity.UpdatedTime = DateTime.UtcNow;
             Context.Update(entity);
-            return await Context.SaveChangesAsync();
+            return await Context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -57,7 +55,7 @@ namespace jfYu.Core.Data.Service
                 entity.UpdatedTime = DateTime.UtcNow;
                 Context.Update(entity);
             });
-            return await Context.SaveChangesAsync();
+            return await Context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -72,7 +70,7 @@ namespace jfYu.Core.Data.Service
                 data[i].UpdatedTime = DateTime.UtcNow;
             }
 
-            return await Context.SaveChangesAsync();
+            return await Context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -80,14 +78,14 @@ namespace jfYu.Core.Data.Service
         {
             if (predicate == null)
                 return 0;
-            var list = await GetListAsync(predicate);
+            var list = await GetListAsync(predicate).ConfigureAwait(false);
             foreach (var entity in list)
             {
                 entity.UpdatedTime = DateTime.UtcNow;
                 entity.State = (int)StateEnum.Disable;
                 Context.Update(entity);
             }
-            return await Context.SaveChangesAsync();
+            return await Context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -96,12 +94,12 @@ namespace jfYu.Core.Data.Service
             if (predicate == null)
                 return 0;
 
-            var lists = await GetListAsync(predicate);
+            var lists = await GetListAsync(predicate).ConfigureAwait(false);
             foreach (var entity in lists)
             {
                 Context.Remove(entity);
             }
-            return await Context.SaveChangesAsync();
+            return await Context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -109,8 +107,8 @@ namespace jfYu.Core.Data.Service
         {
             return predicate switch
             {
-                null => await ReadonlyContext.Set<T>().FirstOrDefaultAsync(),
-                _ => await ReadonlyContext.Set<T>().FirstOrDefaultAsync(predicate)
+                null => await ReadonlyContext.Set<T>().FirstOrDefaultAsync().ConfigureAwait(false),
+                _ => await ReadonlyContext.Set<T>().FirstOrDefaultAsync(predicate).ConfigureAwait(false)
             };
         }
 
@@ -119,8 +117,8 @@ namespace jfYu.Core.Data.Service
         {
             return predicate switch
             {
-                null => await ReadonlyContext.Set<T>().ToListAsync(),
-                _ => await ReadonlyContext.Set<T>().Where(predicate).ToListAsync()
+                null => await ReadonlyContext.Set<T>().ToListAsync().ConfigureAwait(false),
+                _ => await ReadonlyContext.Set<T>().Where(predicate).ToListAsync().ConfigureAwait(false)
             };
         }
 
@@ -132,8 +130,8 @@ namespace jfYu.Core.Data.Service
 
             return predicate switch
             {
-                null => (await ReadonlyContext.Set<T>().ToListAsync()).Select(selector).ToList(),
-                _ => (await ReadonlyContext.Set<T>().Where(predicate).ToListAsync()).Select(selector).ToList()
+                null => (await ReadonlyContext.Set<T>().ToListAsync().ConfigureAwait(false)).Select(selector).ToList(),
+                _ => (await ReadonlyContext.Set<T>().Where(predicate).ToListAsync().ConfigureAwait(false)).Select(selector).ToList()
             };
         }
 
@@ -144,9 +142,9 @@ namespace jfYu.Core.Data.Service
                 return [];
             return predicate switch
             {
-                null => await ReadonlyContext.Set<T>().Select(selector).ToListAsync(),
-                _ => await ReadonlyContext.Set<T>().Where(predicate).Select(selector).ToListAsync()
+                null => await ReadonlyContext.Set<T>().Select(selector).ToListAsync().ConfigureAwait(false),
+                _ => await ReadonlyContext.Set<T>().Where(predicate).Select(selector).ToListAsync().ConfigureAwait(false)
             };
         }
-    }   
+    }
 }

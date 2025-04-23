@@ -23,14 +23,14 @@ namespace jfYu.Core.Redis.Interface
         /// Adds elements to the set.
         /// </summary>
         /// <typeparam name="T">The type of the values.</typeparam>
-        /// <param name="key">The Redis key.</param> 
+        /// <param name="key">The Redis key.</param>
         /// <param name="values">The values associated with the key.</param>
         /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
         /// <returns>The number of elements added.</returns>
         Task<long> SetAddAllAsync<T>(string key, List<T> values, CommandFlags flag = CommandFlags.None);
 
         /// <summary>
-        /// Removes the specified value of set.    
+        /// Removes the specified value of set.
         /// </summary>
         /// <param name="key">The Redis key.</param>
         /// <param name="value">The value associated with the key.</param>
@@ -38,10 +38,10 @@ namespace jfYu.Core.Redis.Interface
         Task<bool> SetRemoveAsync<T>(string key, T value);
 
         /// <summary>
-        /// Removes the specified value of set.  
+        /// Removes the specified value of set.
         /// </summary>
         /// <typeparam name="T">The type of the values.</typeparam>
-        /// <param name="key">The Redis key.</param> 
+        /// <param name="key">The Redis key.</param>
         /// <param name="values">The values associated with the key.</param>
         /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
         /// <returns>The number of elements removed.</returns>
@@ -60,7 +60,7 @@ namespace jfYu.Core.Redis.Interface
         /// <summary>
         /// Gets all elements of set.
         /// </summary>
-        /// <param name="key">The Redis key.</param> 
+        /// <param name="key">The Redis key.</param>
         /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
         /// <returns>Values</returns>
         Task<List<RedisValue>> SetMembersAsync(string key, CommandFlags flag = CommandFlags.None);
@@ -68,7 +68,7 @@ namespace jfYu.Core.Redis.Interface
         /// <summary>
         /// Gets the number of elements in the set.
         /// </summary>
-        /// <param name="key">The Redis key.</param> 
+        /// <param name="key">The Redis key.</param>
         /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
         /// <returns>number of elements</returns>
         Task<long> SetLengthAsync(string key, CommandFlags flag = CommandFlags.None);
@@ -76,7 +76,7 @@ namespace jfYu.Core.Redis.Interface
         /// <summary>
         /// Gets a random member of the set.
         /// </summary>
-        /// <param name="key">The Redis key.</param> 
+        /// <param name="key">The Redis key.</param>
         /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
         /// <returns>The random value of the set.</returns>
         Task<RedisValue> SetRandomMemberAsync(string key, CommandFlags flag = CommandFlags.None);
@@ -85,7 +85,7 @@ namespace jfYu.Core.Redis.Interface
         /// Gets random members with count of the set.
         /// </summary>
         /// <param name="key">The Redis key.</param>
-        /// <param name="count">the count of members</param> 
+        /// <param name="count">the count of members</param>
         /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
         /// <returns>The random values of the set.</returns>
         Task<List<RedisValue>> SetRandomMembersAsync(string key, int count, CommandFlags flag = CommandFlags.None);

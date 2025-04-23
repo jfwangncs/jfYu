@@ -31,7 +31,5 @@
         /// 通知地址
         /// </summary>
         public string NotifyUrl { get; set; } = null!;
-
-
     }
 }

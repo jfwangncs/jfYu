@@ -3,9 +3,8 @@
     public class TestSubModel
     {
         public int Id { get; set; }
-        public required string CardNum { get; set; }
+        public string CardNum { get; set; }
         public DateTime ExpiresIn { get; set; }
-
 
         public override bool Equals(object? obj)
         {
@@ -15,6 +14,7 @@
             }
             return false;
         }
+
         public static bool operator ==(TestSubModel x, TestSubModel y)
         {
             if (ReferenceEquals(x, y))
@@ -29,10 +29,12 @@
 
             return x.Equals(y);
         }
+
         public static bool operator !=(TestSubModel x, TestSubModel y)
         {
             return !(x == y);
         }
+
         public override int GetHashCode()
         {
             return HashCode.Combine(CardNum, ExpiresIn);

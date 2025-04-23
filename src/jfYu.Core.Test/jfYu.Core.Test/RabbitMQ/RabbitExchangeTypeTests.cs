@@ -11,6 +11,7 @@ namespace jfYu.Core.Test.RabbitMQ
     {
         private readonly IRabbitMQService _rabbitMQService;
         private readonly IModel _channel;
+
         public RabbitExchangeTypeTests(IRabbitMQService rabbitMQService)
         {
             _rabbitMQService = rabbitMQService;
@@ -81,6 +82,7 @@ namespace jfYu.Core.Test.RabbitMQ
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
         }
+
         [Fact]
         public async Task Send_DirectExchange()
         {
@@ -206,7 +208,6 @@ namespace jfYu.Core.Test.RabbitMQ
             const string queueName1 = "topic_queue1";
             const string queueName2 = "topic_queue2";
 
-
             _rabbitMQService.QueueBind(queueName1, exchangeName, ExchangeType.Topic, "logs.error.#");
             _rabbitMQService.QueueBind(queueName2, exchangeName, ExchangeType.Topic, "logs.*.database");
 
@@ -240,7 +241,6 @@ namespace jfYu.Core.Test.RabbitMQ
             _channel.QueueDelete(queueName1);
             _channel.QueueDelete(queueName2);
             _channel.ExchangeDelete(exchangeName);
-
         }
 
         [Fact]
@@ -249,7 +249,6 @@ namespace jfYu.Core.Test.RabbitMQ
             const string exchangeName1 = "direct_exchange1";
             const string exchangeName2 = "direct_exchange2";
             const string queueName = "direct_multiplequeue";
-
 
             _rabbitMQService.QueueBind(queueName, exchangeName1, ExchangeType.Direct);
             _rabbitMQService.ExchangeBind(exchangeName1, exchangeName2, ExchangeType.Direct);
@@ -271,13 +270,11 @@ namespace jfYu.Core.Test.RabbitMQ
             _channel.ExchangeDelete(exchangeName2);
         }
 
-
         [Fact]
         public async Task Receive_RejectFisrt()
         {
             const string exchangeName = "reject_exchange";
             const string queueName = "reject_queue";
-
 
             _rabbitMQService.QueueBind(queueName, exchangeName, ExchangeType.Direct);
 
@@ -304,13 +301,11 @@ namespace jfYu.Core.Test.RabbitMQ
             _channel.ExchangeDelete(exchangeName);
         }
 
-
         [Fact]
         public async Task Receive_RejectModelFisrt()
         {
             const string exchangeName = "reject_exchange_model";
             const string queueName = "reject_queue_model";
-
 
             _rabbitMQService.QueueBind(queueName, exchangeName, ExchangeType.Direct);
 
@@ -336,7 +331,6 @@ namespace jfYu.Core.Test.RabbitMQ
             Assert.Equal(JsonConvert.SerializeObject(message), JsonConvert.SerializeObject(receivedMessages));
             _channel.QueueDelete(queueName);
             _channel.ExchangeDelete(exchangeName);
-        }    
-
+        }
     }
 }

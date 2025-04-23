@@ -4,8 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Net;
-using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 
@@ -15,6 +15,7 @@ namespace jfYu.Core.Test.JfYuRequest
     public class JfYuBaseTests
     {
         #region Send
+
         public class ServicesNoLogger : TheoryData<IJfYuRequest>
         {
             public ServicesNoLogger()
@@ -38,7 +39,6 @@ namespace jfYu.Core.Test.JfYuRequest
                 Add(request);
             }
         }
-
 
         [Theory]
         [ClassData(typeof(ServicesNoLogger))]
@@ -103,7 +103,6 @@ namespace jfYu.Core.Test.JfYuRequest
             Assert.Contains("testUser", JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse!["form"].ToString()!)!["username"]!.ToString());
             Assert.Contains("30", JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse!["form"].ToString()!)!["age"]!.ToString());
         }
-
 
         [Theory]
         [ClassData(typeof(ServicesNoLogger))]
@@ -192,6 +191,7 @@ namespace jfYu.Core.Test.JfYuRequest
             await client.SendAsync();
             Assert.Equal(HttpStatusCode.NotFound, client.StatusCode);
         }
+
         [Theory]
         [ClassData(typeof(ServicesNoLogger))]
         public async Task Test_Status_400(IJfYuRequest client)
@@ -221,6 +221,7 @@ namespace jfYu.Core.Test.JfYuRequest
             await client.SendAsync();
             Assert.Equal(HttpStatusCode.BadGateway, client.StatusCode);
         }
+
         [Theory]
         [ClassData(typeof(ServicesNoLogger))]
         public async Task Test_Timeout(IJfYuRequest client)
@@ -351,6 +352,7 @@ namespace jfYu.Core.Test.JfYuRequest
                 Add("brotli", request);
             }
         }
+
         [Theory]
         [ClassData(typeof(EncodeExpectdata))]
         public async Task Test_Gzip(string code, IJfYuRequest client)
@@ -443,7 +445,6 @@ namespace jfYu.Core.Test.JfYuRequest
             await Assert.ThrowsAsync<DivideByZeroException>(client.SendAsync);
         }
 
-
         [Fact]
         public async Task Test_Porxy()
         {
@@ -471,9 +472,11 @@ namespace jfYu.Core.Test.JfYuRequest
 
             await Assert.ThrowsAsync<WebException>(client.SendAsync);
         }
-        #endregion
+
+        #endregion Send
 
         #region Download
+
         [Theory]
         [ClassData(typeof(ServicesNoLogger))]
         public async Task Test_DownloadStream(IJfYuRequest client)
@@ -490,7 +493,6 @@ namespace jfYu.Core.Test.JfYuRequest
             Assert.NotNull(stream);
             Assert.Equal(1024, stream.Length);
         }
-
 
         [Theory]
         [ClassData(typeof(ServicesNoLogger))]
@@ -537,7 +539,6 @@ namespace jfYu.Core.Test.JfYuRequest
             if (File.Exists(path))
                 File.Delete(path);
         }
-
 
         [Theory]
         [ClassData(typeof(ServicesNoLogger))]
@@ -587,8 +588,6 @@ namespace jfYu.Core.Test.JfYuRequest
             }
         }
 
-
-
         [Theory]
         [ClassData(typeof(ServicesNoLogger))]
         public async Task Test_DownloadFile_Timeout(IJfYuRequest client)
@@ -613,9 +612,11 @@ namespace jfYu.Core.Test.JfYuRequest
 
             await Assert.ThrowsAsync<ArgumentNullException>(() => client.DownloadFileAsync(path));
         }
-        #endregion
 
-        #region  Logger
+        #endregion Download
+
+        #region Logger
+
         public class ServicesWithLogger : TheoryData<object, IJfYuRequest>
         {
             public ServicesWithLogger()
@@ -623,14 +624,14 @@ namespace jfYu.Core.Test.JfYuRequest
                 IJfYuRequest client;
                 IJfYuRequest request;
                 var services = new ServiceCollection();
-                services.AddJfYuHttpRequestService(q=>q.LoggingFields= JfYuLoggingFields.RequestData);
+                services.AddJfYuHttpRequestService(q => q.LoggingFields = JfYuLoggingFields.RequestData);
                 var mockLogger = new Mock<ILogger<JfYuHttpRequest>>();
                 services.AddSingleton(mockLogger.Object);
                 var serviceProvider = services.BuildServiceProvider();
                 request = serviceProvider.GetRequiredService<IJfYuRequest>();
 
                 var services1 = new ServiceCollection();
-                services1.AddJfYuHttpClientService(null,q => q.LoggingFields = JfYuLoggingFields.RequestData);
+                services1.AddJfYuHttpClientService(null, q => q.LoggingFields = JfYuLoggingFields.RequestData);
                 var mockLogger1 = new Mock<ILogger<JfYuHttpClient>>();
                 services1.AddSingleton(mockLogger1.Object);
                 var serviceProvider1 = services1.BuildServiceProvider();
@@ -654,7 +655,6 @@ namespace jfYu.Core.Test.JfYuRequest
                 logger2.Verify(x => x.Log(LogLevel.Information, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.Exactly(2));
         }
 
-
         [Theory]
         [ClassData(typeof(ServicesWithLogger))]
         public async Task Test_Send_ThrowException(object logger, IJfYuRequest client)
@@ -670,7 +670,8 @@ namespace jfYu.Core.Test.JfYuRequest
             if (logger is Mock<ILogger<JfYuHttpClient>> logger2)
                 logger2.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.Once);
         }
-        #endregion
+
+        #endregion Logger
 
         #region Exception With Logger
 
@@ -697,6 +698,7 @@ namespace jfYu.Core.Test.JfYuRequest
                 Add(mockLogger1, client);
             }
         }
+
         [Theory]
         [ClassData(typeof(ServicesWrongFilterWithLogger))]
         public async Task Test_Filter_ThrowException(object logger, IJfYuRequest client)
@@ -711,7 +713,6 @@ namespace jfYu.Core.Test.JfYuRequest
             if (logger is Mock<ILogger<JfYuHttpClient>> logger2)
                 logger2.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.AtLeastOnce);
         }
-
 
         [Theory]
         [ClassData(typeof(ServicesWithLogger))]
@@ -771,7 +772,7 @@ namespace jfYu.Core.Test.JfYuRequest
                 logger2.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.AtLeastOnce);
         }
 
-        #endregion
+        #endregion Exception With Logger
 
         public class ServicesFilter : TheoryData<IJfYuRequest>
         {
@@ -840,8 +841,5 @@ namespace jfYu.Core.Test.JfYuRequest
             Assert.Contains("testUser", JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse!["args"].ToString()!)!["username"]!.ToString());
             Assert.Contains("30", JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse!["args"].ToString()!)!["age"]!.ToString());
         }
-
-
     }
 }
-

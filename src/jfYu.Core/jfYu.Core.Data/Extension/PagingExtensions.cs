@@ -38,7 +38,6 @@ namespace jfYu.Core.Data.Extension
             return new PagedData<T>() { TotalPages = totalPages, Data = list, TotalCount = totalCount };
         }
 
-
         /// <summary>
         /// Converts an IQueryable into a paged result asynchronously.
         /// </summary>
@@ -59,8 +58,8 @@ namespace jfYu.Core.Data.Extension
             if (pageSize <= 0)
                 throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
 
-            int totalCount =await source.CountAsync();
-            var list =await source.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToListAsync();
+            int totalCount = await source.CountAsync().ConfigureAwait(false);
+            var list = await source.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToListAsync().ConfigureAwait(false);
             int totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
             return new PagedData<T>() { TotalPages = totalPages, Data = list, TotalCount = totalCount };
         }
@@ -94,7 +93,6 @@ namespace jfYu.Core.Data.Extension
             return new PagedData<Q>() { TotalPages = totalPages, Data = func(list).ToList(), TotalCount = totalCount };
         }
 
-
         /// <summary>
         /// Converts an IQueryable into a paged result with data transformation asynchronously.
         /// </summary>
@@ -117,8 +115,8 @@ namespace jfYu.Core.Data.Extension
             if (pageSize <= 0)
                 throw new InvalidOperationException($"{nameof(pageIndex)} must be a positive integer greater than 0.");
 
-            int totalCount = await source.CountAsync();
-            var list = await source.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToListAsync();
+            int totalCount = await source.CountAsync().ConfigureAwait(false);
+            var list = await source.Skip(pageSize * (pageIndex - 1)).Take(pageSize).ToListAsync().ConfigureAwait(false);
             int totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
             return new PagedData<Q>() { TotalPages = totalPages, Data = func(list).ToList(), TotalCount = totalCount };
         }

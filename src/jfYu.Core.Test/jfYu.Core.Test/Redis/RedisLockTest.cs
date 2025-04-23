@@ -9,6 +9,7 @@ namespace jfYu.Core.Test.Redis
         private readonly IRedisService _redisService = redisService;
 
         #region LockTakeAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task LockTakeAsync_WhenkeyIsNull_ShouldThrowArgumentException(string key)
@@ -25,6 +26,7 @@ namespace jfYu.Core.Test.Redis
             Assert.True(result);
             await _redisService.LockReleaseAsync(key);
         }
+
         [Fact]
         public async Task LockTakeAsync_WhenKeyExist_ReturnsFalse()
         {
@@ -47,7 +49,8 @@ namespace jfYu.Core.Test.Redis
             Assert.True(result);
             await _redisService.LockReleaseAsync(key);
         }
-        #endregion
+
+        #endregion LockTakeAsync
 
         #region LockReleaseAsync
 
@@ -58,6 +61,7 @@ namespace jfYu.Core.Test.Redis
             var ex = await Record.ExceptionAsync(async () => await _redisService.LockReleaseAsync(key));
             Assert.IsAssignableFrom<ArgumentException>(ex);
         }
+
         [Fact]
         public async Task LockReleaseAsync_WhenKeyNotExist_ReturnsFalse()
         {
@@ -74,9 +78,11 @@ namespace jfYu.Core.Test.Redis
             bool result = await _redisService.LockReleaseAsync(key);
             Assert.True(result);
         }
-        #endregion
+
+        #endregion LockReleaseAsync
 
         #region HighConcurrency
+
         [Fact]
         public async Task HighConcurrency_LockCorrectly()
         {
@@ -84,7 +90,7 @@ namespace jfYu.Core.Test.Redis
             const int NumberOfTasks = 100;
             const int LockTimeoutInSeconds = 5;
             const int IncrementCount = 1000;
-            // Arrange 
+            // Arrange
             var taskResults = new Task[NumberOfTasks];
             int count = 0;
             var records = new List<int>();
@@ -101,9 +107,7 @@ namespace jfYu.Core.Test.Redis
                         }
                         await _redisService.RemoveAsync(LockKey);
                     }
-
                 } while (!locked);
-
             })).ToList();
 
             await Task.WhenAll(tasks);
@@ -118,7 +122,7 @@ namespace jfYu.Core.Test.Redis
             const int NumberOfTasks = 100;
             const int LockTimeoutInSeconds = 5;
             const int IncrementCount = 1000;
-            // Arrange 
+            // Arrange
             var taskResults = new Task[NumberOfTasks];
             int count = 0;
             var records = new List<int>();
@@ -138,16 +142,14 @@ namespace jfYu.Core.Test.Redis
                         await Task.Delay(500);
                         await _redisService.RemoveAsync(LockKey);
                     }
-
                 } while (!locked);
-
             })).ToList();
 
             await Task.WhenAll(tasks);
             // Assert
             Assert.True(count <= NumberOfTasks * IncrementCount);
+        }
 
-        } 
-        #endregion
+        #endregion HighConcurrency
     }
 }

@@ -13,14 +13,13 @@ namespace jfYu.Core.Redis.Implementation
     /// </summary>
     public partial class RedisService : IRedisService
     {
-
         /// <inheritdoc/>
         public async Task<bool> SortedSetAddAsync<T>(string key, T value, double score, When when = When.Always, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             ArgumentNullException.ThrowIfNull(value);
             Log(nameof(SortedSetAddAsync), key);
-            return await _database.SortedSetAddAsync(key, _serializer.Serialize(value), score, when, flag);
+            return await _database.SortedSetAddAsync(key, _serializer.Serialize(value), score, when, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -30,7 +29,7 @@ namespace jfYu.Core.Redis.Implementation
             if (values == null || values.Count <= 0)
                 throw new ArgumentNullException(nameof(values));
             Log(nameof(SortedSetAddAllAsync), key);
-            return await _database.SortedSetAddAsync(key, values.Select(x => new SortedSetEntry(_serializer.Serialize(x.Key), x.Value)).ToArray(), flag);
+            return await _database.SortedSetAddAsync(key, values.Select(x => new SortedSetEntry(_serializer.Serialize(x.Key), x.Value)).ToArray(), flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -39,7 +38,7 @@ namespace jfYu.Core.Redis.Implementation
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             values.ThrowListIfNullOrEmpty();
             Log(nameof(SortedSetRemoveAsync), key);
-            return await _database.SortedSetRemoveAsync(key, values.Select(x => (RedisValue)_serializer.Serialize(x)).ToArray(), flag);
+            return await _database.SortedSetRemoveAsync(key, values.Select(x => (RedisValue)_serializer.Serialize(x)).ToArray(), flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -48,7 +47,7 @@ namespace jfYu.Core.Redis.Implementation
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             ArgumentNullException.ThrowIfNull(value);
             Log(nameof(SortedSetIncrementScoreAsync), key);
-            return await _database.SortedSetIncrementAsync(key, _serializer.Serialize(value), increment, flag);
+            return await _database.SortedSetIncrementAsync(key, _serializer.Serialize(value), increment, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -57,7 +56,7 @@ namespace jfYu.Core.Redis.Implementation
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             ArgumentNullException.ThrowIfNull(value);
             Log(nameof(SortedSetRankAsync), key);
-            return await _database.SortedSetRankAsync(key, _serializer.Serialize(value), order, flag);
+            return await _database.SortedSetRankAsync(key, _serializer.Serialize(value), order, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -65,7 +64,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(SortedSetRangeByRankAsync), key);
-            return [.. await _database.SortedSetRangeByRankAsync(key, start, stop, order, flag)];
+            return [.. await _database.SortedSetRangeByRankAsync(key, start, stop, order, flag).ConfigureAwait(false)];
         }
 
         /// <inheritdoc/>
@@ -73,7 +72,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(SortedSetRangeByScoreAsync), key);
-            return [.. await _database.SortedSetRangeByScoreAsync(key, min, max, exclude, order, skip, take, flag)];
+            return [.. await _database.SortedSetRangeByScoreAsync(key, min, max, exclude, order, skip, take, flag).ConfigureAwait(false)];
         }
 
         /// <inheritdoc/>
@@ -81,7 +80,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(SortedSetCountAsync), key);
-            return await _database.SortedSetLengthAsync(key, min, max, exclude, flag);
+            return await _database.SortedSetLengthAsync(key, min, max, exclude, flag).ConfigureAwait(false);
         }
     }
 }

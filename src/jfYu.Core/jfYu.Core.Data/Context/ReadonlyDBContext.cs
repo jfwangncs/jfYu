@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+
 namespace jfYu.Core.Data.Context
 {
     /// <summary>
@@ -12,6 +13,5 @@ namespace jfYu.Core.Data.Context
         ///Read-only  DBContext
         /// </summary>
         public T Current { get; } = current;
-
     }
 }

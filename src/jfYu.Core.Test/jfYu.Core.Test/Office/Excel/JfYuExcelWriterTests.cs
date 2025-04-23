@@ -74,7 +74,6 @@ namespace jfYu.Core.Test.Office.Excel
                 IFont font = style.GetFont(workbook);
                 Assert.Equal(10, font.FontHeightInPoints);
                 Assert.True(font.IsBold);
-
             }
             // Verify column widths
             i = 0;

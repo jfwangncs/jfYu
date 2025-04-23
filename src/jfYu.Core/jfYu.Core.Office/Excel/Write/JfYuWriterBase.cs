@@ -14,7 +14,6 @@ namespace jfYu.Core.Office.Excel.Write
     /// <typeparam name="T">The type of data to be written to Excel.</typeparam>
     public abstract class JfYuWriterBase<T> : IJfYuExcelWrite<T>
     {
-
         /// <inheritdoc/>
         protected abstract void WriteDataToWorkbook(IWorkbook workbook, T source, Dictionary<string, string>? titles = null, Action<int>? callback = null);
 
@@ -73,7 +72,7 @@ namespace jfYu.Core.Office.Excel.Write
                 case TypeCode.UInt32:
                     cell.SetCellValue(Convert.ToDouble(value));
                     break;
-                //Store values in text format to ensure accuracy           
+                //Store values in text format to ensure accuracy
                 case TypeCode.Int64:
                 case TypeCode.UInt64:
                 case TypeCode.Double:
@@ -89,17 +88,19 @@ namespace jfYu.Core.Office.Excel.Write
                 case TypeCode.DateTime:
                     cell.SetCellValue(((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss.fff"));
                     break;
+
                 case TypeCode.SByte:
                     cell.SetCellValue(Convert.ToSByte(value));
                     break;
+
                 case TypeCode.Byte:
                     cell.SetCellValue(Convert.ToByte(value));
                     break;
+
                 default:
                     cell.SetCellValue(Convert.ToString(value));
                     break;
             }
-
         }
     }
 }

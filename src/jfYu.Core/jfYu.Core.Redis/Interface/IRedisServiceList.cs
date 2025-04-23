@@ -35,29 +35,27 @@ namespace jfYu.Core.Redis.Interface
         /// Pop an element from the tail of the list.
         /// </summary>
         /// <typeparam name="T">The type of the values.</typeparam>
-        /// <param name="key">The Redis key.</param>  
+        /// <param name="key">The Redis key.</param>
         /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
         /// <returns>The last element of the list, or null if the key does not exist.</returns>
         Task<T?> ListPopFromRightAsync<T>(string key, CommandFlags flag = CommandFlags.None);
-
 
         /// <summary>
         /// Pop an element from the head of the list.
         /// </summary>
         /// <typeparam name="T">The type of the values.</typeparam>
-        /// <param name="key">The Redis key.</param> 
+        /// <param name="key">The Redis key.</param>
         /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
         /// <returns>The head element of the list, or null if the key does not exist.</returns>
         Task<T?> ListPopFromLeftAsync<T>(string key, CommandFlags flag = CommandFlags.None);
 
         /// <summary>
-        /// Get the length of list      
-        /// </summary> 
-        /// <param name="key">The key of the list.</param> 
+        /// Get the length of list
+        /// </summary>
+        /// <param name="key">The key of the list.</param>
         /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
         /// <returns>The number of elements.</returns>
         Task<long> ListLengthAsync(string key, CommandFlags flag = CommandFlags.None);
-
 
         /// <summary>
         /// Remove the specified number of values.
@@ -73,16 +71,14 @@ namespace jfYu.Core.Redis.Interface
         /// <returns>The number of removed elements.</returns>
         Task<long> ListRemoveAsync(string key, string value, int count);
 
-
         /// <summary>
         ///  Returns the specified elements of the list stored at key.
-        /// </summary>    
+        /// </summary>
         /// <param name="key">The Redis key.</param>
         /// <param name="start">start index</param>
-        /// <param name="stop">stop index</param> 
+        /// <param name="stop">stop index</param>
         /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
         /// <returns>The all element of the list.</returns>
         Task<List<RedisValue>> ListGetRangeAsync(string key, int start, int stop = -1, CommandFlags flag = CommandFlags.None);
-
     }
 }

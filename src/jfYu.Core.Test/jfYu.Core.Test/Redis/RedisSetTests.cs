@@ -9,7 +9,8 @@ namespace jfYu.Core.Test.Redis
     {
         private readonly IRedisService _redisService = redisService;
 
-        #region  SetAdd
+        #region SetAdd
+
         [Theory]
         [ClassData(typeof(NullKeyAndValueExpectData))]
         public async Task SetAddAsync_WhenKeyOrValueIsNull_ShouldThrowArgumentException(string key, string value)
@@ -38,9 +39,11 @@ namespace jfYu.Core.Test.Redis
             Assert.False(result);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion SetAdd
 
         #region SetAddAll
+
         [Theory]
         [ClassData(typeof(NullKeyAndValuesExpectData))]
         public async Task SetAddAllAsync_WhenKeyOrValueIsNull_ShouldThrowArgumentException(string key, List<string> values)
@@ -48,7 +51,6 @@ namespace jfYu.Core.Test.Redis
             var ex = await Record.ExceptionAsync(async () => await _redisService.SetAddAllAsync(key, values));
             Assert.IsAssignableFrom<ArgumentException>(ex);
         }
-
 
         [Fact]
         public async Task SetAddAllAsync_ValuesNotExist_ReturnCorrectLength()
@@ -71,9 +73,11 @@ namespace jfYu.Core.Test.Redis
             Assert.Equal(2, result);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion SetAddAll
 
         #region SetRemoveAsync
+
         [Theory]
         [ClassData(typeof(NullKeyAndValueExpectData))]
         public async Task SetRemoveAsync_WhenKeyOrValueIsNull_ShouldThrowArgumentException(string key, string value)
@@ -102,7 +106,8 @@ namespace jfYu.Core.Test.Redis
             Assert.True(result);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion SetRemoveAsync
 
         #region SetRemoveAllAsync
 
@@ -146,9 +151,11 @@ namespace jfYu.Core.Test.Redis
             Assert.Equal(1, result);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion SetRemoveAllAsync
 
         #region SetContainsAsync
+
         [Theory]
         [ClassData(typeof(NullKeyAndValueExpectData))]
         public async Task SetContainsAsync_WhenKeyOrValueIsNull_ShouldThrowArgumentException(string key, string value)
@@ -196,9 +203,11 @@ namespace jfYu.Core.Test.Redis
             Assert.True(result);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion SetContainsAsync
 
         #region SetMembersAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task SetMembersAsync_WhenKeyIsNull_ShouldThrowArgumentException(string key)
@@ -240,9 +249,11 @@ namespace jfYu.Core.Test.Redis
             Assert.Equal(values.Count - 1, result.Count);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion SetMembersAsync
 
         #region SetLengthAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task SetLengthAsync_WhenKeyIsNull_ShouldThrowArgumentException(string key)
@@ -250,7 +261,6 @@ namespace jfYu.Core.Test.Redis
             var ex = await Record.ExceptionAsync(async () => await _redisService.SetLengthAsync(key));
             Assert.IsAssignableFrom<ArgumentException>(ex);
         }
-
 
         [Fact]
         public async Task SetLengthAsync_KeyNotExist_ReturnCorrectly()
@@ -263,7 +273,6 @@ namespace jfYu.Core.Test.Redis
         [Fact]
         public async Task SetLengthAsync_ValueNotExist_ReturnCorrectly()
         {
-
             string key = "testKey";
             var value = "v1";
             await _redisService.SetAddAsync(key, value);
@@ -282,9 +291,11 @@ namespace jfYu.Core.Test.Redis
             Assert.Equal(values.Count, result);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion SetLengthAsync
 
         #region SetRandomMemberAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task SetRandomMemberAsync_WhenKeyIsNull_ShouldThrowArgumentException(string key)
@@ -304,7 +315,6 @@ namespace jfYu.Core.Test.Redis
         [Fact]
         public async Task SetRandomMemberAsync_ValueNotExist_ReturnEmpty()
         {
-
             string key = "testKey";
             var value = "v1";
             await _redisService.SetAddAsync(key, value);
@@ -312,10 +322,10 @@ namespace jfYu.Core.Test.Redis
             var result = await _redisService.SetRandomMemberAsync(key);
             Assert.False(result.HasValue);
         }
+
         [Fact]
         public async Task SetRandomMemberAsync_WithOneStringValue_ReturnOne()
         {
-
             string key = "testKey";
             var value = "v1";
             await _redisService.SetAddAsync(key, value);
@@ -327,7 +337,6 @@ namespace jfYu.Core.Test.Redis
         [Fact]
         public async Task SetRandomMemberAsync_WithOneModelValue_ReturnOne()
         {
-
             string key = "testKey";
             var value = new TestModelFaker().Generate(10);
             await _redisService.SetAddAsync(key, value);
@@ -347,9 +356,10 @@ namespace jfYu.Core.Test.Redis
             Assert.Contains(_redisService.Serializer.Deserialize<string>(result!), values);
         }
 
-        #endregion
+        #endregion SetRandomMemberAsync
 
         #region SetRandomMembersAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task SetRandomMembersAsync_WhenKeyIsNull_ShouldThrowArgumentException(string key)
@@ -369,7 +379,6 @@ namespace jfYu.Core.Test.Redis
         [Fact]
         public async Task SetRandomMembersAsync_ValueNotExist_ReturnEmpty()
         {
-
             string key = "testKey";
             var value = "v1";
             await _redisService.SetAddAsync(key, value);
@@ -386,7 +395,8 @@ namespace jfYu.Core.Test.Redis
             await _redisService.SetAddAllAsync(key, values);
             var result = await _redisService.SetRandomMembersAsync(key, 3);
             Assert.Equal(3, result.Count);
-        } 
-        #endregion
+        }
+
+        #endregion SetRandomMembersAsync
     }
 }

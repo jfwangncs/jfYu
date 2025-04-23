@@ -10,7 +10,6 @@ namespace jfYu.Core.Office.Excel.Write.Interface
     /// </summary>
     public interface IJfYuExcelWrite<T>
     {
-
         /// <summary>
         /// Writes the provided data to an Excel file.
         /// </summary>

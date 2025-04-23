@@ -12,9 +12,11 @@ namespace jfYu.Core.Test.Models
 
         [DisplayName("地址")]
         public string? Address { get; set; }
+
         public DateTime DateTime { get; set; }
         public TestSubModel? Sub { get; set; }
         public List<TestSubModel> Items { get; set; } = [];
+
         public override bool Equals(object? obj)
         {
             if (obj is TestModel other)
@@ -29,10 +31,12 @@ namespace jfYu.Core.Test.Models
             }
             return false;
         }
+
         public override int GetHashCode()
         {
             return HashCode.Combine(Name, Age, Address, DateTime, Items);
         }
+
         private static bool AreListsEqual(List<TestSubModel> list1, List<TestSubModel> list2)
         {
             if (list1 == null || list2 == null)
@@ -56,13 +60,13 @@ namespace jfYu.Core.Test.Models
             return true;
         }
     }
+
     public class TestModelComparer : IEqualityComparer<TestModel>
     {
         public bool Equals(TestModel? x, TestModel? y)
         {
-
             if (ReferenceEquals(x, y)) return true;
-            if (x is null || y is null) return false; 
+            if (x is null || y is null) return false;
             return x.Name == y.Name && x.Age == y.Age && x.Address == y.Address && x.DateTime.ToUniversalTime() == y.DateTime.ToUniversalTime() && VerifySub() && AreListsEqual(x.Items, y.Items);
 
             bool VerifySub()
@@ -72,6 +76,7 @@ namespace jfYu.Core.Test.Models
                 return x.Sub == y.Sub;
             }
         }
+
         public static int GetHashCode(Person obj)
         {
             unchecked
@@ -82,10 +87,12 @@ namespace jfYu.Core.Test.Models
                 return hash;
             }
         }
+
         public int GetHashCode([DisallowNull] TestModel obj)
         {
             return HashCode.Combine(obj.Name, obj.Age, obj.Address, obj.DateTime, obj.Items);
         }
+
         private static bool AreListsEqual(List<TestSubModel> list1, List<TestSubModel> list2)
         {
             if (list1 == null || list2 == null)
@@ -109,6 +116,4 @@ namespace jfYu.Core.Test.Models
             return true;
         }
     }
-
-
 }

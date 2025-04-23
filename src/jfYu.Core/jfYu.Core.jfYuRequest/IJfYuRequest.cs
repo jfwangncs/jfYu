@@ -114,7 +114,6 @@ namespace jfYu.Core.jfYuRequest
         /// <returns>The response content.</returns>
         Task<string> SendAsync();
 
-
         /// <summary>
         /// Downloads a file asynchronously.
         /// </summary>
@@ -129,6 +128,5 @@ namespace jfYu.Core.jfYuRequest
         /// <param name="progress">The progress delegate function.</param>
         /// <returns>The memory stream containing the downloaded file.</returns>
         Task<MemoryStream?> DownloadFileAsync(Action<decimal, decimal, decimal>? progress = null);
-
     }
 }

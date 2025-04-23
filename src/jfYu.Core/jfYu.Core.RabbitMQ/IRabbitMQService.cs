@@ -47,7 +47,7 @@ namespace jfYu.Core.RabbitMQ
 
         /// <summary>
         /// Receives messages from a queue asynchronously with a specified prefetch count.
-        /// </summary> 
+        /// </summary>
         /// <param name="queueName">The name of the queue.</param>
         /// <param name="func">The async function to process the message.</param>
         /// <param name="prefetchCount">The number of messages to prefetch (default is 1).</param>
@@ -75,7 +75,7 @@ namespace jfYu.Core.RabbitMQ
         /// Sends a message to an exchange with a specific routing key.
         /// </summary>
         /// <typeparam name="T">The type of the message.</typeparam>
-        /// <param name="exchangeName">The name of the exchange.</param> 
+        /// <param name="exchangeName">The name of the exchange.</param>
         /// <param name="msg">The message to send.</param>
         /// <param name="routingKey">The routing key (optional).</param>
         /// <param name="headers">The headers (optional) if exchangeType="header" must be mandatory.</param>
@@ -84,8 +84,8 @@ namespace jfYu.Core.RabbitMQ
 
         /// <summary>
         /// Sends a message to an exchange with a specific routing key.
-        /// </summary> 
-        /// <param name="exchangeName">The name of the exchange.</param> 
+        /// </summary>
+        /// <param name="exchangeName">The name of the exchange.</param>
         /// <param name="msg">The message to send.</param>
         /// <param name="routingKey">The routing key (optional).</param>
         /// <param name="headers">The headers (optional) if exchangeType="header" must be mandatory.</param>

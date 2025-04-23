@@ -12,7 +12,6 @@ namespace jfYu.Core.Test.Office.Excel
     {
         public readonly IJfYuExcel _jfYuExcel = jfYuExcel;
 
-
         [Fact]
         public void ListWriter_WithoutTitles_ReturnCorrectly()
         {
@@ -109,6 +108,7 @@ namespace jfYu.Core.Test.Office.Excel
             Assert.Equal(JsonConvert.SerializeObject(source), JsonConvert.SerializeObject(data));
             File.Delete(filePath);
         }
+
         [Fact]
         public void ListWriter_WithAllType_ReturnCorrectly()
         {
@@ -126,7 +126,6 @@ namespace jfYu.Core.Test.Office.Excel
             Assert.Equal(JsonConvert.SerializeObject(source), JsonConvert.SerializeObject(data));
             File.Delete(filePath);
         }
-
 
         [Fact]
         public void ListWriter_WithMultipleSheet_ReturnCorrectly()
@@ -154,11 +153,9 @@ namespace jfYu.Core.Test.Office.Excel
             Assert.NotNull(data);
             Assert.Equal(26, data.Count);
 
-
             Assert.Equal(JsonConvert.SerializeObject(source.OrderBy(q => q.Name)), JsonConvert.SerializeObject(data.OrderBy(q => q.Name)));
             File.Delete(filePath);
         }
-
 
         [Fact]
         public void ListWriter_WithUnsupportedType_ReturnCorrectly()
@@ -168,6 +165,7 @@ namespace jfYu.Core.Test.Office.Excel
             var ex = Record.Exception(() => _jfYuExcel.Write(new HashSet<int>(), filePath, JfYuExcelExtension.GetTitles<AllTypeTestModel>()));
             Assert.IsAssignableFrom<Exception>(ex);
         }
+
         [Fact]
         public void ListWriter_WithUnsupportedType1_ReturnCorrectly()
         {
@@ -227,6 +225,7 @@ namespace jfYu.Core.Test.Office.Excel
             Assert.Equal(JsonConvert.SerializeObject(d2), JsonConvert.SerializeObject(data.Item2));
             File.Delete(filePath);
         }
+
         [Fact]
         public void ListWriter_WithTypeTuple3_ReturnCorrectly()
         {
@@ -251,6 +250,7 @@ namespace jfYu.Core.Test.Office.Excel
             Assert.Equal(JsonConvert.SerializeObject(d2), JsonConvert.SerializeObject(data.Item3));
             File.Delete(filePath);
         }
+
         [Fact]
         public void ListWriter_WithTypeTuple4_ReturnCorrectly()
         {
@@ -276,6 +276,7 @@ namespace jfYu.Core.Test.Office.Excel
             Assert.Equal(JsonConvert.SerializeObject(d2), JsonConvert.SerializeObject(data.Item4));
             File.Delete(filePath);
         }
+
         [Fact]
         public void ListWriter_WithTypeTuple5_ReturnCorrectly()
         {
@@ -302,6 +303,7 @@ namespace jfYu.Core.Test.Office.Excel
             Assert.Equal(JsonConvert.SerializeObject(d2), JsonConvert.SerializeObject(data.Item5));
             File.Delete(filePath);
         }
+
         [Fact]
         public void ListWriter_WithTypeTuple6_ReturnCorrectly()
         {
@@ -329,6 +331,7 @@ namespace jfYu.Core.Test.Office.Excel
             Assert.Equal(JsonConvert.SerializeObject(d2), JsonConvert.SerializeObject(data.Item6));
             File.Delete(filePath);
         }
+
         [Fact]
         public void ListWriter_WithTypeTuple7_ReturnCorrectly()
         {
@@ -455,6 +458,7 @@ namespace jfYu.Core.Test.Office.Excel
 
             File.Delete(filePath);
         }
+
         [Fact]
         public void ListWriter_TupleSimpleTypeDateTime_ReturnCorrectly()
         {
@@ -472,6 +476,7 @@ namespace jfYu.Core.Test.Office.Excel
 
             File.Delete(filePath);
         }
+
         [Fact]
         public void ListWriter_SimpleTypeString_ReturnCorrectly()
         {
@@ -525,6 +530,7 @@ namespace jfYu.Core.Test.Office.Excel
 
             File.Delete(filePath);
         }
+
         [Fact]
         public void ListWriter_SimpleTypeDatetime_ReturnCorrectly()
         {
@@ -542,6 +548,7 @@ namespace jfYu.Core.Test.Office.Excel
 
             File.Delete(filePath);
         }
+
         [Fact]
         public void ListWriter_WithErrorTitle_ThrowException()
         {
@@ -551,11 +558,11 @@ namespace jfYu.Core.Test.Office.Excel
                 File.Delete(filePath);
             var source = new List<IJfYuExcel>() { _jfYuExcel };
 
-            // Act 
+            // Act
             var ex = Record.Exception(() => _jfYuExcel.Write(source, filePath, new Dictionary<string, string>() { { "x", "y" } }));
             Assert.IsAssignableFrom<InvalidOperationException>(ex);
         }
-        #endregion
 
+        #endregion Tuple
     }
 }

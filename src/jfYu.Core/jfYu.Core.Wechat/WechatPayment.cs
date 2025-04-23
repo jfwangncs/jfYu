@@ -185,9 +185,9 @@ namespace jfYu.Core.Wechat
 
         private static string SHAmd5Encrypt(string normalTxt)
         {
-            var bytes = Encoding.Default.GetBytes(normalTxt);//求Byte[]数组  
+            var bytes = Encoding.Default.GetBytes(normalTxt);//求Byte[]数组
             using var md5 = MD5.Create();
-            var encryptbytes = md5.ComputeHash(bytes);//求哈希值  
+            var encryptbytes = md5.ComputeHash(bytes);//求哈希值
             static string BytesToHex(byte[] buffer)
             {
                 string md_str = string.Empty;
@@ -197,7 +197,7 @@ namespace jfYu.Core.Wechat
                 }
                 return md_str;
             }
-            return BytesToHex(encryptbytes);//将Byte[]数组转为明文(其实就是字符串)  
+            return BytesToHex(encryptbytes);//将Byte[]数组转为明文(其实就是字符串)
         }
 
         public static T? XmlGet<T>(string xml)

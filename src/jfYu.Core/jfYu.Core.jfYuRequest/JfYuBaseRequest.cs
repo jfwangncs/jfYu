@@ -15,26 +15,20 @@ namespace jfYu.Core.jfYuRequest
     /// </summary>
     public abstract class JfYuBaseRequest : IJfYuRequest
     {
-
         /// <inheritdoc/>
         public string Url { get; set; } = "";
-
 
         /// <inheritdoc/>
         public string ContentType { get; set; } = RequestContentType.Json;
 
-
         /// <inheritdoc/>
         public HttpMethod Method { get; set; } = HttpMethod.Get;
-
 
         /// <inheritdoc/>
         public string Authorization { get; set; } = "";
 
-
         /// <inheritdoc/>
         public Encoding RequestEncoding { get; set; } = Encoding.UTF8;
-
 
         /// <inheritdoc/>
         public CookieContainer RequestCookies { get; set; } = new();
@@ -45,14 +39,11 @@ namespace jfYu.Core.jfYuRequest
         /// <inheritdoc/>
         public WebProxy? Proxy { get; set; }
 
-
         /// <inheritdoc/>
         public Dictionary<string, string> Files { get; set; } = [];
 
-
         /// <inheritdoc/>
         public RequestHeader RequestHeader { get; set; } = new();
-
 
         /// <inheritdoc/>
         public int Timeout { get; set; } = 30;
@@ -60,13 +51,11 @@ namespace jfYu.Core.jfYuRequest
         /// <inheritdoc/>
         public Dictionary<string, string> RequestCustomHeaders { get; set; } = [];
 
-
         /// <inheritdoc/>
         public string RequestData { get; set; } = "";
 
         /// <inheritdoc/>
         public X509Certificate2? Certificate { get; set; }
-
 
         /// <inheritdoc/>
         public bool CertificateValidation { get; set; } = false;
@@ -74,14 +63,11 @@ namespace jfYu.Core.jfYuRequest
         /// <inheritdoc/>
         public Action<object>? CustomInit { get; set; }
 
-
         /// <inheritdoc/>
         public Dictionary<string, List<string>> ResponseHeader { get; protected set; } = [];
 
-
         /// <inheritdoc/>
         public HttpStatusCode StatusCode { get; protected set; }
-
 
         /// <inheritdoc/>
         protected const int DefaultBufferSize = 8192;
@@ -138,7 +124,6 @@ namespace jfYu.Core.jfYuRequest
         /// <returns>The formatted log message.</returns>
         protected static string LogRequest(JfYuLoggingFields LoggingFields, string requestId, string url, string method, string header, string requestData)
         {
-
             var logMessage = new StringBuilder($"Request [RequestId:{requestId}]");
 
             if ((LoggingFields & JfYuLoggingFields.RequestPath) == JfYuLoggingFields.RequestPath)
@@ -166,7 +151,6 @@ namespace jfYu.Core.jfYuRequest
         /// <returns>The formatted log message.</returns>
         protected static string LogResponse(JfYuLoggingFields LoggingFields, string requestId, string status, string result)
         {
-
             var logMessage = new StringBuilder($"Response [RequestId:{requestId}]");
 
             if ((LoggingFields & JfYuLoggingFields.ResponseStatus) == JfYuLoggingFields.ResponseStatus)
@@ -178,10 +162,8 @@ namespace jfYu.Core.jfYuRequest
             return logMessage.ToString();
         }
 
-
         /// <inheritdoc/>
         public abstract Task<string> SendAsync();
-
 
         /// <inheritdoc/>
         public abstract Task<bool> DownloadFileAsync(string path, Action<decimal, decimal, decimal>? progress = null);
@@ -189,6 +171,5 @@ namespace jfYu.Core.jfYuRequest
         /// <inheritdoc/>
 
         public abstract Task<MemoryStream?> DownloadFileAsync(Action<decimal, decimal, decimal>? progress = null);
-
     }
 }

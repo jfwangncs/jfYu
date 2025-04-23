@@ -14,7 +14,7 @@ namespace jfYu.Core.Redis.Serializer.Newtonsoft
     {
         /// <summary>
         /// Encoding to use to convert string to byte[] and the other way around.
-        /// </summary>   
+        /// </summary>
         private static readonly Encoding _encoding = Encoding.UTF8;
 
         private readonly JsonSerializerSettings _settings = settings;

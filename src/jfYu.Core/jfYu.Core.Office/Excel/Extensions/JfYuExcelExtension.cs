@@ -154,7 +154,6 @@ namespace jfYu.Core.Office.Excel.Extensions
             {
                 throw;
             }
-
         }
 
         /// <summary>
@@ -213,7 +212,6 @@ namespace jfYu.Core.Office.Excel.Extensions
                         {
                             var title = titles.FirstOrDefault(q => q.Value == c.Value);
                             p = type.GetProperty(title.Key);
-
                         }
                         if (p != null)
                         {
@@ -253,15 +251,19 @@ namespace jfYu.Core.Office.Excel.Extensions
                     else
                         result = cell.NumericCellValue.ToString();
                     break;
+
                 case CellType.String:
                     result = cell.StringCellValue;
                     break;
+
                 case CellType.Blank:
                     result = null;
                     break;
+
                 case CellType.Boolean:
                     result = cell.BooleanCellValue.ToString();
                     break;
+
                 case CellType.Formula:
                     if (cell.CachedFormulaResultType == CellType.Numeric)
                         result = cell.NumericCellValue.ToString();
@@ -270,6 +272,7 @@ namespace jfYu.Core.Office.Excel.Extensions
                     else
                         throw new InvalidOperationException("Formula resulted in an error.");
                     break;
+
                 default:
                     throw new Exception($"unknown cell type,{cell.CellType}");
             }
@@ -317,7 +320,6 @@ namespace jfYu.Core.Office.Excel.Extensions
             ConstructorInfo? constructor = tupleType.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, CallingConventions.HasThis, Array.ConvertAll(args, arg => arg.GetType()), null);
             return constructor!.Invoke(args);
         }
-
 
         /// <summary>
         /// Creates a tuple type with the specified generic type arguments.

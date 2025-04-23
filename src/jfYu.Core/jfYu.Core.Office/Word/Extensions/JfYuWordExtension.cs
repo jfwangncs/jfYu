@@ -36,7 +36,6 @@ namespace jfYu.Core.Office.Word.Extensions
             // Insert the text before the placeholder
             if (!string.IsNullOrEmpty(beforeText))
             {
-
                 XWPFRun beforeRun = run.Paragraph.InsertNewRun(pos);
                 beforeRun.SetText(beforeText);
                 pos++;

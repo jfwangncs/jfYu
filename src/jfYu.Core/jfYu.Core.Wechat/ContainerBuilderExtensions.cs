@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Net.Http;
-using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 
@@ -10,13 +9,13 @@ namespace jfYu.Core.Wechat
 {
     public static class ContainerBuilderExtensions
     {
-
         #region 小程序
+
         /// <summary>
         /// 小程序
         /// </summary>
         /// <param name="services"></param>
-        public static void AddMiniProgram(this IServiceCollection services,WechatConfig wechatConfig)
+        public static void AddMiniProgram(this IServiceCollection services, WechatConfig wechatConfig)
         {
             services.AddSingleton(wechatConfig);
             services.AddSingleton<MiniProgram>();
@@ -26,11 +25,11 @@ namespace jfYu.Core.Wechat
                 q.Timeout = TimeSpan.FromSeconds(30);
             });
         }
-       
 
-        #endregion
+        #endregion 小程序
 
         #region 支付
+
         /// <summary>
         /// 支付
         /// </summary>
@@ -59,6 +58,6 @@ namespace jfYu.Core.Wechat
             });
         }
 
-        #endregion
+        #endregion 支付
     }
 }

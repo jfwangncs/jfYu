@@ -11,7 +11,7 @@ namespace jfYu.Core.Test.Models.Entity
         /// UserName
         /// </summary>
         [DisplayName("UserName"), Required, MaxLength(100)]
-        public required string UserName { get; set; }
+        public string UserName { get; set; }
 
         /// <summary>
         /// NickName
@@ -29,7 +29,6 @@ namespace jfYu.Core.Test.Models.Entity
         /// Department
         /// </summary>
         public virtual Department? Department { get; set; }
-
     }
 
     public class Department : BaseEntity
@@ -38,13 +37,13 @@ namespace jfYu.Core.Test.Models.Entity
         /// Name
         /// </summary>
         [DisplayName("Name"), Required]
-        public required  string Name { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// SubName
         /// </summary>
         [DisplayName("SubName"), Required]
-        public required string SubName { get; set; }
+        public string SubName { get; set; }
 
         /// <summary>
         /// SuperiorId
@@ -63,12 +62,11 @@ namespace jfYu.Core.Test.Models.Entity
         /// </summary>
         [DisplayName("Users")]
         public virtual List<User>? Users { get; set; }
-
     }
+
     public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Department> Departments { get; set; }
-
     }
 }

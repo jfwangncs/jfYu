@@ -14,7 +14,5 @@
         /// One sheet max record default:1000000
         /// </summary>
         public int SheetMaxRecord { get; set; } = 1000000;
-         
-  
     }
 }

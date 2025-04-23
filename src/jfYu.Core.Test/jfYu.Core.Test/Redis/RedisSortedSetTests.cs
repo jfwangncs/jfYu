@@ -9,6 +9,7 @@ namespace jfYu.Core.Test.Redis
         private readonly IRedisService _redisService = redisService;
 
         #region SortedSetAddAsync
+
         [Theory]
         [ClassData(typeof(NullKeyAndValueExpectData))]
         public async Task SortedSetAddAsync_WhenkeyOrValueIsNull_ShouldThrowArgumentException(string key, string value)
@@ -39,9 +40,11 @@ namespace jfYu.Core.Test.Redis
             Assert.False(result);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion SortedSetAddAsync
 
         #region SortedSetAddAllAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task SortedSetAddAllAsync_WhenkeyIsNull_ShouldThrowArgumentException(string key)
@@ -79,9 +82,11 @@ namespace jfYu.Core.Test.Redis
             Assert.Equal(values.Count, result);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion SortedSetAddAllAsync
 
         #region SortedSetRemoveAsync
+
         [Theory]
         [ClassData(typeof(NullKeyAndValuesExpectData))]
         public async Task SortedSetRemoveAsync_WhenkeyIsNullOrValuesIsNull_ShouldThrowArgumentException(string key, List<string> values)
@@ -126,9 +131,11 @@ namespace jfYu.Core.Test.Redis
             Assert.Equal(2, result);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion SortedSetRemoveAsync
 
         #region SortedSetIncrementScoreAsync
+
         [Theory]
         [ClassData(typeof(NullKeyAndValueExpectData))]
         public async Task SortedSetIncrementScoreAsync_WhenkeyIsNullOrValueIsNull_ShouldThrowArgumentException(string key, string value)
@@ -159,9 +166,11 @@ namespace jfYu.Core.Test.Redis
             Assert.Equal(score * 2, result);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion SortedSetIncrementScoreAsync
 
         #region SortedSetRankAsync
+
         [Theory]
         [ClassData(typeof(NullKeyAndValueExpectData))]
         public async Task SortedSetRankAsync_WhenkeyIsNullOrValueIsNull_ShouldThrowArgumentException(string key, string value)
@@ -207,9 +216,11 @@ namespace jfYu.Core.Test.Redis
             Assert.Null(result);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion SortedSetRankAsync
 
         #region SortedSetRangeByRankAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task SortedSetRangeByRankAsync_WhenkeyIsNull_ShouldThrowArgumentException(string key)
@@ -252,9 +263,11 @@ namespace jfYu.Core.Test.Redis
             Assert.Equal("e", _redisService.Serializer.Deserialize<string>(result.First()!));
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion SortedSetRangeByRankAsync
 
         #region SortedSetRangeByScoreAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task SortedSetRangeByScoreAsync_WhenkeyIsNull_ShouldThrowArgumentException(string key)
@@ -298,9 +311,11 @@ namespace jfYu.Core.Test.Redis
             Assert.Equal("c", _redisService.Serializer.Deserialize<string>(result.First()!));
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion SortedSetRangeByScoreAsync
 
         #region SortedSetCountAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task SortedSetCountAsync_WhenkeyIsNull_ShouldThrowArgumentException(string key)
@@ -342,7 +357,8 @@ namespace jfYu.Core.Test.Redis
             result = await _redisService.SortedSetCountAsync(key, 1.1d, 1.3d, StackExchange.Redis.Exclude.Both);
             Assert.Equal(1, result);
             await _redisService.RemoveAsync(key);
-        } 
-        #endregion
+        }
+
+        #endregion SortedSetCountAsync
     }
 }

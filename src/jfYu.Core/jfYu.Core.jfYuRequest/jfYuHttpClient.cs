@@ -1,6 +1,5 @@
 ﻿using jfYu.Core.jfYuRequest.Enum;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -23,7 +22,6 @@ namespace jfYu.Core.jfYuRequest
     /// <param name="logger">The logger.</param>
     public class JfYuHttpClient(IHttpClientFactory factory, CookieContainer cookieContainer, LogFilter logFilter, ILogger<JfYuHttpClient>? logger = null) : JfYuBaseRequest
     {
-
         /// <summary>
         /// The HTTP web request.
         /// </summary>
@@ -83,7 +81,6 @@ namespace jfYu.Core.jfYuRequest
             }
         }
 
-
         /// <inheritdoc/>
         public override async Task<string> SendAsync()
         {
@@ -120,7 +117,6 @@ namespace jfYu.Core.jfYuRequest
                             formData.Add(fileContent, file.Key, Path.GetFileName(file.Value));
                         }
                         response = await _request!.PostAsync(Url, formData);
-
                     }
                     else
                         response = await _request!.PostAsync(Url, new StringContent(RequestData, RequestEncoding, ContentType));
@@ -145,7 +141,6 @@ namespace jfYu.Core.jfYuRequest
                 throw;
             }
         }
-
 
         /// <inheritdoc/>
         public override async Task<bool> DownloadFileAsync(string path, Action<decimal, decimal, decimal>? progress = null)
@@ -175,7 +170,6 @@ namespace jfYu.Core.jfYuRequest
                 throw;
             }
         }
-
 
         /// <inheritdoc/>
         public override async Task<MemoryStream?> DownloadFileAsync(Action<decimal, decimal, decimal>? progress = null)

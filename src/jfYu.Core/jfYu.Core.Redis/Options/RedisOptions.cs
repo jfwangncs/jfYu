@@ -41,7 +41,7 @@ namespace jfYu.Core.Redis.Options
         public string? Prefix { get; set; }
 
         /// <summary>
-        /// Enabled or disabled logs default:false  
+        /// Enabled or disabled logs default:false
         /// </summary>
         public bool EnableLogs { get; set; } = false;
 
@@ -49,7 +49,6 @@ namespace jfYu.Core.Redis.Options
         /// Serializer Options
         /// </summary>
         internal ISerializerOptionsExtension? SerializerOptions { get; set; }
-
     }
 
     /// <summary>

@@ -5,7 +5,6 @@
     /// </summary>
     public class MessageRetryPolicy
     {
-
         /// <summary>
         /// Indicates whether the dead letter queue is enabled.
         /// </summary>

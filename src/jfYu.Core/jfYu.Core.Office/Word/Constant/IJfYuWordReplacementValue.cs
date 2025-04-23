@@ -1,6 +1,5 @@
 ﻿namespace jfYu.Core.Office.Word.Constant
 {
-
     /// <summary>
     /// Interface for defining replacement values in Word documents.
     /// </summary>
@@ -40,6 +39,3 @@
         public string Text { get; set; } = "";
     }
 }
-
-
-

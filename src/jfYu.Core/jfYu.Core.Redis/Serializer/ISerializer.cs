@@ -23,5 +23,4 @@
         /// </returns>
         T? Deserialize<T>(byte[] serializedObject);
     }
-
 }

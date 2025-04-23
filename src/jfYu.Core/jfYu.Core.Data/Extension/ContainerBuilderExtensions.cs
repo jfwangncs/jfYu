@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
+
 namespace jfYu.Core.Data.Extension
 {
     /// <summary>
@@ -60,7 +61,7 @@ namespace jfYu.Core.Data.Extension
 
             return services;
         }
-     
+
         private static DbContextOptions GetDbContextOptions<T>(DatabaseConfig config, DbContextOptionsBuilder? opt = null) where T : DbContext
         {
             var optionsBuilder = opt ?? new DbContextOptionsBuilder<T>();
@@ -70,9 +71,11 @@ namespace jfYu.Core.Data.Extension
                 case DatabaseType.MySql:
                     optionsBuilder.UseMySql(config.ConnectionString, ServerVersion.AutoDetect(config.ConnectionString));
                     break;
+
                 case DatabaseType.Sqlite:
                     optionsBuilder.UseSqlite(config.ConnectionString);
                     break;
+
                 default:
                 case DatabaseType.SqlServer:
                     optionsBuilder.UseSqlServer(config.ConnectionString);
@@ -81,6 +84,5 @@ namespace jfYu.Core.Data.Extension
 
             return optionsBuilder.Options;
         }
-
     }
 }

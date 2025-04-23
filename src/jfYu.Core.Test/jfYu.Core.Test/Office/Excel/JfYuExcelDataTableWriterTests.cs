@@ -54,6 +54,7 @@ namespace jfYu.Core.Test.Office.Excel
             if (File.Exists(filePath))
                 File.Delete(filePath);
         }
+
         [Fact]
         public void DataTableExcelWriter_ValidDataTableWithWriteOperationAppend_CreatesWorkbookWithCorrectData()
         {
@@ -67,7 +68,7 @@ namespace jfYu.Core.Test.Office.Excel
             var callbackCalledCount = 0;
             void callback(int count) => callbackCalledCount++;
 
-            // Act 
+            // Act
             _jfYuExcel.Write(source, filePath, titles, writeOperation, callback);
 
             // Assert
@@ -80,12 +81,11 @@ namespace jfYu.Core.Test.Office.Excel
                 File.Delete(filePath);
         }
 
-
         [Fact]
         public void DataTableExcelWriter_ValidDataTableButFileExistWithWriteOperationAppend_CreatesWorkbookWithCorrectData()
         {
             var filePath = "ValidDataTableButFileExistWithWriteOperationAppend.xlsx";
-            // Arrange 
+            // Arrange
             if (File.Exists(filePath))
                 File.Delete(filePath);
             var source = CreateSampleDataTable();
@@ -112,7 +112,6 @@ namespace jfYu.Core.Test.Office.Excel
             if (File.Exists(filePath))
                 File.Delete(filePath);
         }
-
 
         [Fact]
         public void DataTableExcelWriter_ValidDataTableWithoutTitles_CreatesWorkbookWithCorrectData()
@@ -198,7 +197,6 @@ namespace jfYu.Core.Test.Office.Excel
         [Fact]
         public void DataTableExcelWriter_ValidDataTable_CreatesWorkbookWithDict()
         {
-
             var filePath = "excel1/ValidDataTable.xlsx";
             // Arrange
             if (File.Exists(filePath))
@@ -218,7 +216,6 @@ namespace jfYu.Core.Test.Office.Excel
         [Fact]
         public void DataTableExcelWriter_ValidDataTable_CreatesWorkbookWithExistDict()
         {
-
             var filePath = "excel/ValidDataTableExistDict.xlsx";
             // Arrange
             if (!Directory.Exists("excel"))
@@ -310,7 +307,6 @@ namespace jfYu.Core.Test.Office.Excel
                 Assert.Equal(item["sbyte"], data[index].Sbyte);
                 Assert.Equal(item["EmptyStr"], data[index].EmptyStr);
                 Assert.Null(data[index].NullStr);
-
             }
             File.Delete(filePath);
         }
@@ -334,7 +330,6 @@ namespace jfYu.Core.Test.Office.Excel
             {
                 table.Rows.Add(i, $"Name{i}", i + 10, DateTime.Now, null, string.Empty);
             }
-
 
             // Act
             _jfYuExcel.Write(table, filePath);
@@ -374,6 +369,5 @@ namespace jfYu.Core.Test.Office.Excel
 
             return table;
         }
-
     }
 }

@@ -1,4 +1,4 @@
-﻿using jfYu.Core.Office.Excel.Constant; 
+﻿using jfYu.Core.Office.Excel.Constant;
 using jfYu.Core.Office.Excel.Extensions;
 using jfYu.Core.Office.Excel.Write.Interface;
 using Microsoft.Extensions.Options;
@@ -11,7 +11,6 @@ using System.Text;
 
 namespace jfYu.Core.Office.Excel
 {
-
     /// <summary>
     /// Class for handling Excel operations such as creating, reading, and writing Excel files.
     /// </summary>
@@ -19,7 +18,6 @@ namespace jfYu.Core.Office.Excel
     {
         private readonly IOptionsMonitor<JfYuExcelOption> _configuration = configuration;
         private readonly IJfYuExcelWriterFactory _excelWriterFactory = excelWriterFactory;
-
 
         /// <inheritdoc/>
         public IWorkbook CreateExcel(JfYuExcelVersion excelVersion = JfYuExcelVersion.Xlsx)

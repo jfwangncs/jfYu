@@ -12,7 +12,8 @@ namespace jfYu.Core.Test.Office.Excel
     [Collection("Excel")]
     public class JfYuWordBaseTests
     {
-        #region  AddService  
+        #region AddService
+
         [Fact]
         public void AddJfYuExcel_WithoutOptions_Registers()
         {
@@ -27,6 +28,7 @@ namespace jfYu.Core.Test.Office.Excel
             Assert.NotNull(jfYuExcel);
             Assert.NotNull(dataWrite);
         }
+
         [Fact]
         public void AddJfYuExcel_WithOptions_RegistersExcel()
         {
@@ -44,7 +46,7 @@ namespace jfYu.Core.Test.Office.Excel
             Assert.Equal(33, options.Value.SheetMaxRecord);
         }
 
-        #endregion
+        #endregion AddService
 
         [Fact]
         public void GetTitles_ShouldReturnCorrectTitles()

@@ -23,6 +23,7 @@ namespace jfYu.Core.Test.Models
 
         [DisplayName("NullShort")]
         public short? NullShort { get; set; }
+
         public ushort? NullUshort { get; set; }
         public int? NullInt { get; set; }
         public uint? NullUint { get; set; }

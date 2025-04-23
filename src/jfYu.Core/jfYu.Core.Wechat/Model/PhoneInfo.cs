@@ -24,6 +24,5 @@ namespace jfYu.Core.Wechat.Model
 
         [JsonProperty(PropertyName = "timestamp")]
         public long Timestamp { get; set; }
-
     }
 }

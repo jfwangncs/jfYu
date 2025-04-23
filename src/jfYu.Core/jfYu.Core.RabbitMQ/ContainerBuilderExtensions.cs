@@ -1,11 +1,9 @@
-﻿
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
 using System;
 
 namespace jfYu.Core.RabbitMQ
 {
-
     /// <summary>
     ///  Adds RabbitMQ services extensions
     /// </summary>
@@ -25,10 +23,10 @@ namespace jfYu.Core.RabbitMQ
 
             var factory = new ConnectionFactory();
             var retryPolicy = new MessageRetryPolicy();
-            configure(factory, retryPolicy);          
+            configure(factory, retryPolicy);
             services.AddSingleton(_ => factory.CreateConnection());
-            services.AddSingleton(retryPolicy); 
-            services.AddScoped<IRabbitMQService, RabbitMQService>();             
+            services.AddSingleton(retryPolicy);
+            services.AddScoped<IRabbitMQService, RabbitMQService>();
             return services;
         }
     }

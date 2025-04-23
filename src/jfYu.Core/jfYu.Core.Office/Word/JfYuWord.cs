@@ -12,7 +12,6 @@ namespace jfYu.Core.Office.Word
     /// </summary>
     public class JfYuWord : IJfYuWord
     {
-
         /// <inheritdoc/>
         public void GenerateWordByTemplate(string templatePath, string outputFilePath, List<JfYuWordReplacement> replacements)
         {
@@ -29,7 +28,6 @@ namespace jfYu.Core.Office.Word
                 {
                     foreach (var cell in row.GetTableCells())
                     {
-
                         foreach (var para in cell.Paragraphs)
                         {
                             allRuns.AddRange(para.Runs);

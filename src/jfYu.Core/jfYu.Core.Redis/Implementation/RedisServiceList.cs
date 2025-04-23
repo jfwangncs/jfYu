@@ -16,19 +16,19 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             ArgumentNullException.ThrowIfNull(value);
-            Log( nameof(ListAddAsync), key);
+            Log(nameof(ListAddAsync), key);
             var entryBytes = _serializer.Serialize(value);
-            return await _database.ListRightPushAsync(key, entryBytes, when, flag);
+            return await _database.ListRightPushAsync(key, entryBytes, when, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
         public async Task<long> ListAddToLeftAsync<T>(string key, T value, When when = When.Always, CommandFlags flag = CommandFlags.None)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
-            ArgumentNullException.ThrowIfNull(value);            
+            ArgumentNullException.ThrowIfNull(value);
             Log(nameof(ListAddToLeftAsync), key);
             var entryBytes = _serializer.Serialize(value);
-            return await _database.ListLeftPushAsync(key, entryBytes, when, flag);
+            return await _database.ListLeftPushAsync(key, entryBytes, when, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -36,7 +36,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(ListPopFromRightAsync), key);
-            var valueBytes = await _database.ListRightPopAsync(key, flag);
+            var valueBytes = await _database.ListRightPopAsync(key, flag).ConfigureAwait(false);
             return !valueBytes.HasValue ? default : Serializer.Deserialize<T>(valueBytes!);
         }
 
@@ -45,7 +45,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(ListPopFromLeftAsync), key);
-            var valueBytes = await _database.ListLeftPopAsync(key, flag);
+            var valueBytes = await _database.ListLeftPopAsync(key, flag).ConfigureAwait(false);
             return !valueBytes.HasValue ? default : Serializer.Deserialize<T>(valueBytes!);
         }
 
@@ -54,7 +54,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(ListLengthAsync), key);
-            return await _database.ListLengthAsync(key, flag);
+            return await _database.ListLengthAsync(key, flag).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -64,7 +64,7 @@ namespace jfYu.Core.Redis.Implementation
             ArgumentException.ThrowIfNullOrWhiteSpace(value);
             Log(nameof(ListRemoveAsync), key);
             var entryBytes = _serializer.Serialize(value);
-            return await _database.ListRemoveAsync(key, entryBytes, count);
+            return await _database.ListRemoveAsync(key, entryBytes, count).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -72,7 +72,7 @@ namespace jfYu.Core.Redis.Implementation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(key);
             Log(nameof(ListGetRangeAsync), key);
-            return [.. (await _database.ListRangeAsync(key, start, stop, flag))];
-        }       
+            return [.. await _database.ListRangeAsync(key, start, stop, flag).ConfigureAwait(false)];
+        }
     }
 }

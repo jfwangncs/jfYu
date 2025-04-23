@@ -16,6 +16,7 @@ namespace jfYu.Core.Test.Redis
     public class RedisBaseTests
     {
         #region TestDatas
+
         public class NullkeyAndKeyAndValueExpectData : TheoryData<string?, string?, string?>
         {
             public NullkeyAndKeyAndValueExpectData()
@@ -31,6 +32,7 @@ namespace jfYu.Core.Test.Redis
                 Add("key", "key", null);
             }
         }
+
         public class NullKeyAndValueExpectData : TheoryData<string?, string?>
         {
             public NullKeyAndValueExpectData()
@@ -42,6 +44,7 @@ namespace jfYu.Core.Test.Redis
                 Add("key", null);
             }
         }
+
         public class NullKeyAndValuesExpectData : TheoryData<string?, List<string>?>
         {
             public NullKeyAndValuesExpectData()
@@ -55,6 +58,7 @@ namespace jfYu.Core.Test.Redis
                 Add("key", ["v", null]);
             }
         }
+
         public class NullKeyExpectData : TheoryData<string?>
         {
             public NullKeyExpectData()
@@ -65,6 +69,7 @@ namespace jfYu.Core.Test.Redis
                 Add("         ");
             }
         }
+
         public class NullKeysExpectData : TheoryData<List<string>?>
         {
             public NullKeysExpectData()
@@ -73,9 +78,11 @@ namespace jfYu.Core.Test.Redis
                 Add([]);
             }
         }
-        #endregion
 
-        #region  AddRedisService
+        #endregion TestDatas
+
+        #region AddRedisService
+
         [Fact]
         public void AddRedisService_WhenSetupActionIsNull_ThrowsException()
         {
@@ -154,9 +161,11 @@ namespace jfYu.Core.Test.Redis
             Assert.NotNull(redisService.Database);
             Assert.IsType<RedisService>(redisService);
         }
-        #endregion
+
+        #endregion AddRedisService
 
         #region UsingNewtonsoft
+
         [Fact]
         public void UsingNewtonsoft_RegistersNewtonsoftSerializer()
         {
@@ -177,6 +186,7 @@ namespace jfYu.Core.Test.Redis
             Assert.NotNull(serializer);
             Assert.IsType<NewtonsoftSerializer>(serializer);
         }
+
         [Fact]
         public void UsingNewtonsoft_WithOptions_RegistersNewtonsoftSerializer()
         {
@@ -238,9 +248,11 @@ namespace jfYu.Core.Test.Redis
             Assert.NotNull(serializer);
             Assert.IsType<NewtonsoftSerializer>(serializer);
         }
-        #endregion
+
+        #endregion UsingNewtonsoft
 
         #region UsingMsgPack
+
         [Fact]
         public void UsingMsgPack_RegistersMsgPackSerializer()
         {
@@ -303,9 +315,11 @@ namespace jfYu.Core.Test.Redis
             Assert.NotNull(serializer);
             Assert.IsType<MsgPackObjectSerializer>(serializer);
         }
-        #endregion
+
+        #endregion UsingMsgPack
 
         #region Logs
+
         [Fact]
         public void Logs_LogsEnabled_MethodHaveBeenCalled()
         {
@@ -334,6 +348,7 @@ namespace jfYu.Core.Test.Redis
                null,
                It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
         }
+
         [Fact]
         public void Logs_LogsEnabledButNoLogger_MethodHaveNeverBeenCalled()
         {
@@ -361,6 +376,7 @@ namespace jfYu.Core.Test.Redis
                null,
                It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Never);
         }
+
         [Fact]
         public void Logs_LogsDisabled_MethodHaveNeverBeenCalled()
         {
@@ -387,7 +403,8 @@ namespace jfYu.Core.Test.Redis
                It.Is<It.IsAnyType>((o, t) => o.ToString() == $"Redis {nameof(Logs_LogsEnabledButNoLogger_MethodHaveNeverBeenCalled)} - Key: key"),
                null,
                It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Never);
-        } 
-        #endregion
+        }
+
+        #endregion Logs
     }
 }

@@ -10,7 +10,6 @@ namespace jfYu.Core.Test.Office.Word
     [Collection("Word")]
     public class JfYuWordTests(IJfYuWord jfYuWord)
     {
-
         private readonly IJfYuWord _jfYuWord = jfYuWord;
         private readonly string _testTemplatePath = "Static/template.docx";
         private readonly string _outputFilePath = "Static/output.docx";
@@ -29,7 +28,7 @@ namespace jfYu.Core.Test.Office.Word
 
             Assert.NotNull(jfYuWord);
         }
-                
+
         public class NullCreatePictureExpectData : TheoryData<XWPFRun?, JfYuWordReplacement?>
         {
             public NullCreatePictureExpectData()
@@ -37,15 +36,15 @@ namespace jfYu.Core.Test.Office.Word
                 var doc = new XWPFDocument();
                 var para = doc.CreateParagraph();
                 var run = para.CreateRun();
-                Add(null,new JfYuWordReplacement());
+                Add(null, new JfYuWordReplacement());
                 Add(run, null);
             }
         }
 
         [Theory]
         [ClassData(typeof(NullCreatePictureExpectData))]
-        public void CreatePicture_NullParameter_ThrowException(XWPFRun run,JfYuWordReplacement replacement)
-        { 
+        public void CreatePicture_NullParameter_ThrowException(XWPFRun run, JfYuWordReplacement replacement)
+        {
             var ex = Record.Exception(() => JfYuWordExtension.CreatePicture(run, replacement));
             Assert.IsAssignableFrom<ArgumentNullException>(ex);
         }
@@ -91,7 +90,7 @@ namespace jfYu.Core.Test.Office.Word
         {
             var ex = Record.Exception(() => _jfYuWord.GenerateWordByTemplate(templatePath, _outputFilePath, []));
             Assert.IsAssignableFrom<FileNotFoundException>(ex);
-        }      
+        }
 
         [Fact]
         public void GenerateWordByTemplate_ShouldReplaceTextAndInsertImage()

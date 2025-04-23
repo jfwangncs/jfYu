@@ -30,6 +30,7 @@ namespace jfYu.Core.Test.Office.Excel
             var ex = Record.Exception(() => _jfYuExcel.Write(source, path));
             Assert.IsAssignableFrom<Exception>(ex);
         }
+
         [Fact]
         public void WriteCSV_FileExist_ThrowException()
         {
@@ -62,6 +63,7 @@ namespace jfYu.Core.Test.Office.Excel
             Assert.Equal(source.Count, data.Count);
             File.Delete(filePath + ".csv");
         }
+
         [Fact]
         public void WriteCSV_WithCallback_ReturnCorrectly()
         {
@@ -102,6 +104,7 @@ namespace jfYu.Core.Test.Office.Excel
             Assert.Equal(source.Count, data.Count);
             File.Delete(filePath);
         }
+
         [Fact]
         public void WriteCSV_WithoutTitles_ReturnCorrectly()
         {
@@ -149,7 +152,6 @@ namespace jfYu.Core.Test.Office.Excel
             Assert.IsAssignableFrom<FileNotFoundException>(ex);
         }
 
-
         [Fact]
         public void ReadCSV_SetupFirstRow_ReturnCorrectly()
         {
@@ -167,6 +169,7 @@ namespace jfYu.Core.Test.Office.Excel
             Assert.Equal(source.Count - 10 + 2 - 1, data.Count);
             File.Delete(filePath);
         }
+
         [Fact]
         public void ReadCSV_SomeRowFiledsMoreThanHeader_ReturnCorrectly()
         {
@@ -186,7 +189,6 @@ namespace jfYu.Core.Test.Office.Excel
                 // 写入第三行（8列数据）
                 writer.WriteLine(string.Join(",", ["Data6", "Data7", "Data8", "Data9", "Data10", "Data11", "Data12", "Data13"]));
             }
-
 
             // Assert
             var data = _jfYuExcel.ReadCSV(filePath);

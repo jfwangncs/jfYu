@@ -8,7 +8,6 @@ using System.Data.Common;
 
 namespace jfYu.Core.Office.Excel.Write.Implementation
 {
-
     /// <summary>
     /// The DbDataReader writer.
     /// </summary>
@@ -17,11 +16,10 @@ namespace jfYu.Core.Office.Excel.Write.Implementation
     {
         private readonly JfYuExcelOption _configuration = configuration.CurrentValue;
 
-
         /// <inheritdoc/>
         protected override void WriteDataToWorkbook(IWorkbook workbook, DbDataReader source, Dictionary<string, string>? titles = null, Action<int>? callback = null)
         {
-            if (source.IsClosed)                
+            if (source.IsClosed)
                 throw new DataException("Data Connection is closed.");
             if (titles is null || titles.Count <= 0)
                 throw new NullReferenceException("Titles is null or empty.");
@@ -40,7 +38,7 @@ namespace jfYu.Core.Office.Excel.Write.Implementation
                 {
                     var cell = dataRow.CreateCell(columnIndex);
                     var value = source[title.Key];
-                    SetValue(title.Value.GetType(), value, cell);                   
+                    SetValue(title.Value.GetType(), value, cell);
                     columnIndex++;
                 }
                 sheetWriteRowIndex++;
@@ -54,7 +52,7 @@ namespace jfYu.Core.Office.Excel.Write.Implementation
                 writedCount++;
                 callback?.Invoke(writedCount);
             }
-            source.Close();            
+            source.Close();
         }
     }
 }

@@ -14,7 +14,6 @@ namespace jfYu.Core.Wechat.Model
         public string OpenId { get; set; } = null!;
 
         [JsonProperty(PropertyName = "session_key")]
-
         public string SessionKey { get; set; } = null!;
     }
 }

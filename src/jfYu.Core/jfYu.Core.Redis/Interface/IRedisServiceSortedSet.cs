@@ -9,7 +9,6 @@ namespace jfYu.Core.Redis.Interface
     /// </summary>
     public partial interface IRedisService
     {
-
         /// <summary>
         /// Adds a value with the specified score to the sorted set stored at key.
         /// </summary>
@@ -64,7 +63,7 @@ namespace jfYu.Core.Redis.Interface
 
         /// <summary>
         /// Returns all the values of the sorted set stored at key, in the range [start, stop].
-        /// </summary> 
+        /// </summary>
         /// <param name="key">The Redis key.</param>
         /// <param name="start">The start index of the range.</param>
         /// <param name="stop">The end index of the range.</param>
@@ -75,7 +74,7 @@ namespace jfYu.Core.Redis.Interface
 
         /// <summary>
         /// Returns all the values of the sorted set stored at key, with a score between min and max.
-        /// </summary> 
+        /// </summary>
         /// <param name="key">The Redis key.</param>
         /// <param name="min">The minimum score (inclusive).</param>
         /// <param name="max">The maximum score (inclusive).</param>

@@ -58,7 +58,6 @@ namespace jfYu.Core.Test.Office.Excel
             Assert.IsAssignableFrom<NullReferenceException>(ex);
         }
 
-
         [Fact]
         public void DbDataReaderWriter_ClosedSource_ThrowException()
         {
@@ -72,7 +71,6 @@ namespace jfYu.Core.Test.Office.Excel
             var ex = Record.Exception(() => _jfYuExcel.Write(reader, filePath, JfYuExcelExtension.GetTitles<AllTypeTestModel>()));
             Assert.IsAssignableFrom<Exception>(ex);
         }
-
 
         [Fact]
         public void DbDataReaderWriter_ReturnCorrectly()
@@ -117,7 +115,7 @@ namespace jfYu.Core.Test.Office.Excel
             _db.AddRange(source);
             _db.SaveChanges();
             _jfYuExcel.UpdateOption(q => q.SheetMaxRecord = 10);
-            // Act 
+            // Act
             using var command = _db.Database.GetDbConnection().CreateCommand();
 
             _db.Database.OpenConnection();

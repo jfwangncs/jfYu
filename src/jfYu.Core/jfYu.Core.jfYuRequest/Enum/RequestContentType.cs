@@ -1,5 +1,4 @@
-﻿
-namespace jfYu.Core.jfYuRequest.Enum
+﻿namespace jfYu.Core.jfYuRequest.Enum
 {
     /// <summary>
     /// Request header default values

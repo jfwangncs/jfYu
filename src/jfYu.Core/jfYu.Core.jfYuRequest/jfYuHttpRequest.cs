@@ -11,9 +11,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 #pragma warning disable SYSLIB0014
+
 namespace jfYu.Core.jfYuRequest
 {
-
     /// <summary>
     /// Represents an HTTP request with logging and additional features.(Using HttpWebRequest)
     /// </summary>
@@ -23,7 +23,7 @@ namespace jfYu.Core.jfYuRequest
         /// The HTTP web request.
         /// </summary>
         private HttpWebRequest? _request;
- 
+
         private readonly ILogger<JfYuHttpRequest>? _logger;
 
         private readonly LogFilter _logFilter;
@@ -77,7 +77,6 @@ namespace jfYu.Core.jfYuRequest
                             $"Content-Type:application/octet-stream\r\n\r\n");
                         memStream.Write(fileContentStrByte, 0, fileContentStrByte.Length);
                         memStream.Write(fileData, 0, fileData.Length);
-
                     }
                     var endBoundary = Encoding.UTF8.GetBytes($"\r\n--{boundary}--\r\n");
                     memStream.Write(endBoundary, 0, endBoundary.Length);
@@ -161,7 +160,6 @@ namespace jfYu.Core.jfYuRequest
             return reader.ReadToEnd();
         }
 
-
         /// <inheritdoc/>
         public override async Task<string> SendAsync()
         {
@@ -170,7 +168,7 @@ namespace jfYu.Core.jfYuRequest
             try
             {
                 Initialize();
-                _logger?.LogInformation("{Message}",LogRequest(_logFilter.LoggingFields, requestId, Url, Method.ToString(), JsonConvert.SerializeObject(_request!.Headers.AllKeys.ToDictionary(header => header, header => _request.Headers.GetValues(header)!.ToList())), _logFilter.RequestFilter.Invoke(RequestData)));
+                _logger?.LogInformation("{Message}", LogRequest(_logFilter.LoggingFields, requestId, Url, Method.ToString(), JsonConvert.SerializeObject(_request!.Headers.AllKeys.ToDictionary(header => header, header => _request.Headers.GetValues(header)!.ToList())), _logFilter.RequestFilter.Invoke(RequestData)));
                 HttpWebResponse response = (HttpWebResponse)await _request!.GetResponseAsync();
                 StatusCode = response.StatusCode;
                 html = GetResponse(response);
@@ -202,7 +200,6 @@ namespace jfYu.Core.jfYuRequest
             return html;
         }
 
-
         /// <inheritdoc/>
         public override async Task<bool> DownloadFileAsync(string path, Action<decimal, decimal, decimal>? progress = null)
         {
@@ -229,7 +226,6 @@ namespace jfYu.Core.jfYuRequest
                 throw;
             }
         }
-
 
         /// <inheritdoc/>
         public override async Task<MemoryStream?> DownloadFileAsync(Action<decimal, decimal, decimal>? progress = null)

@@ -22,7 +22,6 @@ namespace jfYu.Core.Wechat.Model.Payment
         [JsonProperty(PropertyName = "appid")]
         public string AppId { get; set; } = null!;
 
-
         /// <summary>
         /// 随机字符串，长度要求在32位以内
         /// </summary>
@@ -53,6 +52,7 @@ namespace jfYu.Core.Wechat.Model.Payment
         [JsonProperty(PropertyName = "err_code_des")]
         public string ErrCodeDes { get; set; } = null!;
     }
+
     public class PaymentResult : PaymentBaseResult
     {
         /// <summary>
@@ -68,15 +68,14 @@ namespace jfYu.Core.Wechat.Model.Payment
         public string PrepayId { get; set; } = null!;
 
         /// <summary>
-        /// 此url用于生成支付二维码，然后提供给用户进行扫码支付。 
+        /// 此url用于生成支付二维码，然后提供给用户进行扫码支付。
         /// 注意：code_url的值并非固定，使用时按照URL格式转成二维码即可。时效性为2小时
         /// </summary>
         [JsonProperty(PropertyName = "code_url")]
         public string CodeUrl { get; set; } = null!;
+    }
 
-    } 
-    public class RefundResult: PaymentBaseResult
-    { 
-    
+    public class RefundResult : PaymentBaseResult
+    {
     }
 }

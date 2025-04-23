@@ -18,7 +18,7 @@ namespace jfYu.Core.Redis.Interface
         IConnectionMultiplexer Client { get; }
 
         /// <summary>
-        /// Redis IDatabase 
+        /// Redis IDatabase
         /// </summary>
         IDatabase Database { get; }
 
@@ -78,7 +78,6 @@ namespace jfYu.Core.Redis.Interface
         /// <returns>The value associated with the key, or null if the key does not exist.</returns>
         Task<T?> GetAsync<T>(string key, TimeSpan expiresIn, CommandFlags flag = CommandFlags.None);
 
-
         /// <summary>
         /// Adds a value with specified key to the Redis
         /// </summary>
@@ -96,7 +95,7 @@ namespace jfYu.Core.Redis.Interface
         /// </summary>
         /// <typeparam name="T">The type of the values.</typeparam>
         /// <param name="key">The Redis key.</param>
-        /// <param name="value">The value associated with the key.</param> 
+        /// <param name="value">The value associated with the key.</param>
         /// <param name="when">The command condition.Default is  When.Always</param>
         /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
@@ -152,14 +151,13 @@ namespace jfYu.Core.Redis.Interface
         /// <param name="key">The unique identifier for the lock.</param>
         /// <param name="expiresIn">The time span for which the lock will be held,default 1 minute</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
-        Task<bool> LockTakeAsync(string key, TimeSpan? expiresIn=null);
+        Task<bool> LockTakeAsync(string key, TimeSpan? expiresIn = null);
 
         /// <summary>
         /// Attempts to release a distributed lock.
         /// </summary>
-        /// <param name="key">The unique identifier for the lock.</param> 
+        /// <param name="key">The unique identifier for the lock.</param>
         /// <returns>True if the operation was successful, false otherwise.</returns>
         Task<bool> LockReleaseAsync(string key);
-
     }
 }

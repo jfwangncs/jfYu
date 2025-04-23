@@ -44,6 +44,6 @@ namespace jfYu.Core.Test.Redis
 
             Assert.NotNull(deserialized);
             Assert.Equal(obj, deserialized);
-        }         
+        }
     }
 }

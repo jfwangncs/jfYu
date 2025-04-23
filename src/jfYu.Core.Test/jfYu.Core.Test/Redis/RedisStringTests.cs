@@ -11,7 +11,8 @@ namespace jfYu.Core.Test.Redis
     {
         private readonly IRedisService _redisService = redisService;
 
-        #region  ExpireAsync
+        #region ExpireAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task ExpireAsync_KeyIsNull_ThrowsException(string key)
@@ -49,16 +50,17 @@ namespace jfYu.Core.Test.Redis
             var value = await _redisService.GetAsync<string>("existent_key");
             Assert.Null(value);
         }
-        #endregion
+
+        #endregion ExpireAsync
 
         #region ExistsAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task ExistsAsync_KeyIsNull_ThrowsException(string key)
         {
             var ex = await Record.ExceptionAsync(() => _redisService.ExistsAsync(key));
             Assert.IsAssignableFrom<ArgumentException>(ex);
-
         }
 
         [Fact]
@@ -76,9 +78,11 @@ namespace jfYu.Core.Test.Redis
             Assert.True(result);
             await _redisService.RemoveAsync("existent_key");
         }
-        #endregion
+
+        #endregion ExistsAsync
 
         #region RemoveAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task RemoveAsync_KeyIsNull_ThrowsException(string key)
@@ -86,7 +90,6 @@ namespace jfYu.Core.Test.Redis
             var ex = await Record.ExceptionAsync(() => _redisService.RemoveAsync(key));
             Assert.IsAssignableFrom<ArgumentException>(ex);
         }
-
 
         [Fact]
         public async Task RemoveAsync_KeyDoesNotExist_ReturnsFalse()
@@ -102,9 +105,11 @@ namespace jfYu.Core.Test.Redis
             var result = await _redisService.RemoveAsync("existent_key");
             Assert.True(result);
         }
-        #endregion
+
+        #endregion RemoveAsync
 
         #region RemoveAllAsync
+
         [Theory]
         [ClassData(typeof(NullKeysExpectData))]
         public async Task RemoveAllAsync_KeyIsNull_ThrowsException(List<string> keys)
@@ -126,7 +131,6 @@ namespace jfYu.Core.Test.Redis
         [Fact]
         public async Task RemoveAllAsync_AllKeysNotExist_ReturnsNumberOfKeysRemoved()
         {
-
             var result = await _redisService.RemoveAllAsync(["{user:123}:key1", "{user:123}:key2", "{user:123}:key3"]);
             Assert.Equal(0, result);
         }
@@ -140,9 +144,11 @@ namespace jfYu.Core.Test.Redis
             var result = await _redisService.RemoveAllAsync(["{user:123}:key1", "{user:123}:key2", "{user:123}:key3"]);
             Assert.Equal(2, result);
         }
-        #endregion
 
-        #region  GetAsync
+        #endregion RemoveAllAsync
+
+        #region GetAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task GetAsync_KeyIsNull_ThrowsException(string key)
@@ -284,9 +290,11 @@ namespace jfYu.Core.Test.Redis
             Assert.Equal("value", result);
             await _redisService.RemoveAsync("key_with_expiry");
         }
-        #endregion
+
+        #endregion GetAsync
 
         #region AddAsync
+
         [Theory]
         [ClassData(typeof(NullKeyAndValueExpectData))]
         public async Task AddAsync_KeyIsNull_ThrowsException(string key, string value)
@@ -354,9 +362,11 @@ namespace jfYu.Core.Test.Redis
             Assert.False(result);
             await _redisService.RemoveAsync("conditional_key");
         }
-        #endregion
+
+        #endregion AddAsync
 
         #region IncrementAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task IncrementAsync_KeyIsNull_ThrowsException(string key)
@@ -430,9 +440,11 @@ namespace jfYu.Core.Test.Redis
             Assert.Equal(value + incrementValue, result);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion IncrementAsync
 
         #region DecrementAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task DecrementAsync_KeyIsNull_ThrowsException(string key)
@@ -505,8 +517,8 @@ namespace jfYu.Core.Test.Redis
             var result = await _redisService.DecrementAsync(key, incrementValue);
             Assert.Equal(value - incrementValue, result);
             await _redisService.RemoveAsync(key);
-        } 
-        #endregion
+        }
 
+        #endregion DecrementAsync
     }
 }

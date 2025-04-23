@@ -25,13 +25,11 @@ namespace jfYu.Core.Test
             .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
             .Build();
 
-
             services.AddRabbitMQService((q, e) =>
             {
                 configuration.GetSection("RabbitMQ").Bind(q);
                 configuration.GetSection("RabbitMQ:RetryPolicy").Bind(e);
             });
-
 
             services.AddRedisService(options =>
             {
@@ -62,7 +60,6 @@ namespace jfYu.Core.Test
                     AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli
                 };
             });
-
         }
 
         public static void InitializeDatabase(DatabaseType databaseType, string connectionString)

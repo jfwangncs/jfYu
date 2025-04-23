@@ -15,7 +15,6 @@ namespace jfYu.Core.Office.Excel.Write.Implementation
     {
         private readonly JfYuExcelOption _configuration = configuration.CurrentValue;
 
-
         /// <inheritdoc/>
         protected override void WriteDataToWorkbook(IWorkbook workbook, DataTable source, Dictionary<string, string>? titles = null, Action<int>? callback = null)
         {
@@ -57,7 +56,6 @@ namespace jfYu.Core.Office.Excel.Write.Implementation
                 writedCount++;
                 callback?.Invoke(writedCount);
             }
-
         }
     }
 }

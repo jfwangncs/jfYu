@@ -5,7 +5,6 @@
     /// </summary>
     public enum DatabaseType
     {
-
         /// <summary>
         /// SqlServer
         /// </summary>

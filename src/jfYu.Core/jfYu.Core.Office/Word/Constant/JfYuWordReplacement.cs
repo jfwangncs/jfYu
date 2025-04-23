@@ -1,5 +1,4 @@
-﻿
-namespace jfYu.Core.Office.Word.Constant
+﻿namespace jfYu.Core.Office.Word.Constant
 {
     /// <summary>
     /// Class representing a replacement in a Word document.

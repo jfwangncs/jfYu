@@ -32,7 +32,7 @@ namespace jfYu.Core.Redis.Interface
         /// <summary>
         /// Gets all values with specified key from the Redis
         /// </summary>
-        /// <param name="key">The Redis key.</param> 
+        /// <param name="key">The Redis key.</param>
         /// <param name="flag">Optional command flags. Default is CommandFlags.None.</param>
         /// <returns>The values associated with the key, or null if the key does not exist.</returns>
         Task<HashEntry[]> HashGetAllAsync(string key, CommandFlags flag = CommandFlags.None);

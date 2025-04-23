@@ -23,13 +23,12 @@ namespace jfYu.Core.Data.Model
 
         /// <summary>
         /// Created Time
-        /// </summary> 
+        /// </summary>
         public DateTime CreatedTime { get; set; } = DateTime.UtcNow;
 
         /// <summary>
         /// Updated Time
         /// </summary>
         public DateTime UpdatedTime { get; set; } = DateTime.UtcNow;
-
     }
 }

@@ -1,5 +1,4 @@
-﻿
-using jfYu.Core.Redis.Interface;
+﻿using jfYu.Core.Redis.Interface;
 using jfYu.Core.Test.Models;
 using static jfYu.Core.Test.Redis.RedisBaseTests;
 
@@ -11,6 +10,7 @@ namespace jfYu.Core.Test.Redis
         private readonly IRedisService _redisService = redisService;
 
         #region ListAddAsync
+
         [Theory]
         [ClassData(typeof(NullKeyAndValueExpectData))]
         public async Task ListAddAsync_KeyIsNull_ThrowsException(string key, string value)
@@ -50,9 +50,11 @@ namespace jfYu.Core.Test.Redis
             Assert.True(result > 0);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion ListAddAsync
 
         #region ListPopFromRightAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task ListPopFromRightAsync_KeyIsNull_ThrowsException(string key)
@@ -60,6 +62,7 @@ namespace jfYu.Core.Test.Redis
             var ex = await Record.ExceptionAsync(() => _redisService.ListPopFromRightAsync<string>(key));
             Assert.IsAssignableFrom<ArgumentException>(ex);
         }
+
         [Fact]
         public async Task ListPopFromRightAsync_KeyNotExist_ReturnsNull()
         {
@@ -82,9 +85,11 @@ namespace jfYu.Core.Test.Redis
             Assert.Equal(value + "2", result);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion ListPopFromRightAsync
 
         #region ListPopFromLeftAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task ListPopFromLeftAsync_KeyIsNull_ThrowsException(string key)
@@ -92,6 +97,7 @@ namespace jfYu.Core.Test.Redis
             var ex = await Record.ExceptionAsync(() => _redisService.ListPopFromLeftAsync<string>(key));
             Assert.IsAssignableFrom<ArgumentException>(ex);
         }
+
         [Fact]
         public async Task ListPopFromLeftAsync_KeyNotExist_ReturnsNull()
         {
@@ -114,9 +120,11 @@ namespace jfYu.Core.Test.Redis
             Assert.Equal(value, result);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion ListPopFromLeftAsync
 
         #region ListLengthAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task ListLengthAsync_KeyIsNull_ThrowsException(string key)
@@ -148,9 +156,11 @@ namespace jfYu.Core.Test.Redis
             Assert.Equal(5, result);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion ListLengthAsync
 
         #region ListRemoveAsync
+
         [Theory]
         [ClassData(typeof(NullKeyAndValueExpectData))]
         public async Task ListRemoveAsync_KeyIsNull_ThrowsException(string key, string value)
@@ -214,6 +224,7 @@ namespace jfYu.Core.Test.Redis
             Assert.Equal(value + "1", pop);
             await _redisService.RemoveAsync(key);
         }
+
         [Fact]
         public async Task ListRemoveAsync_CountGreaterThanActual_ReturnsLong()
         {
@@ -263,6 +274,7 @@ namespace jfYu.Core.Test.Redis
             Assert.Equal(value + "8", pop);
             await _redisService.RemoveAsync(key);
         }
+
         [Fact]
         public async Task ListRemoveAsync_CountLessThanActual_ReturnsLong()
         {
@@ -287,9 +299,11 @@ namespace jfYu.Core.Test.Redis
             Assert.Equal(value + "8", pop);
             await _redisService.RemoveAsync(key);
         }
-        #endregion
+
+        #endregion ListRemoveAsync
 
         #region ListGetRangeAsync
+
         [Theory]
         [ClassData(typeof(NullKeyExpectData))]
         public async Task ListGetRangeAsync_KeyIsNull_ThrowsException(string key)
@@ -318,7 +332,6 @@ namespace jfYu.Core.Test.Redis
             Assert.Empty(result);
             await _redisService.RemoveAsync(key);
         }
-
 
         [Fact]
         public async Task ListGetRangeAsync_ValidInput_ReturnsList()
@@ -364,7 +377,8 @@ namespace jfYu.Core.Test.Redis
             var result = await _redisService.ListGetRangeAsync(key, 0);
             Assert.True(result.Count == 7);
             await _redisService.RemoveAsync(key);
-        } 
-        #endregion
+        }
+
+        #endregion ListGetRangeAsync
     }
 }

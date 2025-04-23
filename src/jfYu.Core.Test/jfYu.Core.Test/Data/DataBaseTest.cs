@@ -22,6 +22,7 @@ namespace jfYu.Core.Test.Data
                 Add(q => { q.ConnectionString = "test"; q.ReadOnlyDatabases = [new() { ConnectionString = "" }]; });
             }
         }
+
         [Theory]
         [ClassData(typeof(NullSetupActionExpectData))]
         public void AddRedisService_SetupActionIsNull_ThrowsException(Action<JfYuDatabaseConfig> action)
@@ -149,6 +150,5 @@ namespace jfYu.Core.Test.Data
             Assert.Contains("127.0.0.1", useService.Context.Database.GetConnectionString());
             Assert.True(useService.ReadonlyContext.Database.GetConnectionString()!.Contains("127.0.0.2") || useService.ReadonlyContext.Database.GetConnectionString()!.Contains("127.0.0.3") || useService.ReadonlyContext.Database.GetConnectionString()!.Contains("127.0.0.4"));
         }
-
     }
 }
