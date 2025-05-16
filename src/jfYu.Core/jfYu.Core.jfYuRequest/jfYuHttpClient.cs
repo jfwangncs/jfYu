@@ -89,7 +89,8 @@ namespace jfYu.Core.jfYuRequest
             try
             {
                 string html = string.Empty;
-                _logger?.LogInformation("{Message}", LogRequest(_logFilter.LoggingFields, requestId, Url, Method.ToString(), JsonConvert.SerializeObject(_request!.DefaultRequestHeaders.ToDictionary(header => header.Key, header => header.Value.ToList())), _logFilter.RequestFilter.Invoke(RequestData)));
+                if (_logFilter.LoggingFields != JfYuLoggingFields.None)
+                    _logger?.LogInformation("{Message}", LogRequest(_logFilter.LoggingFields, requestId, Url, Method.ToString(), JsonConvert.SerializeObject(_request!.DefaultRequestHeaders.ToDictionary(header => header.Key, header => header.Value.ToList())), _logFilter.RequestFilter.Invoke(RequestData)));
 
                 HttpResponseMessage? response = null;
                 if (Method.Equals(HttpMethod.Post))
@@ -132,7 +133,8 @@ namespace jfYu.Core.jfYuRequest
                 _cookieContainer.GetCookies(new Uri(Url)).ToList().ForEach(ResponseCookies.Add);
                 string content = await response.Content.ReadAsStringAsync();
                 html = RequestEncoding.GetString(RequestEncoding.GetBytes(content));
-                _logger?.LogInformation("{Message}", LogResponse(_logFilter.LoggingFields, requestId, StatusCode.ToString(), _logFilter.ResponseFilter.Invoke(html)));
+                if (_logFilter.LoggingFields != JfYuLoggingFields.None)
+                    _logger?.LogInformation("{Message}", LogResponse(_logFilter.LoggingFields, requestId, StatusCode.ToString(), _logFilter.ResponseFilter.Invoke(html)));
                 return html;
             }
             catch (Exception ex)

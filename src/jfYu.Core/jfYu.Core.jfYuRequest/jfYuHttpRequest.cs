@@ -168,7 +168,8 @@ namespace jfYu.Core.jfYuRequest
             try
             {
                 Initialize();
-                _logger?.LogInformation("{Message}", LogRequest(_logFilter.LoggingFields, requestId, Url, Method.ToString(), JsonConvert.SerializeObject(_request!.Headers.AllKeys.ToDictionary(header => header, header => _request.Headers.GetValues(header)!.ToList())), _logFilter.RequestFilter.Invoke(RequestData)));
+                if (_logFilter.LoggingFields != JfYuLoggingFields.None)
+                    _logger?.LogInformation("{Message}", LogRequest(_logFilter.LoggingFields, requestId, Url, Method.ToString(), JsonConvert.SerializeObject(_request!.Headers.AllKeys.ToDictionary(header => header, header => _request.Headers.GetValues(header)!.ToList())), _logFilter.RequestFilter.Invoke(RequestData)));
                 HttpWebResponse response = (HttpWebResponse)await _request!.GetResponseAsync().ConfigureAwait(false);
                 StatusCode = response.StatusCode;
                 html = GetResponse(response);
@@ -195,8 +196,8 @@ namespace jfYu.Core.jfYuRequest
                 _logger?.LogError(ex, "An error occurred while sending request.");
                 throw;
             }
-
-            _logger?.LogInformation("{Message}", LogResponse(_logFilter.LoggingFields, requestId, StatusCode.ToString(), _logFilter.ResponseFilter.Invoke(html)));
+            if (_logFilter.LoggingFields != JfYuLoggingFields.None)
+                _logger?.LogInformation("{Message}", LogResponse(_logFilter.LoggingFields, requestId, StatusCode.ToString(), _logFilter.ResponseFilter.Invoke(html)));
             return html;
         }
 

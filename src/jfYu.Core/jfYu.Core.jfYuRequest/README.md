@@ -10,7 +10,7 @@ Install-Package jfYu.Core.jfYuRequest
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 //injection
-services.AddJfYuRequestService();
+services.AddJfYuHttpRequestService();
 services.AddJfYuHttpClientService(new System.Net.Http.HttpClientHandler() { UseCookies = false });
 
 //send
