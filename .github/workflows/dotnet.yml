@@ -7,7 +7,7 @@ on:
     branches: [ "master" ]
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     services:
       redis:
         image: redis
@@ -44,7 +44,7 @@ jobs:
         dotnet-version: 8.0.x
     - name: Install missing dependencies
       run: |
-        sudo apt-get update && sudo apt-get install -y libc6-dev
+        sudo apt-get update && sudo apt-get install -y libc6-dev fonts-dejavu fonts-liberation fonts-freefont-ttf
         # 确保 libdl.so 存在
         if [ ! -f "/usr/lib/x86_64-linux-gnu/libdl.so" ]; then
           sudo ln -s /usr/lib/x86_64-linux-gnu/libdl.so.2 /usr/lib/x86_64-linux-gnu/libdl.so
