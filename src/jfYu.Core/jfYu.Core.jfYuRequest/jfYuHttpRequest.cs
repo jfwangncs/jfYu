@@ -7,6 +7,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,9 +34,9 @@ namespace jfYu.Core.jfYuRequest
         /// </summary>
         /// <param name="logFilter">The log filter.</param>
         /// <param name="logger">The logger.</param>
-        public JfYuHttpRequest(LogFilter logFilter, ILogger<JfYuHttpRequest>? logger = null)
+        public JfYuHttpRequest(LogFilter? logFilter = null, ILogger<JfYuHttpRequest>? logger = null)
         {
-            _logFilter = logFilter;
+            _logFilter = logFilter ?? new LogFilter() { LoggingFields = JfYuLoggingFields.None };
             _logger = logger;
         }
 

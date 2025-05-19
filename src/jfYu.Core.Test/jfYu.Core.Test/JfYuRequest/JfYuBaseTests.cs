@@ -774,6 +774,8 @@ namespace jfYu.Core.Test.JfYuRequest
 
         #endregion Exception With Logger
 
+        #region Filter
+
         public class ServicesFilter : TheoryData<IJfYuRequest>
         {
             public ServicesFilter()
@@ -841,5 +843,19 @@ namespace jfYu.Core.Test.JfYuRequest
             Assert.Contains("testUser", JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse!["args"].ToString()!)!["username"]!.ToString());
             Assert.Contains("30", JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse!["args"].ToString()!)!["age"]!.ToString());
         }
+
+        [Fact]
+        public async Task Test_Use_Constructor()
+        {
+            var request=new JfYuHttpRequest();
+            request.Method = HttpMethod.Get;
+            request.Url = "https://httpbin.org/get?username=testUser&age=30";
+            var response = await request.SendAsync();
+            var jsonResponse = JsonSerializer.Deserialize<Dictionary<string, object>>(response);
+            Assert.Equal(HttpStatusCode.OK, request.StatusCode);
+            Assert.Contains("testUser", JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse!["args"].ToString()!)!["username"]!.ToString());
+            Assert.Contains("30", JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse!["args"].ToString()!)!["age"]!.ToString());
+        }
+        #endregion
     }
 }
