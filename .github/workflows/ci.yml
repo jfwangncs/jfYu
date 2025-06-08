@@ -132,4 +132,20 @@ jobs:
       run: dotnet build --no-incremental
     - name: SonarCloud End
       run: dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
- 
+  snyk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Install Snyk
+        run: npm install -g snyk
+      - name: Set up Snyk token
+        run: snyk config set api=$SNYK_TOKEN
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Snyk test
+        run: snyk test
+      - name: Snyk monitor
+        run: snyk monitor
