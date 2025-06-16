@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>net481;net8.0</TargetFrameworks>
+		<LangVersion>12.0</LangVersion>
+		<Version>8.1.2</Version>
+		<Authors>jfwang</Authors>
+		<Nullable>enable</Nullable>
+		<Description>HttpRequest</Description>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/jfwangncs/jfYu</RepositoryUrl>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net6.0' Or '$(TargetFramework)' == 'net8.0'">
+		<DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="$(OutputPath)**\$(AssemblyName).xml" Pack="true" PackagePath="lib\%(RecursiveDir)" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Brotli.NET" Version="2.1.1" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="\" />
+		<None Include="..\..\..\LICENSE" Pack="true" PackagePath="" />
+	</ItemGroup>
+</Project>
+
