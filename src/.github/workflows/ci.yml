@@ -1,0 +1,79 @@
+name: Build
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+jobs:
+  win:
+    runs-on: windows-latest  
+    defaults:
+      run:
+        working-directory: src
+    steps:
+    - uses: actions/checkout@v4
+    - name: Start dependencies
+      shell: pwsh
+      run: |
+        docker run -d --name redis -p 6379:6379 --health-cmd="redis-cli ping || exit 1" --health-interval=5s --health-timeout=10s --health-retries=5 redis
+        docker run -d --name sqlserver -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=StrongP@ssw0rd!" -p 1433:1433 mcr.microsoft.com/mssql/server:2022-latest
+        docker run -d --name rabbitmq -e "RABBITMQ_DEFAULT_USER=guest" -e "RABBITMQ_DEFAULT_PASS=guest" -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+        docker run -d --name httpbin -p 8000:80 kennethreitz/httpbin
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |        
+          8.0.x
+          9.0.x
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Test (4.8)
+      run: dotnet test --no-restore --verbosity normal -f net48 --logger "trx;LogFileName=results4.trx"
+    - name: Upload test results (4.8)
+      uses: actions/upload-artifact@v4  # upload test results
+      if: success() || failure()        # run this step even if previous step failed
+      with:
+          name: test-results-win48
+          path: jfYu.Core.Test/TestResults/results4.trx
+
+    - name: Test (8.0)
+      run: dotnet test --no-restore --verbosity normal -f net8.0 /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --logger "trx;LogFileName=results8.trx"   
+    - name: Upload test results (8.0)
+      uses: actions/upload-artifact@v4  # upload test results
+      if: success() || failure()        # run this step even if previous step failed
+      with:
+          name: test-results-win8
+          path: jfYu.Core.Test/TestResults/results8.trx
+    - name: Upload test results (8.0 .NET Std)
+      uses: actions/upload-artifact@v4
+      if: success() || failure()
+      with:
+          name: test-results-win8-std
+          path: jfYu.Core.Test/TestResults/results8.trx   
+
+    - name: Test (9.0)
+      run: dotnet test --no-restore --verbosity normal -f net9.0 /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --logger "trx;LogFileName=results9.trx"   
+    - name: Upload test results (9.0)
+      uses: actions/upload-artifact@v4  # upload test results
+      if: success() || failure()        # run this step even if previous step failed
+      with:
+          name: test-results-win9
+          path: jfYu.Core.Test/TestResults/results9.trx
+    - name: Upload test results (9.0 .NET Std)
+      uses: actions/upload-artifact@v4
+      if: success() || failure()
+      with:
+          name: test-results-win9-std
+          path: jfYu.Core.Test/TestResults/results9.trx
+
+    - name: Publish coverage report to coveralls.io (9.0)
+      uses: coverallsapp/github-action@master   
+      with:
+        github-token: ${{ secrets.COVERALLS_REPO_TOKEN }} 
+        path-to-lcov: jfYu.Core.Test/TestResults/coverage.net9.0.info
+        flag-name: win9
+        parallel: true
+   
