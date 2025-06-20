@@ -1,7 +1,7 @@
 ﻿using jfYu.Core.jfYuRequest.Enum;
 using System;
 
-namespace jfYu.Core.jfYuRequest
+namespace jfYu.Core.jfYuRequest.Logs
 {
     /// <summary>
     /// Represents a filter for logging requests and responses.

@@ -1,151 +1,74 @@
-name: CI
+name: Build
 on:
   pull_request:
     branches: [ "master" ]
 jobs:
-  dotnet-test:
-    runs-on: ubuntu-latest
-    services:
-      redis:
-        image: redis
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping || exit 1"
-          --health-interval 5s
-          --health-timeout 10s
-          --health-retries 5 
-      sqlserver:
-        image: mcr.microsoft.com/mssql/server:2022-latest
-        ports:
-          - 1433:1433       
-        env:
-          ACCEPT_EULA: Y
-          SA_PASSWORD: "StrongP@ssw0rd!"
-      rabbitmq:
-        image: rabbitmq:3-management
-        ports:
-          - 5672:5672 
-          - 15672:15672
-        env:
-          RABBITMQ_DEFAULT_USER: guest
-          RABBITMQ_DEFAULT_PASS: guest
-      httpbin:
-        image: kennethreitz/httpbin
-        ports:
-          - 8000:80
-    defaults:
-      run:
-        working-directory: src
+  win:
+    runs-on: windows-latest  
     steps:
     - uses: actions/checkout@v4
-    - name: Install fonts
+    - name: Start dependencies
+      shell: pwsh
       run: |
-        sudo apt-get update && sudo apt-get install -y fonts-noto fonts-dejavu-core 
-        if [ ! -f "/usr/lib/x86_64-linux-gnu/libdl.so" ]; then
-          sudo ln -s /usr/lib/x86_64-linux-gnu/libdl.so.2 /usr/lib/x86_64-linux-gnu/libdl.so
-        fi
-        export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
-        echo "LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-    - name: Setup .NET
+        docker run -d --name redis -p 6379:6379 --health-cmd="redis-cli ping || exit 1" --health-interval=5s --health-timeout=10s --health-retries=5 redis
+        docker run -d --name sqlserver -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=StrongP@ssw0rd!" -p 1433:1433 mcr.microsoft.com/mssql/server:2022-latest
+        docker run -d --name rabbitmq -e "RABBITMQ_DEFAULT_USER=guest" -e "RABBITMQ_DEFAULT_PASS=guest" -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+        docker run -d --name httpbin -p 8000:80 kennethreitz/httpbin
+    - name: Setup .NET Core
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: |
-          6.0.x
+        dotnet-version: |        
           8.0.x
           9.0.x
     - name: Install dependencies
       run: dotnet restore
-    - name: Test with coverage
-      run: dotnet test -p:CollectCoverage=true   -p:CoverletOutputFormat=opencover   -p:CoverletOutput=coverage.opencover.xml
-    - name: Find coverage file
-      id: findcov
-      run: |
-        cd $GITHUB_WORKSPACE
-        COV_FILE=$(find src -type f -name 'coverage.opencover.xml' | head -n 1)
-        echo "COV_FILE=$COV_FILE" >> $GITHUB_ENV
-        echo "coverage=$COV_FILE" >> $GITHUB_OUTPUT
-    - name: Upload coverage xml
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Test (4.8)
+      run: dotnet test --no-restore --verbosity normal -f net48 --logger "trx;LogFileName=results4.trx"
+    - name: Upload test results (4.8)
+      uses: actions/upload-artifact@v4  # upload test results
+      if: success() || failure()        # run this step even if previous step failed
+      with:
+          name: test-results-win48
+          path: jfYu.Core.Test/TestResults/results4.trx
+
+    - name: Test (8.0)
+      run: dotnet test --no-restore --verbosity normal -f net8.0 /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --logger "trx;LogFileName=results8.trx"   
+    - name: Upload test results (8.0)
+      uses: actions/upload-artifact@v4  # upload test results
+      if: success() || failure()        # run this step even if previous step failed
+      with:
+          name: test-results-win8
+          path: jfYu.Core.Test/TestResults/results8.trx
+    - name: Upload test results (8.0 .NET Std)
       uses: actions/upload-artifact@v4
+      if: success() || failure()
       with:
-        name: coverage-xml
-        path: ${{ steps.findcov.outputs.coverage }}
-  coverage-upload:
-    runs-on: ubuntu-latest
-    needs: dotnet-test
-    steps:
-    - uses: actions/checkout@v4
-    - name: Download coverage xml
-      uses: actions/download-artifact@v4
+          name: test-results-win8-std
+          path: jfYu.Core.Test/TestResults/results8.trx   
+
+    - name: Test (9.0)
+      run: dotnet test --no-restore --verbosity normal -f net9.0 /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --logger "trx;LogFileName=results9.trx"   
+    - name: Upload test results (9.0)
+      uses: actions/upload-artifact@v4  # upload test results
+      if: success() || failure()        # run this step even if previous step failed
       with:
-        name: coverage-xml
-        path: src
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+          name: test-results-win9
+          path: jfYu.Core.Test/TestResults/results9.trx
+    - name: Upload test results (9.0 .NET Std)
+      uses: actions/upload-artifact@v4
+      if: success() || failure()
       with:
-        dotnet-version: |
-          6.0.x
-          8.0.x
-          9.0.x
-    - name: Install coverage tools
-      run: |
-        dotnet tool install --global dotnet-reportgenerator-globaltool
-        dotnet tool install --global coveralls.net
-        echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-    - name: Upload to Coveralls
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-      run: |
-        COV_FILE=$(find . -type f -name 'coverage.opencover.xml' | head -n 1)
-        echo "Found coverage file: $COV_FILE"
-        reportgenerator -reports:"$COV_FILE" -targetdir:coveragereport     
-        csmacnz.Coveralls --opencover -i "$COV_FILE" --repoToken $COVERALLS_REPO_TOKEN
-  sonarqube:
-    runs-on: ubuntu-latest
-    needs: dotnet-test
-    defaults:
-      run:
-        working-directory: src
-    steps:
-    - uses: actions/checkout@v4
-    - name: Download coverage xml artifact
-      uses: actions/download-artifact@v4
+          name: test-results-win9-std
+          path: jfYu.Core.Test/TestResults/results9.trx
+
+    - name: Publish coverage report to coveralls.io (9.0)
+      uses: coverallsapp/github-action@master   
       with:
-        name: coverage-xml
-        path: src
-    - name: List files after artifact download
-      run: ls -lR
-    - name: Set up .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
-    - name: Install SonarScanner for .NET
-      run: dotnet tool install --global dotnet-sonarscanner
-    - name: SonarCloud Begin
-      run: |
-        dotnet sonarscanner begin \
-          /k:"jfwangncs_jfYu" \
-          /o:"jfwang" \
-          /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
-          /d:sonar.cs.opencover.reportsPaths=coverage.opencover.xml
-    - name: Build 
-      run: dotnet build --no-incremental
-    - name: SonarCloud End
-      run: dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
-  snyk:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-      - name: Install Snyk
-        run: npm install -g snyk
-      - name: Set up Snyk token
-        run: snyk config set api=$SNYK_TOKEN
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      - name: Snyk test
-        run: snyk test
-      - name: Snyk monitor
-        run: snyk monitor
+        github-token: ${{ secrets.COVERALLS_REPO_TOKEN }} 
+        path-to-lcov: jfYu.Core.Test/TestResults/coverage.net9.0.info
+        flag-name: win9
+        parallel: true
+   

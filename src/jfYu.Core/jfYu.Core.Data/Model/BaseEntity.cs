@@ -17,9 +17,9 @@ namespace jfYu.Core.Data.Model
         public int Id { get; set; }
 
         /// <summary>
-        /// State
+        /// Status
         /// </summary>
-        public int State { get; set; } = (int)DataState.Enabled;
+        public int Status { get; set; } = (int)DataStatus.Active;
 
         /// <summary>
         /// Created Time

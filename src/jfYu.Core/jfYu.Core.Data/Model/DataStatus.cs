@@ -1,9 +1,9 @@
 ﻿namespace jfYu.Core.Data.Model
 {
     /// <summary>
-    /// DataState
+    /// Status
     /// </summary>
-    public enum DataState
+    public enum DataStatus
     {
         /// <summary>
         /// Disable:0
@@ -11,8 +11,8 @@
         Disable,
 
         /// <summary>
-        /// Enabled:1
+        /// Active:1
         /// </summary>
-        Enabled
+        Active
     }
 }

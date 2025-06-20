@@ -118,7 +118,9 @@ Create DbContext
         }
     }
 ```
+
 Migration
+
 ```
 //set migration connection string
 $env:EFConString="Data Source = xxx; database = test; User Id = sa; Password = xxx;";
@@ -128,25 +130,33 @@ dotnet ef migrations add init --project XXXX
 dotnet ef  database update --project XXXX
 
 ```
-if encountered runtime error 
+if encountered runtime error add following package
 ```
 <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="x.x.x" />  
+
+or
+
+Install-Package Microsoft.EntityFrameworkCore.Tools
+
+or
+
+dotnet add package Microsoft.EntityFrameworkCore.Tools
 ```
 
-IOC
+Injection
 
 ```
 
 services.AddJfYuDbContextService<DataContext>(q =>
-        {
-            q.ConnectionString = "server=127.0.0.1;Database=Test;uid=Test;pwd=test;";
-            q.ReadOnlyDatabases = new List<DatabaseConfig>() { new DatabaseConfig() { ConnectionString = "server=127.0.0.2;Database=Test;uid=Test;pwd=test;" } };
-        });
+    {
+        q.ConnectionString = "server=127.0.0.1;Database=Test;uid=Test;pwd=test;";
+        q.ReadOnlyDatabases = new List<DatabaseConfig>() { new DatabaseConfig() { ConnectionString = "server=127.0.0.2;Database=Test;uid=Test;pwd=test;" } };
+    });
 
- services.AddJfYuDbContextService<DataContext>(options =>
-            {
-                configuration.GetSection("ConnectionStrings").Bind(options);
-            });
+services.AddJfYuDbContextService<DataContext>(options =>
+    {
+        configuration.GetSection("ConnectionStrings").Bind(options);
+    });
 ```
 
 Usage
@@ -183,6 +193,7 @@ Expand
             return await Context.Set<User>().FirstOrDefaultAsync(u => u.NickName == nickName);
         }
     }
+
 //IOC
  services.AddScoped<IUserService, UserService>();
 ```

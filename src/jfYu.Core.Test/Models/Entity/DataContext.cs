@@ -1,4 +1,5 @@
-﻿using jfYu.Core.Data.Model;
+﻿#if NET8_0_OR_GREATER
+using jfYu.Core.Data.Model;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -70,3 +71,4 @@ namespace jfYu.Core.Test.Models.Entity
         public DbSet<Department> Departments { get; set; }
     }
 }
+#endif

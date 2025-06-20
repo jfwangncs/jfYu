@@ -1,72 +1,50 @@
-﻿using jfYu.Core.Data.Constant;
-using jfYu.Core.Data.Extension;
-using jfYu.Core.jfYuRequest;
-using jfYu.Core.Office;
-using jfYu.Core.RabbitMQ;
-using jfYu.Core.Redis.Extensions;
-using jfYu.Core.Test.MemoryDB;
-using jfYu.Core.Test.Models;
-using jfYu.Core.Test.Models.Entity;
-using jfYu.Core.Test.Models.Service;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MySqlConnector;
-using System.Net;
+using System.Data.SqlClient;
+using MySql.Data.MySqlClient;
+using System.Data.Common;
+
+#if NET8_0_OR_GREATER
+using jfYu.Core.Data.Constant;
+using jfYu.Core.Data.Extension;
+using jfYu.Core.Test.Models.Entity;
+#endif
+
+
+
 
 namespace jfYu.Core.Test
 {
-    public class Startup
+    public static class Common
     {
-        public static void ConfigureServices(IServiceCollection services)
+#if NET8_0_OR_GREATER
+        public static IServiceCollection AddDataContextServices(this IServiceCollection services)
         {
+
             var configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-            .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
-            .Build();
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
+                .Build(); 
 
-            services.AddRabbitMQService((q, e) =>
-            {
-                configuration.GetSection("RabbitMQ").Bind(q);
-                configuration.GetSection("RabbitMQ:RetryPolicy").Bind(e);
-            });
-
-            services.AddRedisService(options =>
-            {
-                configuration.GetSection("Redis").Bind(options);
-                options.UsingNewtonsoft(options =>
-                {
-                    options.MaxDepth = 12;
-                });
-            });
-            services.AddJfYuExcel(q => { q.SheetMaxRecord = 10; });
-            services.AddJfYuWord();
-            services.AddDbContext<TestDbContext>();
-
-            var dbconfig = configuration.GetSection("JfYuConnectionStrings").Get<JfYuDatabaseConfig>();
+            var dbName = "TestDb_" + Guid.NewGuid().ToString("N");         
 
             services.AddJfYuDbContextService<DataContext>(options =>
             {
                 configuration.GetSection("JfYuConnectionStrings").Bind(options);
-            });
-
-            services.AddScoped<IUserService, UserService>();
-            InitializeDatabase(dbconfig!.DatabaseType, dbconfig.ConnectionString);
-
-            services.AddJfYuHttpClientService(() =>
-            {
-                return new HttpClientHandler
+                var builder = new DbConnectionStringBuilder
                 {
-                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli
+                    ConnectionString = options.ConnectionString
                 };
+                builder["Database"] = dbName;
+                options.ConnectionString = builder.ConnectionString;
             });
-            services.Configure<HttpTestOption>(configuration.GetSection("HttpTestOption"));
+            return services;
         }
-
-        public static void InitializeDatabase(DatabaseType databaseType, string connectionString)
+#endif
+        public static void InitializeDatabase(bool isMyql, string connectionString)
         {
-            if (databaseType == DatabaseType.MySql)
+            if (isMyql)
             {
                 var builder = new MySqlConnectionStringBuilder(connectionString)
                 {
@@ -90,7 +68,7 @@ namespace jfYu.Core.Test
                         UserName VARCHAR(100) NOT NULL,
                         NickName VARCHAR(100) NOT NULL,
                         DepartmentId INT NULL,
-                        State INT NOT NULL DEFAULT 1,
+                        Status INT NOT NULL DEFAULT 1,
                         CreatedTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                         UpdatedTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                     );
@@ -98,8 +76,7 @@ namespace jfYu.Core.Test
                 cmd.ExecuteNonQuery();
                 rawConnection.Close();
             }
-            else if (databaseType == DatabaseType.SqlServer)
-
+            else
             {
                 var builder = new SqlConnectionStringBuilder(connectionString)
                 {
@@ -127,7 +104,7 @@ namespace jfYu.Core.Test
                             UserName NVARCHAR(100) NOT NULL,
                             NickName NVARCHAR(100) NOT NULL,
                             DepartmentId INT NULL,
-                            State INT NOT NULL DEFAULT 1,
+                            Status INT NOT NULL DEFAULT 1,
                             CreatedTime DATETIME NOT NULL DEFAULT GETDATE(),
                             UpdatedTime DATETIME NOT NULL DEFAULT GETDATE()
                         );
@@ -136,5 +113,6 @@ namespace jfYu.Core.Test
                 cmd.ExecuteNonQuery();
             }
         }
+
     }
 }

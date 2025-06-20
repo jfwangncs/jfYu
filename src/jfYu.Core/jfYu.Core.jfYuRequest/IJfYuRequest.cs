@@ -22,7 +22,7 @@ namespace jfYu.Core.jfYuRequest
         public string Url { get; set; }
 
         /// <summary>
-        /// ContentType,default:Josn
+        /// ContentType,default:Josn <see cref="RequestContentType"/> class.
         /// </summary>
         public string ContentType { get; set; }
 
@@ -37,7 +37,7 @@ namespace jfYu.Core.jfYuRequest
         public string Authorization { get; set; }
 
         /// <summary>
-        /// Encoding default:utf8
+        /// Encoding default:utf8 <see cref="Encoding"/> class.
         /// </summary>
         public Encoding RequestEncoding { get; set; }
 
@@ -53,6 +53,7 @@ namespace jfYu.Core.jfYuRequest
 
         /// <summary>
         /// Proxy only for JfYuHttpRequest <see cref="WebProxy"/> class.
+        /// For Httpclient please use HttpClientHandler set UseProxy=True and set Proxy property.
         /// </summary>
         public WebProxy? Proxy { get; set; }
 
@@ -62,9 +63,9 @@ namespace jfYu.Core.jfYuRequest
         public Dictionary<string, string> Files { get; set; }
 
         /// <summary>
-        /// Header <see cref="RequestHeader"/> class.
+        /// Header <see cref="RequestHeaders"/> class.
         /// </summary>
-        public RequestHeader RequestHeader { get; set; }
+        public RequestHeaders RequestHeader { get; set; }
 
         /// <summary>
         /// Timeout default:30 seconds
@@ -77,15 +78,19 @@ namespace jfYu.Core.jfYuRequest
         public Dictionary<string, string> RequestCustomHeaders { get; set; }
 
         /// <summary>
-        /// Request data,
-        /// Json:"{\"username\":\"testUser\"}"
-        /// FormData/FormUrlEncoded:"username=testUser"
-        /// Xml:"<user><username>testUser</username></user>"
+        /// Request payload data in various formats.
         /// </summary>
+        /// <remarks>
+        /// <para><b>JSON format:</b> <c>{"username":"testUser"}</c></para>
+        /// <para><b>Form Data format:</b> <c>username=testUser</c></para>
+        /// <para><b>XML format:</b> <c>&lt;user&gt;&lt;username&gt;testUser&lt;/username&gt;&lt;/user&gt;</c></para>
+        /// <para>Format is determined by <see cref="ContentType"/>.</para>
+        /// </remarks>
         public string RequestData { get; set; }
 
         /// <summary>
-        /// SSL only for JfYuHttpRequest，
+        /// SSL only for JfYuHttpRequest <see cref="X509Certificate2"/> class.
+        /// For Httpclient please use HttpClientHandler and set ClientCertificates property.
         /// </summary>
         public X509Certificate2? Certificate { get; set; }
 

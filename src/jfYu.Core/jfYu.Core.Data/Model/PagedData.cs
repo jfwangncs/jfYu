@@ -11,12 +11,12 @@ namespace jfYu.Core.Data.Model
         /// <summary>
         /// Total Pages
         /// </summary>
-        public int TotalPages { get; set; } = 0;
+        public int TotalPages { get; set; }
 
         /// <summary>
         /// Total Count
         /// </summary>
-        public int TotalCount { get; set; } = 0;
+        public int TotalCount { get; set; }
 
         /// <summary>
         /// Data

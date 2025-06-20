@@ -1,14 +1,24 @@
-﻿using jfYu.Core.Data.Extension;
+﻿#if NET8_0_OR_GREATER
+using jfYu.Core.Data.Extension;
 using jfYu.Core.Test.Models;
 using jfYu.Core.Test.Models.Entity;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore; 
+using Microsoft.Extensions.DependencyInjection;
 
 namespace jfYu.Core.Test.Data
 {
     [Collection("Data")]
-    public class PagingTest(DataContext context)
+    public class PagingTest: IDisposable
     {
-        private readonly DataContext _context = context;
+        private readonly DataContext _context;
+
+        public PagingTest()
+        {
+            var services = new ServiceCollection();
+            var serviceProvider = services.AddDataContextServices().BuildServiceProvider();
+            _context = serviceProvider.GetRequiredService<DataContext>();
+            _context.Database.EnsureCreated();
+        }
 
         [Fact]
         public async Task NullSource_ThrowException()
@@ -175,7 +185,12 @@ namespace jfYu.Core.Test.Data
                 Assert.Equal(item.ExpiresIn, model.CreatedTime);
             }
         }
-
+        public void Dispose()
+        {
+            _context.Database.EnsureDeleted();
+            GC.SuppressFinalize(this);
+        }
         #endregion ToPagedAsync
     }
 }
+#endif

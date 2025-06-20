@@ -58,8 +58,7 @@ namespace jfYu.Core.Office.Excel.Write.Implementation
         /// <param name="workbook">The workbook to write data to.</param>
         /// <param name="tType">The type of data.</param>
         /// <param name="titles">Optional dictionary of column titles.</param>
-        /// <param name="callback">Optional callback action to report progress.</param>
-        /// <param name="needAutoCreateSheet">Indicates whether to automatically create new sheets when the row limit is reached.</param>
+        /// <param name="callback">Optional callback action to report progress.</param> 
         /// <exception cref="InvalidOperationException">Thrown when a title's value cannot be found.</exception>
         protected void Write(IQueryable data, IWorkbook workbook, Type tType, Dictionary<string, string>? titles, Action<int>? callback = null)
         {

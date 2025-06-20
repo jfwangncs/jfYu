@@ -1,4 +1,5 @@
-﻿using jfYu.Core.Data.Context;
+﻿#if NET8_0_OR_GREATER
+using jfYu.Core.Data.Context;
 using jfYu.Core.Data.Service;
 using jfYu.Core.Test.Models.Entity;
 using Microsoft.EntityFrameworkCore;
@@ -14,3 +15,4 @@ namespace jfYu.Core.Test.Models.Service
         }
     }
 }
+#endif

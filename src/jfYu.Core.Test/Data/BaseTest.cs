@@ -1,4 +1,5 @@
-﻿using jfYu.Core.Data.Constant;
+﻿#if NET8_0_OR_GREATER
+using jfYu.Core.Data.Constant;
 using jfYu.Core.Data.Extension;
 using jfYu.Core.Data.Service;
 using jfYu.Core.Test.Models.Entity;
@@ -10,25 +11,43 @@ namespace jfYu.Core.Test.Data
     [Collection("Data")]
     public class BaseTest
     {
-        public class NullSetupActionExpectData : TheoryData<Action<JfYuDatabaseConfig>?>
-        {
-            public NullSetupActionExpectData()
-            {
-                Add(null);
-                Add(q => { });
-                Add(q => { q.ConnectionString = ""; });
-                Add(q => { q.ConnectionString = null!; });
-                Add(q => { q.ConnectionString = "     "; });
-                Add(q => { q.ConnectionString = "test"; q.ReadOnlyDatabases = [new() { ConnectionString = "" }]; });
-            }
-        }
-
-        [Theory]
-        [ClassData(typeof(NullSetupActionExpectData))]
-        public void AddService_SetupActionIsNull_ThrowsException(Action<JfYuDatabaseConfig> action)
+        [Fact]
+        public void AddService_SetupActionIsNull_ThrowsException()
         {
             var services = new ServiceCollection();
-            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContextService<DataContext>(action));
+            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContextService<DataContext>(null!));
+        }
+        [Fact]
+        public void AddService_SetupActionIsEmpty_ThrowsException()
+        {
+            var services = new ServiceCollection();
+            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContextService<DataContext>(q => { }));
+        }
+        [Fact]
+        public void AddService_ConnectionStringIsEmpty_ThrowsException()
+        {
+            var services = new ServiceCollection();
+            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContextService<DataContext>(q => { q.ConnectionString = ""; }));
+        }
+        [Fact]
+        public void AddService_ConnectionStringIsNull_ThrowsException()
+        {
+            var services = new ServiceCollection();
+            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContextService<DataContext>(q => { q.ConnectionString = null!; }));
+        }
+
+        [Fact]
+        public void AddService_ConnectionStringIsWhiteSpace_ThrowsException()
+        {
+            var services = new ServiceCollection();
+            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContextService<DataContext>(q => { q.ConnectionString = "   "; }));
+        }
+
+        [Fact]
+        public void AddService_ReadOnlyConnectionStringIsEmpty_ThrowsException()
+        {
+            var services = new ServiceCollection();
+            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContextService<DataContext>(q => { q.ConnectionString = "test"; q.ReadOnlyDatabases = [new() { ConnectionString = "" }]; }));
         }
 
         [Fact]
@@ -152,3 +171,4 @@ namespace jfYu.Core.Test.Data
         }
     }
 }
+#endif

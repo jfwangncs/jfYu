@@ -37,7 +37,13 @@
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(CardNum, ExpiresIn);
+            unchecked 
+            {
+                int hash = 17;
+                hash = hash * 23 + (CardNum == "" ? 0 : CardNum.GetHashCode());
+                hash = hash * 23 + ExpiresIn.GetHashCode();
+                return hash;
+            }
         }
     }
 }

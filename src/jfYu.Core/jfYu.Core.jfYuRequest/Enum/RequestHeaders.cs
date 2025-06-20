@@ -3,7 +3,7 @@
     /// <summary>
     /// Request header default values
     /// </summary>
-    public class RequestHeader
+    public class RequestHeaders
     {
         /// <summary>
         /// Accept

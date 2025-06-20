@@ -1,4 +1,5 @@
-﻿using jfYu.Core.Data.Service;
+﻿#if NET8_0_OR_GREATER
+using jfYu.Core.Data.Service;
 using jfYu.Core.Test.Models.Entity;
 
 namespace jfYu.Core.Test.Models.Service
@@ -8,3 +9,4 @@ namespace jfYu.Core.Test.Models.Service
         Task<User?> GetByNickNameAsync(string nickName);
     }
 }
+#endif

@@ -1,9 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using jfYu.Core.jfYuRequest.Logs;
+using Microsoft.Extensions.DependencyInjection;
 using System;
+#if NET8_0_OR_GREATER
 using System.Net;
 using System.Net.Http;
+#endif
 
-namespace jfYu.Core.jfYuRequest
+namespace jfYu.Core.jfYuRequest.Extension
 {
     /// <summary>
     ///  Adds http request services extensions
@@ -15,7 +18,7 @@ namespace jfYu.Core.jfYuRequest
         /// </summary>
         /// <param name="services">The IServiceCollection to add the DbContext service to.</param>
         /// <param name="filter">The log filter.</param>
-        public static void AddJfYuHttpRequestService(this IServiceCollection services, Action<LogFilter>? filter = null)
+        public static void AddJfYuHttpRequest(this IServiceCollection services, Action<LogFilter>? filter = null)
         {
             services.AddScoped<IJfYuRequest, JfYuHttpRequest>();
             var logFilter = new LogFilter();
@@ -23,7 +26,7 @@ namespace jfYu.Core.jfYuRequest
             services.AddSingleton(logFilter);
         }
 
-#if NETCORE
+#if NET8_0_OR_GREATER
 
         /// <summary>
         ///  Adds and configures the http client service to the dependency injection container.
@@ -31,7 +34,7 @@ namespace jfYu.Core.jfYuRequest
         /// <param name="services">The IServiceCollection to add the DbContext service to.</param>
         /// <param name="httpClientHandler">The http client handler</param>
         /// <param name="filter">The log filter.</param>
-        public static void AddJfYuHttpClientService(this IServiceCollection services, Func<HttpClientHandler>? httpClientHandler = null, Action<LogFilter>? filter = null)
+        public static void AddJfYuHttpClient(this IServiceCollection services, Func<HttpClientHandler>? httpClientHandler = null, Action<LogFilter>? filter = null)
         {
             var build = services.AddHttpClient("httpclient");
             services.AddSingleton<CookieContainer>();

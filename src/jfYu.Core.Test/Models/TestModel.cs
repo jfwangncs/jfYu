@@ -1,6 +1,4 @@
-﻿using Bogus;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.ComponentModel;
 
 namespace jfYu.Core.Test.Models
 {
@@ -34,7 +32,20 @@ namespace jfYu.Core.Test.Models
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Name, Age, Address, DateTime, Items);
+#if NET8_0_OR_GREATER
+            return HashCode.Combine(Name, Age, Address,DateTime,Items);
+#else
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 23 + (Name == null ? 0 : Name.GetHashCode());
+                hash = hash * 23 + Age.GetHashCode();
+                hash = hash * 23 + (Address == null ? 0 : Address.GetHashCode());
+                hash = hash * 23 + DateTime.GetHashCode();
+                hash = hash * 23 + (Items == null ? 0 : Items.GetHashCode());
+                return hash;
+            }
+#endif
         }
 
         private static bool AreListsEqual(List<TestSubModel> list1, List<TestSubModel> list2)
@@ -77,20 +88,19 @@ namespace jfYu.Core.Test.Models
             }
         }
 
-        public static int GetHashCode(Person obj)
+        public int GetHashCode(TestModel obj)
         {
+            if (obj == null) return 0;
             unchecked
             {
                 int hash = 17;
-                hash = (hash * 31) + (obj.FirstName?.GetHashCode() ?? 0);
-                hash = (hash * 31) + (obj.LastName?.GetHashCode() ?? 0);
+                hash = hash * 23 + (obj.Name == null ? 0 : obj.Name.GetHashCode());
+                hash = hash * 23 + obj.Age.GetHashCode();
+                hash = hash * 23 + (obj.Address == null ? 0 : obj.Address.GetHashCode());
+                hash = hash * 23 + obj.DateTime.GetHashCode();
+                hash = hash * 23 + (obj.Items == null ? 0 : obj.Items.GetHashCode());
                 return hash;
             }
-        }
-
-        public int GetHashCode([DisallowNull] TestModel obj)
-        {
-            return HashCode.Combine(obj.Name, obj.Age, obj.Address, obj.DateTime, obj.Items);
         }
 
         private static bool AreListsEqual(List<TestSubModel> list1, List<TestSubModel> list2)

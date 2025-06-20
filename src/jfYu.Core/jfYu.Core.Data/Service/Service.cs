@@ -84,7 +84,7 @@ namespace jfYu.Core.Data.Service
             foreach (var entity in list)
             {
                 entity.UpdatedTime = DateTime.UtcNow;
-                entity.State = (int)DataState.Disable;
+                entity.Status = (int)DataStatus.Disable;
                 Context.Update(entity);
             }
             return await Context.SaveChangesAsync().ConfigureAwait(false);

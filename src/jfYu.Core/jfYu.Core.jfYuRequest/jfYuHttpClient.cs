@@ -1,4 +1,6 @@
-﻿using jfYu.Core.jfYuRequest.Enum;
+﻿#if NET8_0_OR_GREATER
+using jfYu.Core.jfYuRequest.Enum;
+using jfYu.Core.jfYuRequest.Logs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -12,7 +14,6 @@ using System.Threading.Tasks;
 
 namespace jfYu.Core.jfYuRequest
 {
-#if NETCORE
 
     /// <summary>
     /// Represents an HTTP request with logging and additional features.(Using HttpClient)
@@ -67,7 +68,7 @@ namespace jfYu.Core.jfYuRequest
                 if (!string.IsNullOrEmpty(Authorization))
                     _request.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Authorization.Replace("Bearer ", ""));
                 ;
-                RequestCookies.GetCookies(new Uri(Url)).ToList().ForEach(x => _cookieContainer.SetCookies(new Uri(Url), $"{x.Name}={x.Value}"));
+                RequestCookies?.GetCookies(new Uri(Url)).ToList().ForEach(x => _cookieContainer.SetCookies(new Uri(Url), $"{x.Name}={x.Value}"));
                 foreach (var item in RequestCustomHeaders)
                 {
                     _request.DefaultRequestHeaders.TryAddWithoutValidation(item.Key, item.Value);
@@ -83,6 +84,7 @@ namespace jfYu.Core.jfYuRequest
         }
 
         /// <inheritdoc/>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2000:Dispose objects before losing scope")]
         public override async Task<string> SendAsync()
         {
             Initialize();
@@ -91,7 +93,7 @@ namespace jfYu.Core.jfYuRequest
             {
                 string html = string.Empty;
                 if (_logFilter.LoggingFields != JfYuLoggingFields.None)
-                    _logger?.LogInformation("{Message}", LogRequest(_logFilter.LoggingFields, requestId, Url, Method.ToString(), JsonConvert.SerializeObject(_request!.DefaultRequestHeaders.ToDictionary(header => header.Key, header => header.Value.ToList())), _logFilter.RequestFilter.Invoke(RequestData)));
+                    _logger?.LogRequestWithFilter(_logFilter.LoggingFields, requestId, Url, Method.ToString(), JsonConvert.SerializeObject(_request!.DefaultRequestHeaders.ToDictionary(header => header.Key, header => header.Value.ToList())), _logFilter.RequestFilter.Invoke(RequestData));
 
                 HttpResponseMessage? response = null;
                 if (Method.Equals(HttpMethod.Post))
@@ -107,35 +109,46 @@ namespace jfYu.Core.jfYuRequest
                             {
                                 string[] keyValue = param.Split('=');
                                 if (keyValue.Length == 2)
-                                    formData.Add(new StringContent(keyValue[1]), keyValue[0]);
+                                {
+                                    // stringContent will be disposed by formData.Dispose()
+                                    var stringContent = new StringContent(keyValue[1]);
+                                    formData.Add(stringContent, keyValue[0]);
+                                }
                             }
                         }
 
                         foreach (var file in Files)
                         {
+                            // stringContent will be disposed by formData.Dispose()
                             var fileStream = File.OpenRead(file.Value);
                             var fileContent = new StreamContent(fileStream);
                             fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
                             formData.Add(fileContent, file.Key, Path.GetFileName(file.Value));
                         }
-                        response = await _request!.PostAsync(Url, formData);
+                        response = await _request!.PostAsync(Url, formData).ConfigureAwait(false);
                     }
                     else
-                        response = await _request!.PostAsync(Url, new StringContent(RequestData, RequestEncoding, ContentType));
+                    {
+                        using var stringContent = new StringContent(RequestData, RequestEncoding, ContentType);
+                        response = await _request!.PostAsync(Url, stringContent).ConfigureAwait(false);
+                    }
                 }
                 else if (Method.Equals(HttpMethod.Put))
-                    response = await _request!.PutAsync(Url, new StringContent(RequestData, RequestEncoding, ContentType));
+                {
+                    using var stringContent = new StringContent(RequestData, RequestEncoding, ContentType);
+                    response = await _request!.PutAsync(Url, stringContent).ConfigureAwait(false);
+                }
                 else if (Method.Equals(HttpMethod.Delete))
-                    response = await _request!.DeleteAsync(Url);
+                    response = await _request!.DeleteAsync(Url).ConfigureAwait(false);
                 else
-                    response = await _request!.GetAsync(Url, HttpCompletionOption.ResponseHeadersRead);
+                    response = await _request!.GetAsync(Url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
                 ResponseHeader = response.Headers.ToDictionary(header => header.Key, header => header.Value.ToList());
                 StatusCode = response.StatusCode;
                 _cookieContainer.GetCookies(new Uri(Url)).ToList().ForEach(ResponseCookies.Add);
-                string content = await response.Content.ReadAsStringAsync();
+                string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 html = RequestEncoding.GetString(RequestEncoding.GetBytes(content));
                 if (_logFilter.LoggingFields != JfYuLoggingFields.None)
-                    _logger?.LogInformation("{Message}", LogResponse(_logFilter.LoggingFields, requestId, StatusCode.ToString(), _logFilter.ResponseFilter.Invoke(html)));
+                    _logger?.LogResponseWithFilter(_logFilter.LoggingFields, requestId, StatusCode.ToString(), _logFilter.ResponseFilter.Invoke(html));
                 return html;
             }
             catch (Exception ex)
@@ -157,14 +170,14 @@ namespace jfYu.Core.jfYuRequest
                 var dir = Path.GetDirectoryName(path);
                 if (!string.IsNullOrEmpty(dir))
                     Directory.CreateDirectory(dir);
-                using var response = await _request!.GetAsync(Url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+                using var response = await _request!.GetAsync(Url, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                 StatusCode = response.StatusCode;
                 if (!response.IsSuccessStatusCode)
                     return false;
                 var filesize = (decimal?)response.Content.Headers.ContentLength ?? 0M;
-                using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
                 using var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, DefaultBufferSize, FileOptions.Asynchronous);
-                await DownloadFileInternalAsync(fileStream, responseStream, filesize, progress, cancellationToken);
+                await DownloadFileInternalAsync(fileStream, responseStream, filesize, progress, cancellationToken).ConfigureAwait(false);
                 return File.Exists(path);
             }
             catch (Exception ex)
@@ -180,13 +193,13 @@ namespace jfYu.Core.jfYuRequest
             Initialize();
             try
             {
-                using var response = await _request!.GetAsync(Url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+                using var response = await _request!.GetAsync(Url, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                 if (!response.IsSuccessStatusCode)
                     return default;
                 var filesize = (decimal?)response.Content.Headers.ContentLength ?? 0M;
-                using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
                 var memoryStream = new MemoryStream();
-                await DownloadFileInternalAsync(memoryStream, responseStream, filesize, progress, cancellationToken);
+                await DownloadFileInternalAsync(memoryStream, responseStream, filesize, progress, cancellationToken).ConfigureAwait(false);
                 memoryStream.Position = 0;
                 return memoryStream;
             }
@@ -197,5 +210,5 @@ namespace jfYu.Core.jfYuRequest
             }
         }
     }
-#endif
 }
+#endif

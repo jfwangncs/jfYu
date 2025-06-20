@@ -44,7 +44,7 @@ namespace jfYu.Core.jfYuRequest
         public Dictionary<string, string> Files { get; set; } = [];
 
         /// <inheritdoc/>
-        public RequestHeader RequestHeader { get; set; } = new();
+        public RequestHeaders RequestHeader { get; set; } = new();
 
         /// <inheritdoc/>
         public int Timeout { get; set; } = 30;
@@ -59,7 +59,7 @@ namespace jfYu.Core.jfYuRequest
         public X509Certificate2? Certificate { get; set; }
 
         /// <inheritdoc/>
-        public bool CertificateValidation { get; set; } = false;
+        public bool CertificateValidation { get; set; }
 
         /// <inheritdoc/>
         public Action<object>? CustomInit { get; set; }
@@ -91,8 +91,13 @@ namespace jfYu.Core.jfYuRequest
                 int bytesRead;
                 do
                 {
-                    bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
-                    await targetStream.WriteAsync(buffer, 0, bytesRead, cancellationToken);
+#if NET8_0_OR_GREATER
+                    bytesRead = await responseStream.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken).ConfigureAwait(false);
+                    await targetStream.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken).ConfigureAwait(false);
+#else
+                    bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false);
+                    await targetStream.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
+#endif
                     if (progress != null && fileSize > 0)
                     {
                         decimal currentLength = targetStream.Length;
@@ -104,7 +109,7 @@ namespace jfYu.Core.jfYuRequest
                     }
                 }
                 while (bytesRead > 0);
-                await targetStream.FlushAsync(cancellationToken);
+                await targetStream.FlushAsync(cancellationToken).ConfigureAwait(false);
                 progress?.Invoke(100M, 0M, 0M);
                 return targetStream;
             }
@@ -112,57 +117,7 @@ namespace jfYu.Core.jfYuRequest
             {
                 throw;
             }
-        }
-
-        /// <summary>
-        /// Logs the request details.
-        /// </summary>
-        /// <param name="LoggingFields">The fields to be included in the logging.</param>
-        /// <param name="requestId">The unique identifier for the request.</param>
-        /// <param name="url">The request URL.</param>
-        /// <param name="method">The HTTP method used for the request.</param>
-        /// <param name="header">The request headers.</param>
-        /// <param name="requestData">The request data.</param>
-        /// <returns>The formatted log message.</returns>
-        protected static string LogRequest(JfYuLoggingFields LoggingFields, string requestId, string url, string method, string header, string requestData)
-        {
-            var logMessage = new StringBuilder($"Request [RequestId:{requestId}]");
-
-            if ((LoggingFields & JfYuLoggingFields.RequestPath) == JfYuLoggingFields.RequestPath)
-                logMessage.Append($" Path={url}");
-
-            if ((LoggingFields & JfYuLoggingFields.RequestMethod) == JfYuLoggingFields.RequestMethod)
-                logMessage.Append($" Method={method}");
-
-            if ((LoggingFields & JfYuLoggingFields.RequestHeaders) == JfYuLoggingFields.RequestHeaders)
-                logMessage.Append($" Headers={header}");
-
-            if ((LoggingFields & JfYuLoggingFields.RequestData) == JfYuLoggingFields.RequestData)
-                logMessage.Append($" Data={requestData}");
-
-            return logMessage.ToString();
-        }
-
-        /// <summary>
-        /// Logs the response details.
-        /// </summary>
-        /// <param name="LoggingFields">The fields to be included in the logging.</param>
-        /// <param name="requestId">The unique identifier for the request.</param>
-        /// <param name="status">The response status.</param>
-        /// <param name="result">The response content.</param>
-        /// <returns>The formatted log message.</returns>
-        protected static string LogResponse(JfYuLoggingFields LoggingFields, string requestId, string status, string result)
-        {
-            var logMessage = new StringBuilder($"Response [RequestId:{requestId}]");
-
-            if ((LoggingFields & JfYuLoggingFields.ResponseStatus) == JfYuLoggingFields.ResponseStatus)
-                logMessage.Append($" Status={status}");
-
-            if ((LoggingFields & JfYuLoggingFields.Response) == JfYuLoggingFields.Response)
-                logMessage.Append($" Result={result}");
-
-            return logMessage.ToString();
-        }
+        }               
 
         /// <inheritdoc/>
         public abstract Task<string> SendAsync();
