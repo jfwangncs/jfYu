@@ -37,7 +37,7 @@
 
         public override int GetHashCode()
         {
-            unchecked 
+            unchecked
             {
                 int hash = 17;
                 hash = hash * 23 + (CardNum == "" ? 0 : CardNum.GetHashCode());

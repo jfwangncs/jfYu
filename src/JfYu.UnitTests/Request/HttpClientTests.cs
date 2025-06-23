@@ -1,7 +1,7 @@
 ﻿#if NET8_0_OR_GREATER
-using JfYu.jfYuRequest;
-using JfYu.jfYuRequest.Enum;
-using JfYu.jfYuRequest.Extension;
+using JfYu.Request;
+using JfYu.Request.Enum;
+using JfYu.Request.Extension;
 using JfYu.UnitTests.Models;
 using Microsoft.EntityFrameworkCore.Storage.Json;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +18,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Text.Json;
 
-namespace JfYu.UnitTests.JfYuRequest
+namespace JfYu.UnitTests.Request
 {
     [Collection("JfYuRequest")]
     public class HttpClientTests

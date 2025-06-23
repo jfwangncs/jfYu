@@ -1,6 +1,6 @@
-﻿using Brotli;
-using JfYu.jfYuRequest.Enum;
-using JfYu.jfYuRequest.Logs;
+﻿using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
+using JfYu.Request.Enum;
+using JfYu.Request.Logs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -9,15 +9,12 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Security;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using ICSharpCode.SharpZipLib.GZip;
-using ICSharpCode.SharpZipLib.Zip;
-using System.Net.Security;
 
-namespace JfYu.jfYuRequest
+namespace JfYu.Request
 {
     /// <summary>
     /// Represents an HTTP request with logging and additional features.(Using HttpWebRequest)
@@ -45,19 +42,18 @@ namespace JfYu.jfYuRequest
             _logger = logger;
         }
 
-        /// <inheritdoc/> 
+        /// <inheritdoc/>
         private void Initialize()
         {
             _request = (HttpWebRequest)WebRequest.Create(Url);
             _request.Method = Method.ToString().ToUpper();
-
 
             try
             {
                 _request.AutomaticDecompression = DecompressionMethods.GZip;
                 _request.CookieContainer = RequestCookies;
                 _request.Timeout = Timeout * 1000;
-                _request.ReadWriteTimeout = Timeout * 1000;  
+                _request.ReadWriteTimeout = Timeout * 1000;
                 _request.UserAgent = RequestHeader.UserAgent;
                 _request.Headers.Add(HttpRequestHeader.AcceptEncoding, RequestHeader.AcceptEncoding);// Define gzip compression support
                 _request.Headers.Add(HttpRequestHeader.AcceptLanguage, RequestHeader.AcceptLanguage);
@@ -80,7 +76,7 @@ namespace JfYu.jfYuRequest
                 {
                     CertificateValidation = true;
                     _request.ClientCertificates.Add(Certificate);
-                }             
+                }
 
                 foreach (var item in RequestCustomHeaders)
                 {
@@ -148,7 +144,6 @@ namespace JfYu.jfYuRequest
                     _oldCallback = ServicePointManager.ServerCertificateValidationCallback;
                     ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
                 }
-                
             }
             catch (Exception ex)
             {
@@ -180,7 +175,6 @@ namespace JfYu.jfYuRequest
             else if (response.ContentEncoding.ToLower().Contains("deflate"))
 #endif
             {
-
                 using var inflater = new InflaterInputStream(response.GetResponseStream());
                 using var deflateReader = new StreamReader(inflater, RequestEncoding);
                 return deflateReader.ReadToEnd();
@@ -231,7 +225,8 @@ namespace JfYu.jfYuRequest
                 _logger?.LogError(ex, "An error occurred while sending request.");
                 throw;
             }
-            finally {
+            finally
+            {
                 ServicePointManager.ServerCertificateValidationCallback = _oldCallback;
             }
             if (_logFilter.LoggingFields != JfYuLoggingFields.None)
@@ -251,7 +246,7 @@ namespace JfYu.jfYuRequest
                 HttpWebResponse response = (HttpWebResponse)await _request!.GetResponseAsync().ConfigureAwait(false);
 #else
                 HttpWebResponse response = (HttpWebResponse)await Task.FromResult(_request!.GetResponse());
-#endif 
+#endif
                 StatusCode = response.StatusCode;
                 using Stream responseStream = response.GetResponseStream();
                 ResponseCookies = _request!.CookieContainer?.GetCookies(_request.RequestUri) ?? [];
@@ -260,7 +255,7 @@ namespace JfYu.jfYuRequest
                 if (!string.IsNullOrEmpty(dir))
                     Directory.CreateDirectory(dir);
                 using var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, DefaultBufferSize, FileOptions.Asynchronous);
-                await DownloadFileInternalAsync(fileStream, responseStream, filesize, progress, cancellationToken).ConfigureAwait(false); 
+                await DownloadFileInternalAsync(fileStream, responseStream, filesize, progress, cancellationToken).ConfigureAwait(false);
                 return File.Exists(path);
             }
             catch (Exception ex)
@@ -284,7 +279,7 @@ namespace JfYu.jfYuRequest
                 HttpWebResponse response = (HttpWebResponse)await _request!.GetResponseAsync().ConfigureAwait(false);
 #else
                 HttpWebResponse response = (HttpWebResponse)await Task.FromResult(_request!.GetResponse());
-#endif 
+#endif
                 StatusCode = response.StatusCode;
                 using Stream responseStream = response.GetResponseStream();
                 ResponseCookies = _request!.CookieContainer?.GetCookies(_request.RequestUri) ?? [];

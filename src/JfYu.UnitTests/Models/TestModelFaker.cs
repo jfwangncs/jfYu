@@ -1,7 +1,9 @@
 ﻿using Bogus;
+
 #if NET8_0_OR_GREATER
 using JfYu.UnitTests.Models.Entity;
 #endif
+
 namespace JfYu.UnitTests.Models
 {
     public class TestModelFaker : Faker<TestModel>
@@ -27,6 +29,7 @@ namespace JfYu.UnitTests.Models
             RuleFor(o => o.ExpiresIn, f => f.Date.Recent().ToUniversalTime());
         }
     }
+
 #if NET8_0_OR_GREATER
     public class EFUserFaker : Faker<User>
     {

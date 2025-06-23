@@ -1,12 +1,13 @@
-﻿using JfYu.jfYuRequest.Logs;
+﻿using JfYu.Request.Logs;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+
 #if NET8_0_OR_GREATER
 using System.Net;
 using System.Net.Http;
 #endif
 
-namespace JfYu.jfYuRequest.Extension
+namespace JfYu.Request.Extension
 {
     /// <summary>
     ///  Adds http request services extensions

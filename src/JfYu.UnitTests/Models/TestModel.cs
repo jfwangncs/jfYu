@@ -33,7 +33,7 @@ namespace JfYu.UnitTests.Models
         public override int GetHashCode()
         {
 #if NET8_0_OR_GREATER
-            return HashCode.Combine(Name, Age, Address,DateTime,Items);
+            return HashCode.Combine(Name, Age, Address, DateTime, Items);
 #else
             unchecked
             {

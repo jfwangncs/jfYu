@@ -1,6 +1,7 @@
-﻿using JfYu.jfYuRequest;
-using JfYu.jfYuRequest.Extension;
-using JfYu.jfYuRequest.Enum;
+﻿using JfYu.Request;
+using JfYu.Request.Enum;
+using JfYu.Request.Extension;
+using JfYu.Request.Logs;
 using JfYu.UnitTests.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,12 +15,13 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 
-namespace JfYu.UnitTests.JfYuRequest
+namespace JfYu.UnitTests.Request
 {
     [Collection("JfYuRequest")]
     public class HttpWebRequestTests
     {
         public readonly HttpTestOption _url;
+
         public HttpWebRequestTests()
         {
             var services = new ServiceCollection();
@@ -43,6 +45,7 @@ namespace JfYu.UnitTests.JfYuRequest
             var req = serviceProvider.GetService<IJfYuRequest>();
             Assert.NotNull(req);
         }
+
         [Fact]
         public void AddService_WithFilter()
         {
@@ -373,7 +376,6 @@ namespace JfYu.UnitTests.JfYuRequest
             Assert.Equal(HttpStatusCode.OK, client.StatusCode);
             Assert.Empty(client.ResponseCookies);
 
-
             client = new JfYuHttpRequest
             {
                 Url = $"{_url.Url}/bytes/1024",
@@ -382,7 +384,6 @@ namespace JfYu.UnitTests.JfYuRequest
             using var stream = await client.DownloadFileAsync();
             Assert.Equal(HttpStatusCode.OK, client.StatusCode);
             Assert.Empty(client.ResponseCookies);
-
 
             client = new JfYuHttpRequest
             {
@@ -398,7 +399,6 @@ namespace JfYu.UnitTests.JfYuRequest
             Assert.Empty(client.ResponseCookies);
             if (File.Exists(path))
                 File.Delete(path);
-
         }
 
         [Fact]
@@ -502,7 +502,6 @@ namespace JfYu.UnitTests.JfYuRequest
         [Fact]
         public async Task Test_Certificate_ClientEmpty()
         {
-
             var client = new JfYuHttpRequest
             {
                 Url = $"{_url.ClientSSL}"
@@ -512,10 +511,10 @@ namespace JfYu.UnitTests.JfYuRequest
             Assert.Equal(HttpStatusCode.BadRequest, client.StatusCode);
             Assert.Contains("No required SSL certificate was sent", html);
         }
+
         [Fact]
         public async Task Test_Certificate_ClientHaveError()
         {
-
             var client = new JfYuHttpRequest
             {
                 Url = $"{_url.ClientSSL}"
@@ -544,15 +543,15 @@ namespace JfYu.UnitTests.JfYuRequest
             Assert.Equal(HttpStatusCode.BadRequest, client.StatusCode);
             Assert.Contains("No required SSL certificate was sent", html);
         }
+
         [Fact]
         public async Task Test_Certificate_ClientSuccess()
         {
-
             var client = new JfYuHttpRequest
             {
                 Url = $"{_url.ClientSSL}",
             };
-#if NET9_0_OR_GREATER 
+#if NET9_0_OR_GREATER
             var cert = X509CertificateLoader.LoadPkcs12FromFile("Static/badssl.com-client.p12", "badssl.com");
 #else
             var cert = new X509Certificate2("Static/badssl.com-client.p12", "badssl.com");
@@ -721,13 +720,13 @@ namespace JfYu.UnitTests.JfYuRequest
 
         #endregion Download
 
-        #region Logger         
+        #region Logger
 
         [Fact]
         public async Task Test_Send_Correctly()
         {
             var logger = new Mock<ILogger<JfYuHttpRequest>>();
-            var client = new JfYuHttpRequest(new jfYuRequest.Logs.LogFilter() { LoggingFields = JfYuLoggingFields.All }, logger.Object)
+            var client = new JfYuHttpRequest(new LogFilter() { LoggingFields = JfYuLoggingFields.All }, logger.Object)
             {
                 Url = $"{_url.Url}/get?x=y",
                 Method = HttpMethod.Get
@@ -736,7 +735,6 @@ namespace JfYu.UnitTests.JfYuRequest
             Assert.Equal(HttpStatusCode.OK, client.StatusCode);
             logger.Verify(x => x.Log(LogLevel.Information, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.Exactly(2));
         }
-
 
         public class LoggingFieldsData : TheoryData<JfYuLoggingFields>
         {
@@ -753,17 +751,17 @@ namespace JfYu.UnitTests.JfYuRequest
                 Add(JfYuLoggingFields.ResponseAll);
             }
         }
+
         [Theory]
         [ClassData(typeof(LoggingFieldsData))]
         public async Task Test_Send_WithLoggingFields(JfYuLoggingFields loggingFields)
         {
             var logger = new Mock<ILogger<JfYuHttpRequest>>();
-            var client = new JfYuHttpRequest(new jfYuRequest.Logs.LogFilter() { LoggingFields = loggingFields }, logger.Object)
+            var client = new JfYuHttpRequest(new LogFilter() { LoggingFields = loggingFields }, logger.Object)
             {
                 Url = $"{_url.Url}/get?x=y",
                 Method = HttpMethod.Get
             };
-
 
             var response = await client.SendAsync();
             Assert.Equal(HttpStatusCode.OK, client.StatusCode);
@@ -787,13 +785,13 @@ namespace JfYu.UnitTests.JfYuRequest
 
         #endregion Logger
 
-        #region Exception With Logger       
+        #region Exception With Logger
 
         [Fact]
         public async Task Test_Filter_ThrowException()
         {
             var logger = new Mock<ILogger<JfYuHttpRequest>>();
-            var client = new JfYuHttpRequest(new jfYuRequest.Logs.LogFilter() { RequestFilter = z => { var x = 0; return (1 / x).ToString(); }, ResponseFilter = z => z }, logger.Object)
+            var client = new JfYuHttpRequest(new LogFilter() { RequestFilter = z => { var x = 0; return (1 / x).ToString(); }, ResponseFilter = z => z }, logger.Object)
             {
                 Url = $"{_url.Url}/get"
             };
@@ -843,10 +841,9 @@ namespace JfYu.UnitTests.JfYuRequest
         #region Filter
 
         [Fact]
-
         public async Task Test_Get_Filter_Success()
         {
-            var client = new JfYuHttpRequest(new jfYuRequest.Logs.LogFilter() { RequestFilter = z => z, ResponseFilter = z => z })
+            var client = new JfYuHttpRequest(new LogFilter() { RequestFilter = z => z, ResponseFilter = z => z })
             {
                 Url = $"{_url.Url}/get?username=testUser&age=30",
                 Method = HttpMethod.Get

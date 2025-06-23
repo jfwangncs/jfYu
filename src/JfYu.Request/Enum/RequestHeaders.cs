@@ -1,4 +1,4 @@
-﻿namespace JfYu.jfYuRequest.Enum
+﻿namespace JfYu.Request.Enum
 {
     /// <summary>
     /// Request header default values

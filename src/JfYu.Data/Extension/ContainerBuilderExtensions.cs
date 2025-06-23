@@ -35,7 +35,7 @@ namespace JfYu.Data.Extension
                 throw new ArgumentNullException(nameof(setupAction), "ReadOnlyDatabases is null or dont have one valid connectionString.");
 
             services.AddDbContext<T>(q =>
-            { 
+            {
                 GetDbContextOptions<T>(options, extraConfigure, q);
             });
 
@@ -94,9 +94,11 @@ namespace JfYu.Data.Extension
                 case DatabaseType.Sqlite:
                     optionsBuilder.UseSqlite(config.ConnectionString);
                     break;
+
                 case DatabaseType.Memory:
                     optionsBuilder.UseInMemoryDatabase(config.ConnectionString);
                     break;
+
                 default:
                     optionsBuilder.UseSqlServer(config.ConnectionString).EnableDetailedErrors().EnableSensitiveDataLogging();
                     break;

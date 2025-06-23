@@ -1,4 +1,4 @@
-﻿using JfYu.jfYuRequest.Enum;
+﻿using JfYu.Request.Enum;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace JfYu.jfYuRequest
+namespace JfYu.Request
 {
     /// <summary>
     ///Implement the basic properties and methods of the IJfYuRequest
@@ -117,7 +117,7 @@ namespace JfYu.jfYuRequest
             {
                 throw;
             }
-        }               
+        }
 
         /// <inheritdoc/>
         public abstract Task<string> SendAsync();

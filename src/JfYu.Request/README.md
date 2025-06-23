@@ -1,7 +1,7 @@
 
 
 ```
-Install-Package JfYu.jfYuRequest 
+Install-Package JfYu.Request 
 
 ```
 
@@ -10,11 +10,11 @@ Injection
 //Register default HTTP request service
 services.AddJfYuHttpRequest();
 //Register with logging disabled
-services.AddJfYuHttpRequest(q=>q.LoggingFields= JfYu.jfYuRequest.Enum.JfYuLoggingFields.None); 
+services.AddJfYuHttpRequest(q=>q.LoggingFields= JfYu.Request.Enum.JfYuLoggingFields.None); 
 //Register with logging enabled and identity filters
-services.AddJfYuHttpRequest(q=>{ q.LoggingFields = JfYu.jfYuRequest.Enum.JfYuLoggingFields.All;q.RequestFilter = x => x; q.ResponseFilter = x => x; });
+services.AddJfYuHttpRequest(q=>{ q.LoggingFields = JfYu.Request.Enum.JfYuLoggingFields.All;q.RequestFilter = x => x; q.ResponseFilter = x => x; });
 //Register custom HttpClient with cookie handling disabled
-services.AddJfYuHttpClient(() => { return new HttpClientHandler() { UseCookies = false }; }, q => { q.LoggingFields = JfYu.jfYuRequest.Enum.JfYuLoggingFields.All; q.RequestFilter = x => x; q.ResponseFilter = x => x; });
+services.AddJfYuHttpClient(() => { return new HttpClientHandler() { UseCookies = false }; }, q => { q.LoggingFields = JfYu.Request.Enum.JfYuLoggingFields.All; q.RequestFilter = x => x; q.ResponseFilter = x => x; });
 
 ```
 

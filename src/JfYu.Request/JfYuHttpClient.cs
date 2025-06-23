@@ -1,6 +1,6 @@
 ﻿#if NET8_0_OR_GREATER
-using JfYu.jfYuRequest.Enum;
-using JfYu.jfYuRequest.Logs;
+using JfYu.Request.Enum;
+using JfYu.Request.Logs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -12,7 +12,7 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace JfYu.jfYuRequest
+namespace JfYu.Request
 {
 
     /// <summary>

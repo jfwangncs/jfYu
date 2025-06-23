@@ -1,24 +1,22 @@
-﻿using JfYu.jfYuRequest.Enum;
+﻿using JfYu.Request.Enum;
 using Microsoft.Extensions.Logging;
 using System;
 
-namespace JfYu.jfYuRequest.Logs
+namespace JfYu.Request.Logs
 {
     /// <summary>
     /// Provides logging messages for application events.
     /// </summary>
     public static partial class AppLogMessages
     {
-
         /// <summary>
         /// Logs an error message with an exception.
         /// </summary>
         /// <param name="logger">The logger instance</param>
         /// <param name="ex">The exception to log (required)</param>
         /// <param name="message">Error message</param>
-        [LoggerMessage(EventId = 5001, Level = LogLevel.Error, Message = "{message}",SkipEnabledCheck =true)]
+        [LoggerMessage(EventId = 5001, Level = LogLevel.Error, Message = "{message}", SkipEnabledCheck = true)]
         public static partial void LogError(this ILogger logger, Exception ex, string message);
-
 
         /// <summary>
         /// Logs an informational message for a request.
@@ -31,7 +29,6 @@ namespace JfYu.jfYuRequest.Logs
         /// <param name="data">The data</param>
         [LoggerMessage(EventId = 1001, Level = LogLevel.Information, Message = "Request [RequestId:{requestId}]{path}{method}{headers}{data}", SkipEnabledCheck = true)]
         public static partial void LogRequest(this ILogger logger, string requestId, string path = "", string method = "", string headers = "", string data = "");
-
 
         /// <summary>
         /// Logs an informational message for a response.
@@ -52,9 +49,9 @@ namespace JfYu.jfYuRequest.Logs
         /// <param name="path">The path</param>
         /// <param name="method">The method</param>
         /// <param name="headers">The headers</param>
-        /// <param name="data">The data</param> 
+        /// <param name="data">The data</param>
         public static void LogRequestWithFilter(this ILogger logger, JfYuLoggingFields loggingFields, string requestId, string path, string method, string headers, string data)
-        {       
+        {
             logger.LogRequest(
                 requestId,
                 path: (loggingFields & JfYuLoggingFields.RequestPath) != 0 ? $" Path={path}" : "",
@@ -63,6 +60,7 @@ namespace JfYu.jfYuRequest.Logs
                 data: (loggingFields & JfYuLoggingFields.RequestData) != 0 ? $" Data={data}" : ""
             );
         }
+
         /// <summary>
         /// Logs an HTTP response with optional filtering based on logging fields.
         /// </summary>

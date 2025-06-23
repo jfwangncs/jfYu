@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 #if NET8_0_OR_GREATER
 using JfYu.Data.Constant;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,6 @@ namespace JfYu.UnitTests
 #if NET8_0_OR_GREATER
         public static IServiceCollection AddDataContextServices(this IServiceCollection services)
         {
-
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -43,6 +43,5 @@ namespace JfYu.UnitTests
             }
         }
 #endif
-
     }
 }

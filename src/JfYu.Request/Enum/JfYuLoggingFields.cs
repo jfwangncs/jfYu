@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JfYu.jfYuRequest.Enum
+namespace JfYu.Request.Enum
 {
     /// <summary>
     /// Specifies the fields to be included in the logging.
