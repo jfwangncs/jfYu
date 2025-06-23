@@ -20,13 +20,12 @@ jobs:
       run: dotnet restore src/JfYu.sln
     - name: Build
       run: dotnet build --configuration Release --no-restore src/JfYu.sln
-
-    - name: Run Infer#      
-      run: |
-        for bindir in $(find src -type d -name bin); do
-          echo "Analyzing $bindir"
-          infersharp --binary-path "$bindir" --output infer-out-$(basename $(dirname $bindir)).sarif || true
-        done
+      
+   - name: Run Infer#      
+      uses: microsoft/infersharpaction@v1.5
+      id: runinfersharp
+      with:
+        binary-path: src
 
     - name: Upload SARIF output to GitHub Security Center
       uses: github/codeql-action/upload-sarif@v3
