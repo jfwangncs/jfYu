@@ -93,7 +93,7 @@ jobs:
     - name: Publish coverage report to coveralls.io (9.0)
       uses: coverallsapp/github-action@master   
       with:
-        github-token: ${{ secrets.COVERALLS_REPO_TOKEN }} 
+        github-token: ${{ secrets.GITHUB_TOKEN }} 
         path-to-lcov: src/JfYu.UnitTests/TestResults/coverage.net9.0.info
         flag-name: win9
         parallel: true
@@ -141,5 +141,5 @@ jobs:
     - name: Coveralls Finished
       uses: coverallsapp/github-action@master
       with:
-        github-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
         parallel-finished: true
