@@ -20,8 +20,8 @@ jobs:
       run: dotnet restore src/JfYu.sln
     - name: Build
       run: dotnet build --configuration Release --no-restore src/JfYu.sln
-      
-   - name: Run Infer#      
+
+    - name: Run Infer#      
       uses: microsoft/infersharpaction@v1.5
       id: runinfersharp
       with:
