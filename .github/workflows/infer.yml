@@ -21,15 +21,15 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore src/JfYu.sln
 
-    - name: Run Infer1    
+    - name: Run Infer1
       uses: microsoft/infersharpaction@v1.5
-      id: runinfersharp
+      id: runinfersharp1
       with:
         binary-path: src/JfYu.Data
 
-    - name: Run Infer2     
+    - name: Run Infer2
       uses: microsoft/infersharpaction@v1.5
-      id: runinfersharp
+      id: runinfersharp2
       with:
         binary-path: src/JfYu.Request
 
