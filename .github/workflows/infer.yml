@@ -21,11 +21,17 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore src/JfYu.sln
 
-    - name: Run Infer#      
+    - name: Run Infer1    
       uses: microsoft/infersharpaction@v1.5
       id: runinfersharp
       with:
-        binary-path: src
+        binary-path: src/JfYu.Data
+
+    - name: Run Infer2     
+      uses: microsoft/infersharpaction@v1.5
+      id: runinfersharp
+      with:
+        binary-path: src/JfYu.Request
 
     - name: Upload SARIF output to GitHub Security Center
       uses: github/codeql-action/upload-sarif@v3
