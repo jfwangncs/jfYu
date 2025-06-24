@@ -115,7 +115,8 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore
-
+    - name: Install Brotli via Homebrew
+      run: brew install brotli
     - name: Test (8.0)
       run: |
         export DYLD_LIBRARY_PATH=$PWD/JfYu.UnitTests/bin/Release/net8.0/runtimes/osx/native:$DYLD_LIBRARY_PATH
