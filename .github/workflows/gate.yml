@@ -115,11 +115,10 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore
-    - name: Install Brotli via Homebrew
-      run: brew install brotli
+
     - name: Test (8.0)
       run: |
-        export DYLD_LIBRARY_PATH=$PWD/JfYu.UnitTests/bin/Release/net8.0/runtimes/osx/native:$DYLD_LIBRARY_PATH
+        find ~/.nuget/packages/brotli.net/2.1.1/ -name "*.dylib" -exec cp {} src/JfYu.UnitTests/bin/Debug/net8.0/ \;
         dotnet test --no-restore --verbosity normal -f net8.0 /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --logger "trx;LogFileName=results8.trx"   
     - name: Upload test results (8.0)
       uses: actions/upload-artifact@v4        
@@ -129,7 +128,7 @@ jobs:
 
     - name: Test (9.0)
       run: |
-        export DYLD_LIBRARY_PATH=$PWD/JfYu.UnitTests/bin/Release/net9.0/runtimes/osx/native:$DYLD_LIBRARY_PATH
+        find ~/.nuget/packages/brotli.net/2.1.1/ -name "*.dylib" -exec cp {} src/JfYu.UnitTests/bin/Debug/net9.0/ \;
         dotnet test --no-restore --verbosity normal -f net9.0 /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --logger "trx;LogFileName=results9.trx"   
     - name: Upload test results (9.0)
       uses: actions/upload-artifact@v4    
