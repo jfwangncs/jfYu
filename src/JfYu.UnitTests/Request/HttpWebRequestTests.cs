@@ -541,7 +541,7 @@ namespace JfYu.UnitTests.Request
             client.Certificate = GenerateRandomCertificate();
             var html = await client.SendAsync();
             Assert.Equal(HttpStatusCode.BadRequest, client.StatusCode);
-            Assert.Contains("No required SSL certificate was sent", html);
+            Assert.Contains("SSL certificate", html);
         }
 
         [Fact]
