@@ -89,7 +89,7 @@ jobs:
           name: test-results-win9
           path: src/JfYu.UnitTests/TestResults/results9.trx
 
-   - name: Upload test results (9.0)
+    - name: Upload coverage results (9.0)
       uses: actions/upload-artifact@v4 
       with:
           name: test-results-coverage9
