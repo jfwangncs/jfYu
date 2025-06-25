@@ -11,61 +11,13 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - name: Download test results (linux8)
-        uses: actions/download-artifact@v4
+        uses: dawidd6/action-download-artifact@v3
         with:
           name: test-results-linux8
-          path: TestResults
-          
-      - name: Download test results (linux9)
-        uses: actions/download-artifact@v4
-        with:
-          name: test-results-linux9
-          path: TestResults    
-   
-      - name: Download test results (win48)
-        uses: actions/download-artifact@v4
-        with:
-          name: test-results-win48
-          path: TestResults 
-
-      - name: Download test results (win8)
-        uses: actions/download-artifact@v4
-        with:
-          name: test-results-win8
-          path: TestResults 
-
-      - name: Download test results (win9)
-        uses: actions/download-artifact@v4
-        with:
-          name: test-results-win9
-          path: TestResults 
-
-      - name: Download test results (coverage9)
-        uses: actions/download-artifact@v4
-        with:
-          name: test-results-coverage9
-          path: TestResults 
-
-      - name: Download test results (mac8)
-        uses: actions/download-artifact@v4
-        with:
-          name: test-results-mac8
-          path: TestResults 
-
-      - name: Download test results (mac9)
-        uses: actions/download-artifact@v4
-        with:
-          name: test-results-mac9
-          path: TestResults 
-
-      - name: Install lcov-to-cobertura-xml
-        run: pip install lcov-to-cobertura-xml
-
-      - name: Convert lcov to cobertura
-        run: |
-          lcov-to-cobertura-xml TestResults/coverage.net9.0.info
+          path: TestResults          
+          workflow: Build
+          commit: ${{ github.event.workflow_run.head_sha }}
                     
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
