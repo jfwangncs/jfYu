@@ -74,12 +74,18 @@ jobs:
           path: src/JfYu.UnitTests/TestResults/results4.trx
 
     - name: Test (8.0)
-      run: dotnet test --no-restore --verbosity normal -f net8.0 /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --logger "trx;LogFileName=results8.trx"   
+      run: dotnet test --no-restore --verbosity normal -f net8.0 /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=cobertura --logger "trx;LogFileName=results8.trx"   
     - name: Upload test results (8.0)
       uses: actions/upload-artifact@v4      
       with:
           name: test-results-win8
           path: src/JfYu.UnitTests/TestResults/results8.trx
+
+    - name: Upload coverage results (8.0)
+      uses: actions/upload-artifact@v4 
+      with:
+          name: test-results-coverage8
+          path: src/JfYu.UnitTests/TestResults/coverage.net8.0.cobertura.xml
 
     - name: Test (9.0)
       run: dotnet test --no-restore --verbosity normal -f net9.0 /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --logger "trx;LogFileName=results9.trx"   
