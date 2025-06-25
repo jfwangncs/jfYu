@@ -39,11 +39,10 @@ jobs:
           commit: ${{ github.event.workflow_run.head_sha }}
 
       - name: Install lcov-to-cobertura-xml
-        run: pip install lcov-to-cobertura-xml
+        run: pip install lcov_cobertura
 
       - name: Convert lcov to cobertura
-        run: |
-          lcov-to-cobertura-xml TestResults/coverage.net9.0.info
+        run: lcov_cobertura TestResults/coverage.net9.0.info -o TestResults/coverage.net9.0.info.xml 
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
@@ -59,5 +58,5 @@ jobs:
             -Dsonar.organization=jfwang 
             -Dsonar.projectKey=jfwangncs_jfYu
             -Dsonar.cs.vstest.reportsPaths=TestResults/*.trx
-            -Dsonar.cs.opencover.reportPaths=coverage.net9.0.info.xml 
+            -Dsonar.cs.opencover.reportPaths=TestResults/coverage.net9.0.info.xml
 
