@@ -43,8 +43,7 @@ jobs:
 
       - name: Convert lcov to cobertura
         run: lcov_cobertura TestResults/coverage.net9.0.info -o TestResults/coverage.net9.0.info.xml 
-      - name: List files after artifact download
-        run: ls -lR
+
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
