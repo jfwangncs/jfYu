@@ -9,11 +9,7 @@ using JfYu.UnitTests.Models.Entity;
 #endif
 
 namespace JfYu.UnitTests
-{
-    public class SkipTestException : Xunit.Sdk.XunitException
-    {
-        public SkipTestException(string message) : base(message) { }
-    }
+{     
     public static class Common
     {
 #if NET8_0_OR_GREATER

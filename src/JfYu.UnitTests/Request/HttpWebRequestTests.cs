@@ -568,19 +568,15 @@ namespace JfYu.UnitTests.Request
             {
                 Add("gzip");
                 Add("deflate");
-                Add("brotli");
+                if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    Add("brotli");
             }
         }
 
         [Theory]
         [ClassData(typeof(EncodeData))]
         public async Task Test_Gzip(string code)
-        {
-            if (code == "brotli" && RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            { 
-                throw new SkipTestException("Skip brotli on macOS");
-            }
-
+        {   
             var client = new JfYuHttpRequest
             {
                 Url = $"{_url.Url}/{code}"
