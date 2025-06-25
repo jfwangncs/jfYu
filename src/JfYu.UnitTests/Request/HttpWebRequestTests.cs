@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -575,6 +576,11 @@ namespace JfYu.UnitTests.Request
         [ClassData(typeof(EncodeData))]
         public async Task Test_Gzip(string code)
         {
+            if (code == "brotli" && RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            { 
+                throw new SkipTestException("Skip brotli on macOS");
+            }
+
             var client = new JfYuHttpRequest
             {
                 Url = $"{_url.Url}/{code}"
