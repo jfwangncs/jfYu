@@ -89,6 +89,11 @@ jobs:
           name: test-results-win9
           path: src/JfYu.UnitTests/TestResults/results9.trx
 
+   - name: Upload test results (9.0)
+      uses: actions/upload-artifact@v4 
+      with:
+          name: test-results-coverage9
+          path: src/JfYu.UnitTests/TestResults/coverage.net9.0.info
 
     - name: Publish coverage report to coveralls.io (9.0)
       uses: coverallsapp/github-action@master   
