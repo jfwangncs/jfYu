@@ -2,12 +2,13 @@ name: SonarCloud
 
 on:
   workflow_run:
-    workflows: ["Build"]         # 必须与你的 build workflow 的 name 匹配
+    workflows: ["Build"]
     types:
       - completed
 
 jobs:
   sonarcloud: 
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
