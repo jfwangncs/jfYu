@@ -42,7 +42,10 @@ jobs:
         run: pip install lcov_cobertura
 
       - name: Convert lcov to cobertura
-        run: lcov_cobertura TestResults/coverage.net9.0.info -o TestResults/coverage.net9.0.info.xml 
+        run: |
+          lcov_cobertura TestResults/coverage.net9.0.info -o TestResults/coverage.net9.0.info.xml 
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          reportgenerator -reports:"TestResults/coverage.net9.0.info.xml" -targetdir:"TestResults/merged" -reporttypes:Cobertura
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
@@ -58,6 +61,5 @@ jobs:
             -Dsonar.organization=jfwang 
             -Dsonar.projectKey=jfwangncs_jfYu
             -Dsonar.cs.vstest.reportsPaths=TestResults/*.trx
-            -Dsonar.cs.cobertura.reportPaths=TestResults/coverage.net9.0.info.xml
-            -Dsonar.coverageReportPaths=TestResults/coverage.net9.0.info.xml
+            -Dsonar.cs.cobertura.reportPaths=TestResults/merged/coverage.net9.0.info.xml
 
