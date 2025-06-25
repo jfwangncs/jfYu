@@ -16,7 +16,7 @@ jobs:
         with:
           name: test-results-linux8
           path: TestResults          
-          workflow: Build
+          workflow: gate.yml
           commit: ${{ github.event.workflow_run.head_sha }}
                     
       - name: Set up .NET
