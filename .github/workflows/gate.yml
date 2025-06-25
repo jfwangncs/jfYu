@@ -117,10 +117,7 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Test (8.0)
-      run: |
-        find ~/.nuget/packages/brotli.net/2.1.1/ -name "*.dylib" -exec cp {} $GITHUB_WORKSPACE/src/JfYu.UnitTests/bin/Release/net8.0/runtimes/osx/native/brolib.dylib \;  
-        find ~/.nuget/packages/brotli.net/2.1.1/ -name "*.dylib" -exec cp {} $GITHUB_WORKSPACE/src/JfYu.UnitTests/bin/Release/net8.0/brolib.dylib \;  
-        dotnet test --no-restore --verbosity normal -f net8.0 /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --logger "trx;LogFileName=results8.trx"   
+      run: dotnet test --no-restore --verbosity normal -f net8.0 /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --logger "trx;LogFileName=results8.trx"   
     - name: Upload test results (8.0)
       uses: actions/upload-artifact@v4        
       with:
@@ -128,9 +125,7 @@ jobs:
           path: src/JfYu.UnitTests/TestResults/results8.trx
 
     - name: Test (9.0)
-      run: |
-        find ~/.nuget/packages/brotli.net/2.1.1/ -name "*.dylib" -exec cp {} $GITHUB_WORKSPACE/src/JfYu.UnitTests/bin/Release/net9.0/ \;
-        dotnet test --no-restore --verbosity normal -f net9.0 /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --logger "trx;LogFileName=results9.trx"   
+      run: dotnet test --no-restore --verbosity normal -f net9.0 /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov --logger "trx;LogFileName=results9.trx"   
     - name: Upload test results (9.0)
       uses: actions/upload-artifact@v4    
       with:
