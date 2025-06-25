@@ -62,4 +62,5 @@ jobs:
             -Dsonar.projectKey=jfwangncs_jfYu
             -Dsonar.cs.vstest.reportsPaths=TestResults/*.trx
             -Dsonar.cs.cobertura.reportPaths=TestResults/merged/coverage.net9.0.info.xml
+            -Dsonar.coverageReportPaths=TestResults/merged/coverage.net9.0.info.xml
 
