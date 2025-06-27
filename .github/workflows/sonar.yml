@@ -52,5 +52,5 @@ jobs:
             -Dsonar.organization=jfwang 
             -Dsonar.projectKey=jfwangncs_jfYu
             -Dsonar.cs.vstest.reportsPaths=TestResults/*.trx
-            -Dsonar.coverageReportPaths=TestResults/coverage.net8.0.cobertura.xml
+            -Dsonar.cs.vscoveragexml.reportsPaths=TestResults/coverage.net8.0.cobertura.xml
 
