@@ -200,7 +200,7 @@ jobs:
       - name: SonarCloud Begin
         run: |
           dotnet sonarscanner begin \
-            /k:"jfwangncs_jfYu" \
+            /k:"jfwangncs_Jfyu" \
             /o:"jfwang" \
             /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
             /d:sonar.cs.vstest.reportsPaths=../TestResults/*.trx \
