@@ -1,32 +1,32 @@
 ﻿namespace JfYu.Data.Constant
 {
     /// <summary>
-    /// Database Types
+    /// Database Types.
     /// </summary>
     public enum DatabaseType
     {
         /// <summary>
-        /// SqlServer
+        /// SqlServer.
         /// </summary>
         SqlServer,
 
         /// <summary>
-        /// MySql
+        /// MySql.
         /// </summary>
         MySql,
 
         /// <summary>
-        /// MariaDB
+        /// MariaDB.
         /// </summary>
         MariaDB,
 
         /// <summary>
-        /// Sqlite
+        /// Sqlite.
         /// </summary>
         Sqlite,
 
         /// <summary>
-        /// Memory
+        /// Memory for test.
         /// </summary>
         Memory
     }

@@ -5,29 +5,29 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace JfYu.Data.Model
 {
     /// <summary>
-    /// Base Entity
+    /// Base Entity.
     /// </summary>
     public abstract class BaseEntity
     {
         /// <summary>
-        /// Id
+        /// Id.
         /// </summary>
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         /// <summary>
-        /// Status
+        /// Status.
         /// </summary>
         public int Status { get; set; } = (int)DataStatus.Active;
 
         /// <summary>
-        /// Created Time
+        /// Created Time.
         /// </summary>
         public DateTime CreatedTime { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// Updated Time
+        /// Updated Time.
         /// </summary>
         public DateTime UpdatedTime { get; set; } = DateTime.UtcNow;
     }

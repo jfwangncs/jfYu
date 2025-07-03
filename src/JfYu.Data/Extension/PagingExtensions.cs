@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace JfYu.Data.Extension
 {
     /// <summary>
-    /// Paging extensions
+    /// Paging extensions.
     /// </summary>
     public static class PagingExtensions
     {

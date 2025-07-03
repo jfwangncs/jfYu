@@ -11,7 +11,7 @@ namespace JfYu.UnitTests.Data
 {
 
     [Collection("Data")]
-    public class ServiceTest : IDisposable
+    public class ServiceTest
     {
         private readonly IUserService _userService;
         public ServiceTest()
@@ -64,27 +64,6 @@ namespace JfYu.UnitTests.Data
 
         [Fact]
         public async Task UpdateAsync_Id_Correctly()
-        {
-            _userService.Context.Clear<User>();
-            await _userService.AddAsync(new EFUserFaker().Generate(1)).ConfigureAwait(true);
-            _userService.Context.Departments.Add(new Department() { Id = 213, Name = "test" });
-            await _userService.Context.SaveChangesAsync();
-            var user = await _userService.GetOneAsync().ConfigureAwait(true);
-            user!.Status = (int)DataStatus.Disable;
-            user.DepartmentId = 213;
-            user.UserName = "Test";
-            var result = await _userService.UpdateAsync(user).ConfigureAwait(true);
-            Assert.Equal(1, result);
-            var data = await _userService.GetOneAsync(q => q.Id.Equals(user.Id)).ConfigureAwait(true);
-            Assert.NotNull(data);
-            Assert.Equal(data.Status, user.Status);
-            Assert.Equal(data.DepartmentId, user.DepartmentId);
-            Assert.Equal(data.UserName, user.UserName);
-            Assert.Equal(data.NickName, user.NickName);
-        }
-
-        [Fact]
-        public async Task UpdateAsync_Correctly()
         {
             _userService.Context.Clear<User>();
             await _userService.AddAsync(new EFUserFaker().Generate(1)).ConfigureAwait(true);
@@ -393,13 +372,7 @@ namespace JfYu.UnitTests.Data
             var result = await _userService.GetSelectListAsync<TestSubModel>(null!).ConfigureAwait(true);
 
             Assert.Empty(result);
-        }
-
-        public void Dispose()
-        {
-            _userService.Context.Database.EnsureDeleted();
-            GC.SuppressFinalize(this);
-        }
+        }         
     }
 }
 #endif

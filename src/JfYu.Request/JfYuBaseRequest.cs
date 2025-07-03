@@ -80,7 +80,7 @@ namespace JfYu.Request
         /// <param name="responseStream">The stream to read the file from.</param>
         /// <param name="fileSize">The size of the file being downloaded.</param>
         /// <param name="progress">The progress delegate function.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="cancellationToken">CancellationToken for this operation.</param>
         /// <returns>The target stream containing the downloaded file.</returns>
         protected static async Task<Stream> DownloadFileInternalAsync(Stream targetStream, Stream responseStream, decimal fileSize, Action<decimal, decimal, decimal>? progress, CancellationToken cancellationToken = default)
         {
@@ -113,7 +113,7 @@ namespace JfYu.Request
         }
 
         /// <inheritdoc/>
-        public abstract Task<string> SendAsync();
+        public abstract Task<string> SendAsync(CancellationToken cancellationToken = default);
 
         /// <inheritdoc/>
         public abstract Task<bool> DownloadFileAsync(string path, Action<decimal, decimal, decimal>? progress = null, CancellationToken cancellationToken = default);

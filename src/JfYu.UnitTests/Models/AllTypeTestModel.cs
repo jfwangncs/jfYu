@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Globalization;
 
 namespace JfYu.UnitTests.Models
 {
@@ -53,7 +54,7 @@ namespace JfYu.UnitTests.Models
                     Decimal = decimal.MaxValue,
                     Bool = true,
                     String = "Hello, World!",
-                    DateTime = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")),
+                    DateTime = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"),CultureInfo.InvariantCulture),
                     Byte = byte.MaxValue,
                     Sbyte = sbyte.MaxValue,
                     EmptyStr = "",
@@ -70,7 +71,7 @@ namespace JfYu.UnitTests.Models
                     NullDecimal = decimal.MinValue,
                     NullBool = false,
                     NullString = null,
-                    NullDateTime = DateTime.Parse(DateTime.MinValue.ToString("yyyy-MM-dd HH:mm:ss.fff")),
+                    NullDateTime = DateTime.Parse(DateTime.MinValue.ToString("yyyy-MM-dd HH:mm:ss.fff"),CultureInfo.InvariantCulture),
                     NullByte = byte.MinValue,
                     NullSbyte = sbyte.MinValue
                 },new AllTypeTestModel
@@ -86,7 +87,7 @@ namespace JfYu.UnitTests.Models
                     Decimal = 0m,
                     Bool = false,
                     String = "Another string",
-                    DateTime = DateTime.Parse(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff")),
+                    DateTime = DateTime.Parse(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff"),CultureInfo.InvariantCulture),
                     Byte = 0,
                     Sbyte = 0,
                     EmptyStr = "",
@@ -119,7 +120,7 @@ namespace JfYu.UnitTests.Models
                     Decimal = 123.456m,
                     Bool = true,
                     String = "Random string",
-                    DateTime = DateTime.Parse(new DateTime(2023, 1, 1).ToString("yyyy-MM-dd HH:mm:ss.fff")),
+                    DateTime = DateTime.Parse(new DateTime(2023, 1, 1,0,0,0, DateTimeKind.Local).ToString("yyyy-MM-dd HH:mm:ss.fff"),CultureInfo.InvariantCulture),
                     Byte = 128,
                     Sbyte = -128,
                     EmptyStr = "Not empty",
@@ -136,7 +137,7 @@ namespace JfYu.UnitTests.Models
                     NullDecimal = 123.456m,
                     NullBool = true,
                     NullString = "Nullable string with another value",
-                    NullDateTime = DateTime.Parse(new DateTime(2023, 1, 1).ToString("yyyy-MM-dd HH:mm:ss.fff")),
+                    NullDateTime = DateTime.Parse(new DateTime(2023, 1, 1,0,0,0, DateTimeKind.Local).ToString("yyyy-MM-dd HH:mm:ss.fff"),CultureInfo.InvariantCulture),
                     NullByte = 128,
                     NullSbyte = -128
                 },new AllTypeTestModel
@@ -157,7 +158,7 @@ namespace JfYu.UnitTests.Models
                     Decimal = decimal.MinusOne,
                     Bool = false,
                     String = "Very small numbers",
-                    DateTime = DateTime.Parse(DateTime.MaxValue.ToString("yyyy-MM-dd HH:mm:ss.fff")),
+                    DateTime = DateTime.Parse(DateTime.MaxValue.ToString("yyyy-MM-dd HH:mm:ss.fff"), CultureInfo.InvariantCulture),
                     Byte = 1,
                     Sbyte = -1,
                     EmptyStr = " ",
@@ -174,7 +175,7 @@ namespace JfYu.UnitTests.Models
                     NullDecimal = decimal.MinusOne,
                     NullBool = false,
                     NullString = "Very small nullable numbers",
-                    NullDateTime = DateTime.Parse(DateTime.MaxValue.ToString("yyyy-MM-dd HH:mm:ss.fff")),
+                    NullDateTime = DateTime.Parse(DateTime.MaxValue.ToString("yyyy-MM-dd HH:mm:ss.fff"), CultureInfo.InvariantCulture),
                     NullByte = 1,
                     NullSbyte = -1
                 },new AllTypeTestModel

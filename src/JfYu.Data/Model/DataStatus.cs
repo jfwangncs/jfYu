@@ -1,17 +1,17 @@
 ﻿namespace JfYu.Data.Model
 {
     /// <summary>
-    /// Status
+    /// Status.
     /// </summary>
     public enum DataStatus
     {
         /// <summary>
-        /// Disable:0
+        /// Disable:0.
         /// </summary>
         Disable,
 
         /// <summary>
-        /// Active:1
+        /// Active:1.
         /// </summary>
         Active
     }

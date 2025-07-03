@@ -3,23 +3,23 @@
 namespace JfYu.Data.Model
 {
     /// <summary>
-    /// Paged Data
+    /// Paged Data.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The type of data.</typeparam>
     public class PagedData<T>
     {
         /// <summary>
-        /// Total Pages
+        /// Total Pages.
         /// </summary>
         public int TotalPages { get; set; }
 
         /// <summary>
-        /// Total Count
+        /// Total Count.
         /// </summary>
         public int TotalCount { get; set; }
 
         /// <summary>
-        /// Data
+        /// Data.
         /// </summary>
         public List<T> Data { get; set; } = [];
     }

@@ -1,20 +1,13 @@
-﻿namespace JfYu.UnitTests.Models
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace JfYu.UnitTests.Models
 {
-    public class TestSubModel
+    public sealed class TestSubModel : IEquatable<TestSubModel>
     {
         public int Id { get; set; }
         public string CardNum { get; set; } = "";
         public DateTime ExpiresIn { get; set; }
-
-        public override bool Equals(object? obj)
-        {
-            if (obj is TestSubModel other)
-            {
-                return CardNum == other.CardNum && ExpiresIn.ToUniversalTime() == other.ExpiresIn.ToUniversalTime();
-            }
-            return false;
-        }
-
+              
         public static bool operator ==(TestSubModel x, TestSubModel y)
         {
             if (ReferenceEquals(x, y))
@@ -44,6 +37,22 @@
                 hash = hash * 23 + ExpiresIn.GetHashCode();
                 return hash;
             }
+        }
+        public override bool Equals(object? obj)
+        {
+            if (obj is TestSubModel other)
+            {
+                return CardNum == other.CardNum && ExpiresIn.ToUniversalTime() == other.ExpiresIn.ToUniversalTime();
+            }
+            return false;
+        }
+
+        public bool Equals(TestSubModel? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return CardNum == other.CardNum && ExpiresIn.ToUniversalTime() == other.ExpiresIn.ToUniversalTime();
+
         }
     }
 }

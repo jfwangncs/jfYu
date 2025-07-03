@@ -9,7 +9,7 @@ using System.Linq;
 namespace JfYu.Data.Extension
 {
     /// <summary>
-    ///  Adds JfYuDbContext services extensions
+    ///  Adds JfYuDbContext services extensions.
     /// </summary>
     public static class ContainerBuilderExtensions
     {

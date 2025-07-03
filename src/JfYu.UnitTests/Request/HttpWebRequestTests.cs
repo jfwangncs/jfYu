@@ -220,7 +220,7 @@ namespace JfYu.UnitTests.Request
             Assert.Contains("testUser", JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse!["args"].ToString()!)!["username"]!.ToString());
             Assert.Contains("30", JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse!["args"].ToString()!)!["age"]!.ToString());
         }
-        
+
         [Fact]
         public async Task Test_Status_404()
         {
@@ -275,7 +275,7 @@ namespace JfYu.UnitTests.Request
                 Timeout = 1
             };
 
-            var ex = await Record.ExceptionAsync(client.SendAsync);
+            var ex = await Record.ExceptionAsync(() => client.SendAsync());
             Assert.IsType<Exception>(ex, exactMatch: false);
         }
 
@@ -454,13 +454,13 @@ namespace JfYu.UnitTests.Request
                 CustomInit = (obj) =>
                     {
                         var i = 0;
-                        var x = 1 / i;
+                        _ = 1 / i;
                         var httpClient = (HttpClient)obj;
                         httpClient.DefaultRequestHeaders.Add("X-Custom-Init", "test-value");
                     }
             };
 
-            await Assert.ThrowsAsync<DivideByZeroException>(client.SendAsync);
+            await Assert.ThrowsAsync<DivideByZeroException>(() => client.SendAsync());
         }
 
         [Fact]
@@ -472,7 +472,7 @@ namespace JfYu.UnitTests.Request
                 Proxy = new WebProxy("http://example.cn1"),
             };
 
-            var ex = await Assert.ThrowsAsync<WebException>(client.SendAsync);
+            var ex = await Assert.ThrowsAsync<WebException>(() => client.SendAsync());
             Assert.Contains("example", ex.Message);
         }
 
@@ -485,7 +485,7 @@ namespace JfYu.UnitTests.Request
                 CertificateValidation = true
             };
 
-            var ex = await Assert.ThrowsAsync<WebException>(client.SendAsync);
+            var ex = await Assert.ThrowsAsync<WebException>(() => client.SendAsync());
             Assert.Contains("SSL", ex.Message);
         }
 
@@ -531,10 +531,9 @@ namespace JfYu.UnitTests.Request
                 DateTimeOffset startTime = DateTimeOffset.UtcNow;
                 DateTimeOffset endTime = startTime.AddSeconds(1);
                 var certificate = request.CreateSelfSigned(startTime, endTime);
-                // 导出证书为 DER 格式
-                var certBytes = certificate.Export(X509ContentType.Cert);
 
 #if NET9_0_OR_GREATER
+                var certBytes = certificate.Export(X509ContentType.Cert);   // 导出证书为 DER 格式
                 return X509CertificateLoader.LoadCertificate(certBytes);
 #else
                 return new X509Certificate2(certificate.Export(X509ContentType.Pfx, "password123"), "password123");
@@ -559,7 +558,7 @@ namespace JfYu.UnitTests.Request
             var cert = new X509Certificate2("Static/badssl.com-client.p12", "badssl.com");
 #endif
             client.Certificate = cert;
-            var html = await client.SendAsync();
+            await client.SendAsync();
             Assert.Equal(HttpStatusCode.OK, client.StatusCode);
         }
 
@@ -577,7 +576,7 @@ namespace JfYu.UnitTests.Request
         [Theory]
         [ClassData(typeof(EncodeData))]
         public async Task Test_Gzip(string code)
-        {   
+        {
             var client = new JfYuHttpRequest
             {
                 Url = $"{_url.Url}/{code}"
@@ -734,7 +733,7 @@ namespace JfYu.UnitTests.Request
                 Url = $"{_url.Url}/get?x=y",
                 Method = HttpMethod.Get
             };
-            var response = await client.SendAsync();
+            await client.SendAsync();
             Assert.Equal(HttpStatusCode.OK, client.StatusCode);
             logger.Verify(x => x.Log(LogLevel.Information, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.Exactly(2));
         }
@@ -766,7 +765,7 @@ namespace JfYu.UnitTests.Request
                 Method = HttpMethod.Get
             };
 
-            var response = await client.SendAsync();
+            await client.SendAsync();
             Assert.Equal(HttpStatusCode.OK, client.StatusCode);
             logger.Verify(x => x.Log(LogLevel.Information, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.AtLeast(2));
         }
@@ -781,7 +780,7 @@ namespace JfYu.UnitTests.Request
                 Proxy = new WebProxy("http://example.cn1"),
             };
 
-            var ex = await Assert.ThrowsAsync<WebException>(client.SendAsync);
+            var ex = await Assert.ThrowsAsync<WebException>(() => client.SendAsync());
             Assert.Contains("example", ex.Message);
             logger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.Once);
         }
@@ -799,7 +798,7 @@ namespace JfYu.UnitTests.Request
                 Url = $"{_url.Url}/get"
             };
 
-            var ex = await Record.ExceptionAsync(client.SendAsync);
+            var ex = await Record.ExceptionAsync(() => client.SendAsync());
             Assert.IsType<Exception>(ex, exactMatch: false);
             logger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.AtLeastOnce);
         }
@@ -814,13 +813,13 @@ namespace JfYu.UnitTests.Request
                 CustomInit = (obj) =>
                         {
                             var i = 0;
-                            var x = 1 / i;
+                            _ = 1 / i;
                             var httpClient = (HttpClient)obj;
                             httpClient.DefaultRequestHeaders.Add("X-Custom-Init", "test-value");
                         }
             };
 
-            await Assert.ThrowsAsync<DivideByZeroException>(client.SendAsync);
+            await Assert.ThrowsAsync<DivideByZeroException>(() => client.SendAsync());
             logger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.AtLeastOnce);
         }
 

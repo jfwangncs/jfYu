@@ -219,7 +219,7 @@ namespace JfYu.Request
         }
 
         /// <inheritdoc/>
-        public override async Task<string> SendAsync()
+        public override async Task<string> SendAsync(CancellationToken cancellationToken = default)
         {
             var html = string.Empty;
             var requestId = Guid.NewGuid().ToString();

@@ -88,7 +88,7 @@ namespace JfYu.Request
         }
 
         /// <inheritdoc/>        
-        public override async Task<string> SendAsync()
+        public override async Task<string> SendAsync(CancellationToken cancellationToken = default)
         {
             Initialize();
             var requestId = Guid.NewGuid().ToString();
@@ -97,11 +97,11 @@ namespace JfYu.Request
                 string html = string.Empty;
                 if (_logFilter.LoggingFields != JfYuLoggingFields.None)
                     _logger?.LogRequestWithFilter(_logFilter.LoggingFields, requestId, Url, Method.ToString(), JsonConvert.SerializeObject(_request!.DefaultRequestHeaders.ToDictionary(header => header.Key, header => header.Value.ToList())), _logFilter.RequestFilter.Invoke(RequestData));
-                var response = await SendHttpRequestAsync().ConfigureAwait(false);
+                var response = await SendHttpRequestAsync(cancellationToken).ConfigureAwait(false);
                 ResponseHeader = response.Headers.ToDictionary(header => header.Key, header => header.Value.ToList());
                 StatusCode = response.StatusCode;
                 _cookieContainer.GetCookies(new Uri(Url)).ToList().ForEach(ResponseCookies.Add);
-                string content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                string content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                 html = RequestEncoding.GetString(RequestEncoding.GetBytes(content));
                 if (_logFilter.LoggingFields != JfYuLoggingFields.None)
                     _logger?.LogResponseWithFilter(_logFilter.LoggingFields, requestId, StatusCode.ToString(), _logFilter.ResponseFilter.Invoke(html));
@@ -169,30 +169,31 @@ namespace JfYu.Request
         /// <summary>
         /// Sends the HTTP request asynchronously based on the specified HTTP method and content type.
         /// </summary>
+        /// <param name="cancellationToken">CancellationToken for this operation.</param>
         /// <returns>The HttpResponse Message</returns>
-        private async Task<HttpResponseMessage> SendHttpRequestAsync()
+        private async Task<HttpResponseMessage> SendHttpRequestAsync(CancellationToken cancellationToken = default)
         {
             if (Method == HttpMethod.Post)
             {
                 if (string.Compare(ContentType, RequestContentType.FormData, StringComparison.Ordinal) == 0)
-                    return await SendFormDataAsync().ConfigureAwait(false);
+                    return await SendFormDataAsync(cancellationToken).ConfigureAwait(false);
                 else
-                    return await SendStringContentAsync(HttpMethod.Post).ConfigureAwait(false);
+                    return await SendStringContentAsync(HttpMethod.Post, cancellationToken).ConfigureAwait(false);
             }
             else if (Method == HttpMethod.Put)
-                return await SendStringContentAsync(HttpMethod.Put).ConfigureAwait(false);
+                return await SendStringContentAsync(HttpMethod.Put, cancellationToken).ConfigureAwait(false);
             else if (Method == HttpMethod.Patch)
-                return await SendStringContentAsync(new HttpMethod("PATCH")).ConfigureAwait(false);
+                return await SendStringContentAsync(new HttpMethod("PATCH"), cancellationToken).ConfigureAwait(false);
             else if (Method == HttpMethod.Delete)
-                return await _request!.DeleteAsync(Url).ConfigureAwait(false);
+                return await _request!.DeleteAsync(Url, cancellationToken).ConfigureAwait(false);
             else if (Method == HttpMethod.Get)
-                return await _request!.GetAsync(Url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+                return await _request!.GetAsync(Url, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             else
                 using (var request = new HttpRequestMessage(Method, Url))
                 {
                     if (!string.IsNullOrEmpty(RequestData))
                         request.Content = new StringContent(RequestData, RequestEncoding, ContentType);
-                    return await _request!.SendAsync(request).ConfigureAwait(false);
+                    return await _request!.SendAsync(request, cancellationToken).ConfigureAwait(false);
                 }
         }
 
@@ -200,24 +201,26 @@ namespace JfYu.Request
         /// Sends a string content request asynchronously based on the specified HTTP method.
         /// </summary>
         /// <param name="method">The HttpMethod</param>
+        /// <param name="cancellationToken">CancellationToken for this operation.</param>
         /// <returns>The HttpResponse Message</returns>
-        private async Task<HttpResponseMessage> SendStringContentAsync(HttpMethod method)
+        private async Task<HttpResponseMessage> SendStringContentAsync(HttpMethod method, CancellationToken cancellationToken = default)
         {
             using var stringContent = new StringContent(RequestData, RequestEncoding, ContentType);
             if (method == HttpMethod.Patch)
-                return await _request!.PatchAsync(Url, stringContent).ConfigureAwait(false);
+                return await _request!.PatchAsync(Url, stringContent, cancellationToken).ConfigureAwait(false);
             else if (method == HttpMethod.Put)
-                return await _request!.PutAsync(Url, stringContent).ConfigureAwait(false);
+                return await _request!.PutAsync(Url, stringContent, cancellationToken).ConfigureAwait(false);
             else
-                return await _request!.PostAsync(Url, stringContent).ConfigureAwait(false);
+                return await _request!.PostAsync(Url, stringContent, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Sends a multipart/form-data request asynchronously with the specified files and form data.
         /// </summary>
+        /// <param name="cancellationToken">CancellationToken for this operation.</param>
         /// <returns>The HttpResponse Message</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2000:Dispose objects before losing scope")]
-        private async Task<HttpResponseMessage> SendFormDataAsync()
+        private async Task<HttpResponseMessage> SendFormDataAsync(CancellationToken cancellationToken = default)
         {
             using var formData = new MultipartFormDataContent();
             if (!string.IsNullOrEmpty(RequestData))
@@ -244,7 +247,7 @@ namespace JfYu.Request
                 fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
                 formData.Add(fileContent, file.Key, Path.GetFileName(file.Value));
             }
-            return await _request!.PostAsync(Url, formData).ConfigureAwait(false);
+            return await _request!.PostAsync(Url, formData, cancellationToken).ConfigureAwait(false);
         }
     }
 }

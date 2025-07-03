@@ -12,12 +12,12 @@ using System.Threading.Tasks;
 namespace JfYu.Request
 {
     /// <summary>
-    /// Interface for JfYuRequest
+    /// Interface for JfYuRequest.
     /// </summary>
     public interface IJfYuRequest
     {
         /// <summary>
-        /// Url
+        /// Url.
         /// </summary>
         public string Url { get; set; }
 
@@ -32,7 +32,7 @@ namespace JfYu.Request
         public HttpMethod Method { get; set; }
 
         /// <summary>
-        /// Authorization
+        /// Authorization.
         /// </summary>
         public string Authorization { get; set; }
 
@@ -58,7 +58,7 @@ namespace JfYu.Request
         public WebProxy? Proxy { get; set; }
 
         /// <summary>
-        /// Upload files
+        /// Upload files.
         /// </summary>
         public Dictionary<string, string> Files { get; set; }
 
@@ -68,12 +68,12 @@ namespace JfYu.Request
         public RequestHeaders RequestHeader { get; set; }
 
         /// <summary>
-        /// Timeout default:30 seconds
+        /// Timeout default:30 seconds.
         /// </summary>
         public int Timeout { get; set; }
 
         /// <summary>
-        /// Custom headers
+        /// Custom headers.
         /// </summary>
         public Dictionary<string, string> RequestCustomHeaders { get; set; }
 
@@ -95,37 +95,38 @@ namespace JfYu.Request
         public X509Certificate2? Certificate { get; set; }
 
         /// <summary>
-        /// CertificateValidation default=false only for JfYuHttpRequest
+        /// CertificateValidation default=false only for JfYuHttpRequest.
         /// </summary>
         public bool CertificateValidation { get; set; }
 
         /// <summary>
-        /// Custom init.for jfYuHttpRequest:object as HttpWebRequest,for jfYuHttpClient:object as HttpClient
+        /// Custom init.for jfYuHttpRequest:object as HttpWebRequest,for jfYuHttpClient:object as HttpClient.
         /// </summary>
         Action<object>? CustomInit { get; set; }
 
         /// <summary>
-        /// Response Header
+        /// Response Header.
         /// </summary>
         public Dictionary<string, List<string>> ResponseHeader { get; }
 
         /// <summary>
-        /// HttpStatusCode
+        /// HttpStatusCode.
         /// </summary>
         public HttpStatusCode StatusCode { get; }
 
         /// <summary>
         /// Sends the HTTP request asynchronously.
         /// </summary>
+        /// <param name="cancellationToken">CancellationToken for this operation.</param>
         /// <returns>The response content.</returns>
-        Task<string> SendAsync();
+        Task<string> SendAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Downloads a file asynchronously.
         /// </summary>
         /// <param name="path">The file save location.</param>
         /// <param name="progress">The progress delegate function.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="cancellationToken">CancellationToken for this operation.</param>
         /// <returns>True if the download is successful, otherwise false.</returns>
         Task<bool> DownloadFileAsync(string path, Action<decimal, decimal, decimal>? progress = null, CancellationToken cancellationToken = default);
 
@@ -133,7 +134,7 @@ namespace JfYu.Request
         /// Downloads a file to a memory stream asynchronously.
         /// </summary>
         /// <param name="progress">The progress delegate function.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="cancellationToken">CancellationToken for this operation.</param>
         /// <returns>The memory stream containing the downloaded file.</returns>
         Task<MemoryStream?> DownloadFileAsync(Action<decimal, decimal, decimal>? progress = null, CancellationToken cancellationToken = default);
     }

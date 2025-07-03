@@ -1,17 +1,17 @@
 ﻿namespace JfYu.Data.Constant
 {
     /// <summary>
-    /// Database Configuration
+    /// Database Configuration.
     /// </summary>
     public class DatabaseConfig
     {
         /// <summary>
-        /// SqlServer/MySql/sqlite
+        /// SqlServer/MySql/MariaDB/Sqlite/Memory default:SqlServer.
         /// </summary>
         public DatabaseType DatabaseType { get; set; } = DatabaseType.SqlServer;
 
         /// <summary>
-        /// ConnectionString
+        /// ConnectionString.
         /// </summary>
         public string ConnectionString { get; set; } = string.Empty;
 

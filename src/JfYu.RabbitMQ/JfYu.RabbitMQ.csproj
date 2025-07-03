@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net8.0</TargetFrameworks>
+		<LangVersion>12.0</LangVersion>
+		<Version>8.2.0</Version>
+		<Authors>jfwang</Authors>
+		<Nullable>enable</Nullable>
+		<Description>RabbitMQ</Description>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/jfwangncs/jfYu</RepositoryUrl>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
+	</PropertyGroup>
+	
+	<PropertyGroup>
+		<AnalysisModePerformance>All</AnalysisModePerformance>
+		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
+		<AnalysisModeInteroperability>All</AnalysisModeInteroperability>
+		<AnalysisModeReliability>All</AnalysisModeReliability>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="RabbitMQ.Client" Version="7.1.2" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="$(OutputPath)**\$(AssemblyName).xml" Pack="true" PackagePath="lib\%(RecursiveDir)" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Remove="ContainerBuilderExtensions.cs" />
+	  <Compile Remove="IRabbitMQService.cs" />
+	  <Compile Remove="MessageOptions.cs" />
+	  <Compile Remove="RabbitMQService.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="\" />
+		<None Include="..\..\LICENSE" Pack="true" PackagePath="" />
+	</ItemGroup>
+
+</Project>

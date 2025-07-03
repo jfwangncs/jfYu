@@ -196,7 +196,7 @@ namespace JfYu.UnitTests.Data
             services.AddJfYuDbContextService<DataContext>(q =>
             {
                 q.DatabaseType = DatabaseType.MySql;
-                q.ConnectionString = "Server=localhost;Database=Fake;Uid=root;Pwd=123;";
+                q.ConnectionString = "Server=localhost;Database=Fake;Uid=root;Pwd=Pwd;";
                 q.Version = "1.2.3";
             });
             var serviceProvider = services.BuildServiceProvider();
@@ -214,7 +214,7 @@ namespace JfYu.UnitTests.Data
             services.AddJfYuDbContextService<DataContext>(q =>
             {
                 q.DatabaseType = DatabaseType.MariaDB;
-                q.ConnectionString = "Server=localhost;Database=Fake;Uid=root;Pwd=123;";
+                q.ConnectionString = "Server=localhost;Database=Fake;Uid=root;Pwd=Pwd;";
                 q.Version = "1.2.3";
             });
             var serviceProvider = services.BuildServiceProvider();

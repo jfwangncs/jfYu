@@ -10,7 +10,7 @@ using System.Net.Http;
 namespace JfYu.Request.Extension
 {
     /// <summary>
-    ///  Adds http request services extensions
+    ///  Adds http request services extensions.
     /// </summary>
     public static class ContainerBuilderExtensions
     {

@@ -294,7 +294,7 @@ namespace JfYu.UnitTests.Request
             client.Method = HttpMethod.Options;
             client.RequestData = "{\"username\":\"testUser\"}";
 
-            var response = await client.SendAsync();
+            await client.SendAsync();
             Assert.Equal(HttpStatusCode.OK, client.StatusCode);
         }
 
@@ -370,7 +370,7 @@ namespace JfYu.UnitTests.Request
             client.Url = $"{_url.Url}/delay/50";
             client.Timeout = 1;
 
-            var ex = await Record.ExceptionAsync(client.SendAsync);
+            var ex = await Record.ExceptionAsync(() => client.SendAsync());
             Assert.IsType<Exception>(ex, exactMatch: false);
         }
 
@@ -454,7 +454,7 @@ namespace JfYu.UnitTests.Request
             client.Url = $"{_url.Url}/response-headers?UserAgent=JfYuHttpClient/1.0&Host=httpbin.org&Referer=http://httpbin.org&Accept=text/html&AcceptLanguage=zh-en&CacheControl=cache&Connection=keep-alive&Pragma=Pragma";
 
             var response = await client.SendAsync();
-            var jsonResponse = JsonSerializer.Deserialize<Dictionary<string, object>>(response);
+            JsonSerializer.Deserialize<Dictionary<string, object>>(response);
 
             Assert.Equal(HttpStatusCode.OK, client.StatusCode);
 
@@ -590,12 +590,12 @@ namespace JfYu.UnitTests.Request
             client.CustomInit = (obj) =>
                {
                    var i = 0;
-                   var x = 1 / i;
+                   _ = 1 / i;
                    var httpClient = (HttpClient)obj;
                    httpClient.DefaultRequestHeaders.Add("X-Custom-Init", "test-value");
                };
 
-            await Assert.ThrowsAsync<DivideByZeroException>(client.SendAsync);
+            await Assert.ThrowsAsync<DivideByZeroException>(() => client.SendAsync());
         }
 
         [Fact]
@@ -614,7 +614,7 @@ namespace JfYu.UnitTests.Request
             var client = serviceProvider.GetRequiredService<IJfYuRequest>();
             client.Url = $"{_url.Url}/get";
 
-            var ex = await Assert.ThrowsAsync<HttpRequestException>(client.SendAsync);
+            var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.SendAsync());
             Assert.Contains("example", ex.Message);
         }
 
@@ -630,7 +630,7 @@ namespace JfYu.UnitTests.Request
             client.Url = $"{_url.ErrorSSL}";
             client.CertificateValidation = true;
 
-            var ex = await Assert.ThrowsAsync<HttpRequestException>(client.SendAsync);
+            var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.SendAsync());
             Assert.Contains("SSL", ex.Message);
         }
 
@@ -690,10 +690,9 @@ namespace JfYu.UnitTests.Request
                 DateTimeOffset startTime = DateTimeOffset.UtcNow;
                 DateTimeOffset endTime = startTime.AddSeconds(1);
                 var certificate = request.CreateSelfSigned(startTime, endTime);
-                // 导出证书为 DER 格式
-                var certBytes = certificate.Export(X509ContentType.Cert);
 
 #if NET9_0_OR_GREATER
+                var certBytes = certificate.Export(X509ContentType.Cert);   // 导出证书为 DER 格式
                 return X509CertificateLoader.LoadCertificate(certBytes);
 #else
                 return new X509Certificate2(certificate.Export(X509ContentType.Pfx, "password123"), "password123");
@@ -723,7 +722,7 @@ namespace JfYu.UnitTests.Request
 
 
             client.Certificate = cert;
-            var html = await client.SendAsync();
+            await client.SendAsync();
             Assert.Equal(HttpStatusCode.OK, client.StatusCode);
         }
 
@@ -937,7 +936,7 @@ namespace JfYu.UnitTests.Request
             client.Url = $"{_url.Url}/get?x=y";
             client.Method = HttpMethod.Get;
 
-            var response = await client.SendAsync();
+            await client.SendAsync();
             Assert.Equal(HttpStatusCode.OK, client.StatusCode);
             logger.Verify(x => x.Log(LogLevel.Information, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.Exactly(2));
         }
@@ -970,7 +969,7 @@ namespace JfYu.UnitTests.Request
             client.Url = $"{_url.Url}/get?x=y";
             client.Method = HttpMethod.Get;
 
-            var response = await client.SendAsync();
+            await client.SendAsync();
             Assert.Equal(HttpStatusCode.OK, client.StatusCode);
             logger.Verify(x => x.Log(LogLevel.Information, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.AtLeast(2));
         }
@@ -990,7 +989,7 @@ namespace JfYu.UnitTests.Request
             var client = serviceProvider.GetRequiredService<IJfYuRequest>();
             client.Url = $"{_url.Url}/get";
 
-            var ex = await Record.ExceptionAsync(client.SendAsync);
+            var ex = await Record.ExceptionAsync(() => client.SendAsync());
             Assert.IsType<Exception>(ex, exactMatch: false);
             logger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.AtLeastOnce);
         }
@@ -1008,13 +1007,13 @@ namespace JfYu.UnitTests.Request
             client.CustomInit = (obj) =>
                     {
                         var i = 0;
-                        var x = 1 / i;
+                        _ = 1 / i;
                         var httpClient = (HttpClient)obj;
                         httpClient.DefaultRequestHeaders.Add("X-Custom-Init", "test-value");
                     };
 
 
-            await Assert.ThrowsAsync<DivideByZeroException>(client.SendAsync);
+            await Assert.ThrowsAsync<DivideByZeroException>(() => client.SendAsync());
             logger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()), Times.AtLeastOnce);
         }
 

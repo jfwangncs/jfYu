@@ -1,32 +1,32 @@
 ﻿namespace JfYu.Request.Enum
 {
     /// <summary>
-    /// Request header default values
+    /// Request header default values.
     /// </summary>
     public static class RequestContentType
     {
         /// <summary>
-        /// Plain
+        /// Plain.
         /// </summary>
         public static string Plain { get; } = "text/plain";
 
         /// <summary>
-        /// Xml
+        /// Xml.
         /// </summary>
         public static string Xml { get; } = "application/xml";
 
         /// <summary>
-        /// Json
+        /// Json.
         /// </summary>
         public static string Json { get; } = "application/json";
 
         /// <summary>
-        /// FormUrlEncoded
+        /// FormUrlEncoded.
         /// </summary>
         public static string FormUrlEncoded { get; } = "application/x-www-form-urlencoded";
 
         /// <summary>
-        /// FormData
+        /// FormData.
         /// </summary>
         public static string FormData { get; } = "multipart/form-data";
     }
