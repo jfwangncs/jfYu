@@ -21,7 +21,7 @@ namespace JfYu.Data.Extension
         /// <param name="setupAction">An action to configure the JfYuDatabaseConfig options.</param>
         /// <param name="extraConfigure">An optional action to further configure the DbContextOptionsBuilder.</param>
         /// <returns>The modified IServiceCollection instance for chaining.</returns>
-        public static IServiceCollection AddJfYuDbContextService<T>(this IServiceCollection services, Action<JfYuDatabaseConfig> setupAction, Action<DbContextOptionsBuilder>? extraConfigure = null) where T : DbContext
+        public static IServiceCollection AddJfYuDbContext<T>(this IServiceCollection services, Action<JfYuDatabaseConfig> setupAction, Action<DbContextOptionsBuilder>? extraConfigure = null) where T : DbContext
         {
             ArgumentNullException.ThrowIfNull(setupAction);
 

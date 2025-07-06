@@ -1,6 +1,7 @@
 ﻿using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JfYu.RabbitMQ
@@ -24,7 +25,7 @@ namespace JfYu.RabbitMQ
         /// <param name="routingKey">The routing key (optional).</param>
         /// <param name="headers">The headers (optional) if exchangeType="header" must be mandatory.</param>
         /// <returns>True if the binding is successful, otherwise false.</returns>
-        bool ExchangeBind(string destination, string source, string exchangeType, string routingKey = "", Dictionary<string, object>? headers = null);
+        Task ExchangeBindAsync(string destination, string source, string exchangeType= ExchangeType.Direct, string routingKey = "", IDictionary<string, object?>? headers = null);
 
         /// <summary>
         /// Binds a queue to an exchange with a routing key.
@@ -35,32 +36,29 @@ namespace JfYu.RabbitMQ
         /// <param name="routingKey">The routing key (optional).</param>
         /// <param name="headers">The headers (optional) if exchangeType="header" must be mandatory.</param>
         /// <returns>True if the binding is successful, otherwise false.</returns>
-        bool QueueBind(string queueName, string exchangeName, string exchangeType, string routingKey = "", Dictionary<string, object>? headers = null);
+        Task<QueueDeclareOk> QueueDeclareAsync(string queueName, string exchangeName = "", string exchangeType = ExchangeType.Direct, string routingKey = "", IDictionary<string, object?>? headers = null);
 
         /// <summary>
-        /// Receives messages from a queue with a specified prefetch count (synchronous).
-        /// </summary>
-        /// <param name="queueName">The name of the queue.</param>
-        /// <param name="func">The function to process the message.</param>
-        /// <param name="prefetchCount">The number of messages to prefetch (default is 1).</param>
-        IModel Receive(string queueName, Func<string, bool> func, ushort prefetchCount = 1);
-
-        /// <summary>
-        /// Receives messages from a queue asynchronously with a specified prefetch count.
-        /// </summary>
-        /// <param name="queueName">The name of the queue.</param>
-        /// <param name="func">The async function to process the message.</param>
-        /// <param name="prefetchCount">The number of messages to prefetch (default is 1).</param>
-        IModel Receive(string queueName, Func<string, Task<bool>> func, ushort prefetchCount = 1);
-
-        /// <summary>
-        /// Receives messages from a queue with a specified prefetch count (synchronous).
+        /// Sends a message to an exchange with a specific routing key.
         /// </summary>
         /// <typeparam name="T">The type of the message.</typeparam>
-        /// <param name="queueName">The name of the queue.</param>
-        /// <param name="func">The function to process the message.</param>
-        /// <param name="prefetchCount">The number of messages to prefetch (default is 1).</param>
-        IModel Receive<T>(string queueName, Func<T?, bool> func, ushort prefetchCount = 1);
+        /// <param name="exchangeName">The name of the exchange.</param>
+        /// <param name="message">The messages to send.</param> 
+        /// <param name="routingKey">The routing key (optional).</param>
+        /// <param name="headers">The headers (optional) if exchangeType="header" must be mandatory.</param>
+        /// <param name="cancellationToken">CancellationToken for this operation.</param>
+        Task SendAsync<T>(string exchangeName, T message, string routingKey = "", IDictionary<string, object?>? headers = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Sends a message to an exchange with a specific routing key.
+        /// </summary>
+        /// <typeparam name="T">The type of the message.</typeparam>
+        /// <param name="exchangeName">The name of the exchange.</param>
+        /// <param name="messages">The messages to send.</param> 
+        /// <param name="routingKey">The routing key (optional).</param>
+        /// <param name="headers">The headers (optional) if exchangeType="header" must be mandatory.</param>
+        /// <param name="cancellationToken">CancellationToken for this operation.</param>
+        Task SendBatchAsync<T>(string exchangeName, IList<T> messages, string routingKey = "", IDictionary<string, object?>? headers = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Receives messages from a queue asynchronously with a specified prefetch count.
@@ -69,27 +67,9 @@ namespace JfYu.RabbitMQ
         /// <param name="queueName">The name of the queue.</param>
         /// <param name="func">The async function to process the message.</param>
         /// <param name="prefetchCount">The number of messages to prefetch (default is 1).</param>
-        IModel Receive<T>(string queueName, Func<T?, Task<bool>> func, ushort prefetchCount = 1);
+        /// <param name="cancellationToken">CancellationToken for this operation.</param>
+        /// <returns> </returns>
+        Task<IChannel> ReceiveAsync<T>(string queueName, Func<T?, Task<bool>> func, ushort prefetchCount = 1, CancellationToken cancellationToken = default);
 
-        /// <summary>
-        /// Sends a message to an exchange with a specific routing key.
-        /// </summary>
-        /// <typeparam name="T">The type of the message.</typeparam>
-        /// <param name="exchangeName">The name of the exchange.</param>
-        /// <param name="msg">The message to send.</param>
-        /// <param name="routingKey">The routing key (optional).</param>
-        /// <param name="headers">The headers (optional) if exchangeType="header" must be mandatory.</param>
-        /// <returns>True if the message is sent successfully, otherwise false.</returns>
-        bool Send<T>(string exchangeName, T msg, string routingKey = "", Dictionary<string, object>? headers = null);
-
-        /// <summary>
-        /// Sends a message to an exchange with a specific routing key.
-        /// </summary>
-        /// <param name="exchangeName">The name of the exchange.</param>
-        /// <param name="msg">The message to send.</param>
-        /// <param name="routingKey">The routing key (optional).</param>
-        /// <param name="headers">The headers (optional) if exchangeType="header" must be mandatory.</param>
-        /// <returns>True if the message is sent successfully, otherwise false.</returns>
-        bool Send(string exchangeName, string msg, string routingKey = "", Dictionary<string, object>? headers = null);
     }
 }

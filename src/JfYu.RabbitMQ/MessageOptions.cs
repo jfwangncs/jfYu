@@ -4,31 +4,11 @@
     /// Rabbit MQ message retry policy.
     /// </summary>
     public class MessageOptions
-    {
-        /// <summary>
-        /// Indicates whether the dead letter queue is enabled.
-        /// </summary>
-        public bool EnableDeadQueue { get; set; }
-
+    {      
         /// <summary>
         /// Maximum number of retry attempts before sending to the dead letter queue.
         /// </summary>
-        public int MaxRetryCount { get; set; } = 3;
-
-        /// <summary>
-        /// Name of the dead letter exchange.
-        /// </summary>
-        public string DeadLetterExchange { get; set; } = "dead_letter_exchange";
-
-        /// <summary>
-        /// Name of the dead letter queue.
-        /// </summary>
-        public string DeadLetterQueue { get; set; } = "dead_letter_queue";
-
-        /// <summary>
-        /// Routing key for the dead letter queue.
-        /// </summary>
-        public string DeadLetterRoutingKey { get; set; } = "dead_letter_routing_key";
+        public int MaxRetryCount { get; set; } = 3;    
 
         /// <summary>
         /// Delay time before retrying message delivery.

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using JfYu.RabbitMQ;
 #if NET8_0_OR_GREATER
 using JfYu.Data.Constant;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +23,7 @@ namespace JfYu.UnitTests
 
             var dbName = "TestDb_" + Guid.NewGuid().ToString("N");
 
-            services.AddJfYuDbContextService<DataContext>(options =>
+            services.AddJfYuDbContext<DataContext>(options =>
             {
                 configuration.GetSection("JfYuConnectionStrings").Bind(options);
                 options.ConnectionString = dbName;
@@ -43,5 +43,21 @@ namespace JfYu.UnitTests
             }
         }
 #endif
+        public static IServiceCollection AddRabbitMQServices(this IServiceCollection services)
+        {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
+                .Build();
+
+            services.AddRabbitMQ((q, e) =>
+            {
+                configuration.GetSection("RabbitMQ").Bind(q);
+                configuration.GetSection("RabbitMQ:MessageOption").Bind(e);
+            });
+
+            return services;
+        }
     }
 }

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JfYu.UnitTests", "JfYu.Unit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JfYu.RabbitMQ", "JfYu.RabbitMQ\JfYu.RabbitMQ.csproj", "{7B10331B-3E2C-4A6F-8A59-C4A7383D33FF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JfYu.BenchmarkTests", "JfYu.BenchmarkTests\JfYu.BenchmarkTests.csproj", "{FA2F662D-822C-4422-9746-1AF396C35592}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{7B10331B-3E2C-4A6F-8A59-C4A7383D33FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B10331B-3E2C-4A6F-8A59-C4A7383D33FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B10331B-3E2C-4A6F-8A59-C4A7383D33FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA2F662D-822C-4422-9746-1AF396C35592}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA2F662D-822C-4422-9746-1AF396C35592}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA2F662D-822C-4422-9746-1AF396C35592}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA2F662D-822C-4422-9746-1AF396C35592}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

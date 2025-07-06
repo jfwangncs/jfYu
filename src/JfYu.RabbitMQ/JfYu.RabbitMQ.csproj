@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
 		<LangVersion>12.0</LangVersion>
 		<Version>8.2.0</Version>
 		<Authors>jfwang</Authors>
@@ -34,15 +34,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Remove="ContainerBuilderExtensions.cs" />
-	  <Compile Remove="IRabbitMQService.cs" />
-	  <Compile Remove="MessageOptions.cs" />
-	  <Compile Remove="RabbitMQService.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<None Include="README.md" Pack="true" PackagePath="\" />
 		<None Include="..\..\LICENSE" Pack="true" PackagePath="" />
-	</ItemGroup>
-
+	</ItemGroup> 
+ 
 </Project>

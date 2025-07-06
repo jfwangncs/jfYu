@@ -16,46 +16,46 @@ namespace JfYu.UnitTests.Data
         public void AddService_SetupActionIsNull_ThrowsException()
         {
             var services = new ServiceCollection();
-            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContextService<DataContext>(null!));
+            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContext<DataContext>(null!));
         }
         [Fact]
         public void AddService_SetupActionIsEmpty_ThrowsException()
         {
             var services = new ServiceCollection();
-            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContextService<DataContext>(q => { }));
+            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContext<DataContext>(q => { }));
         }
         [Fact]
         public void AddService_ConnectionStringIsEmpty_ThrowsException()
         {
             var services = new ServiceCollection();
-            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContextService<DataContext>(q => { q.ConnectionString = ""; }));
+            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContext<DataContext>(q => { q.ConnectionString = ""; }));
         }
         [Fact]
         public void AddService_ConnectionStringIsNull_ThrowsException()
         {
             var services = new ServiceCollection();
-            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContextService<DataContext>(q => { q.ConnectionString = null!; }));
+            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContext<DataContext>(q => { q.ConnectionString = null!; }));
         }
 
         [Fact]
         public void AddService_ConnectionStringIsWhiteSpace_ThrowsException()
         {
             var services = new ServiceCollection();
-            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContextService<DataContext>(q => { q.ConnectionString = "   "; }));
+            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContext<DataContext>(q => { q.ConnectionString = "   "; }));
         }
 
         [Fact]
         public void AddService_ReadOnlyConnectionStringIsEmpty_ThrowsException()
         {
             var services = new ServiceCollection();
-            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContextService<DataContext>(q => { q.ConnectionString = "test"; q.ReadOnlyDatabases = [new() { ConnectionString = "" }]; }));
+            Assert.Throws<ArgumentNullException>(() => services.AddJfYuDbContext<DataContext>(q => { q.ConnectionString = "test"; q.ReadOnlyDatabases = [new() { ConnectionString = "" }]; }));
         }
 
         [Fact]
         public void AddService_WithExtraConfigure_Correctly()
         {
             var services = new ServiceCollection();
-            services.AddJfYuDbContextService<DataContext>(q =>
+            services.AddJfYuDbContext<DataContext>(q =>
             {
                 q.ConnectionString = "server=127.0.0.1;Database=Test;uid=Test;pwd=test;";
             }, q => q.EnableDetailedErrors().EnableSensitiveDataLogging());
@@ -72,7 +72,7 @@ namespace JfYu.UnitTests.Data
         public void AddService_MainDatabase_Correctly()
         {
             var services = new ServiceCollection();
-            services.AddJfYuDbContextService<DataContext>(q =>
+            services.AddJfYuDbContext<DataContext>(q =>
             {
                 q.ConnectionString = "server=127.0.0.1;Database=Test;uid=Test;pwd=test;";
             });
@@ -89,7 +89,7 @@ namespace JfYu.UnitTests.Data
         public void AddService_MainDatabase1_Correctly()
         {
             var services = new ServiceCollection();
-            services.AddJfYuDbContextService<DataContext>(q =>
+            services.AddJfYuDbContext<DataContext>(q =>
             {
                 q.ConnectionString = "server=127.0.0.1;Database=Test;uid=Test;pwd=test;";
                 q.ReadOnlyDatabases = [];
@@ -109,7 +109,7 @@ namespace JfYu.UnitTests.Data
         public void AddService_MainDatabaseWithReadOnly1_Correctly()
         {
             var services = new ServiceCollection();
-            services.AddJfYuDbContextService<DataContext>(q =>
+            services.AddJfYuDbContext<DataContext>(q =>
             {
                 q.ConnectionString = "server=127.0.0.1;Database=Test;uid=Test;pwd=test;";
                 q.ReadOnlyDatabases = [new() { ConnectionString = "server=127.0.0.2;Database=Test;uid=Test;pwd=test;" }];
@@ -132,7 +132,7 @@ namespace JfYu.UnitTests.Data
         public void AddService_MainDatabaseWithReadOnly2_Correctly()
         {
             var services = new ServiceCollection();
-            services.AddJfYuDbContextService<DataContext>(q =>
+            services.AddJfYuDbContext<DataContext>(q =>
             {
                 q.ConnectionString = "server=127.0.0.1;Database=Test;uid=Test;pwd=test;";
                 q.ReadOnlyDatabases = [
@@ -160,7 +160,7 @@ namespace JfYu.UnitTests.Data
         public void AddService_MainDatabaseWithReadOnly3_Correctly()
         {
             var services = new ServiceCollection();
-            services.AddJfYuDbContextService<DataContext>(q =>
+            services.AddJfYuDbContext<DataContext>(q =>
             {
                 q.ConnectionString = "server=127.0.0.1;Database=Test;uid=Test;pwd=test;";
                 q.ReadOnlyDatabases = [
@@ -193,7 +193,7 @@ namespace JfYu.UnitTests.Data
         {
             // Act
             var services = new ServiceCollection();
-            services.AddJfYuDbContextService<DataContext>(q =>
+            services.AddJfYuDbContext<DataContext>(q =>
             {
                 q.DatabaseType = DatabaseType.MySql;
                 q.ConnectionString = "Server=localhost;Database=Fake;Uid=root;Pwd=Pwd;";
@@ -211,7 +211,7 @@ namespace JfYu.UnitTests.Data
         {
             // Act
             var services = new ServiceCollection();
-            services.AddJfYuDbContextService<DataContext>(q =>
+            services.AddJfYuDbContext<DataContext>(q =>
             {
                 q.DatabaseType = DatabaseType.MariaDB;
                 q.ConnectionString = "Server=localhost;Database=Fake;Uid=root;Pwd=Pwd;";

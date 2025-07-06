@@ -4,7 +4,9 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JfYu.RabbitMQ
@@ -13,9 +15,9 @@ namespace JfYu.RabbitMQ
     ///
     /// </summary>
     /// <param name="connection"></param>
-    /// <param name="messageRetryPolicy"></param>
+    /// <param name="messageOption"></param>
     /// <param name="logger"></param>
-    public class RabbitMQService(IConnection connection, MessageOptions messageRetryPolicy, ILogger<RabbitMQService>? logger = null) : IRabbitMQService
+    public class RabbitMQService(IConnection connection, MessageOptions messageOption, ILogger<RabbitMQService>? logger = null) : IRabbitMQService
     {
         /// <summary>
         /// Rabbit MQ connection.
@@ -25,25 +27,27 @@ namespace JfYu.RabbitMQ
         private const string xretrycount = "x-retry-count";
         private const string xexchangename = "x-exchange-name";
         private const string xexchangeroutingkey = "x-exchange-routing-key";
-        private const string xdeadletterexchange = "x-dead-letter-exchange";
-        private const string xdeadletterroutingkey = "x-dead-letter-routing-key";
 
 
         private const string receiveError = "Receive message have error.message:{message}";
-        private readonly MessageOptions _messageRetryPolicy = messageRetryPolicy;
+        private readonly MessageOptions _messageOption = messageOption;
         private readonly ILogger<RabbitMQService>? _logger = logger;
 
         /// <inheritdoc/>
-        public async Task QueueBindAsync(string queueName, string exchangeName, string exchangeType, string routingKey = "", Dictionary<string, object?>? headers = null)
+        public async Task<QueueDeclareOk> QueueDeclareAsync(string queueName, string exchangeName = "", string exchangeType = ExchangeType.Direct, string routingKey = "", IDictionary<string, object?>? headers = null)
         {
             using var _channel = await Connection.CreateChannelAsync().ConfigureAwait(false);
-            await _channel.ExchangeDeclareAsync(exchangeName, exchangeType, true).ConfigureAwait(false);
-            await _channel.QueueDeclareAsync(queueName, true, false, false, null).ConfigureAwait(false);
-            await _channel.QueueBindAsync(queueName, exchangeName, routingKey, headers).ConfigureAwait(false);
+            var queue = await _channel.QueueDeclareAsync(queueName, true, false, false, headers).ConfigureAwait(false);
+            if (!string.IsNullOrEmpty(exchangeName))
+            {
+                await _channel.ExchangeDeclareAsync(exchangeName, exchangeType, true).ConfigureAwait(false);
+                await _channel.QueueBindAsync(queueName, exchangeName, routingKey, headers).ConfigureAwait(false);
+            }
+            return queue;
         }
 
         /// <inheritdoc/>
-        public async Task ExchangeBindAsync(string destination, string source, string exchangeType, string routingKey = "", Dictionary<string, object?>? headers = null)
+        public async Task ExchangeBindAsync(string destination, string source, string exchangeType = ExchangeType.Direct, string routingKey = "", IDictionary<string, object?>? headers = null)
         {
             using var _channel = await Connection.CreateChannelAsync().ConfigureAwait(false);
             await _channel.ExchangeDeclareAsync(destination, exchangeType, true).ConfigureAwait(false);
@@ -52,67 +56,84 @@ namespace JfYu.RabbitMQ
         }
 
         /// <inheritdoc/>
-        public async Task Send<T>(string exchangeName, List<T> msgs, string routingKey = "", Dictionary<string, object?>? headers = null)
-        {
-            using var limiter = new ThrottlingRateLimiter(_messageRetryPolicy.MaxOutstandingConfirms);
-            var channelOpts = new CreateChannelOptions(true, true, limiter);
-            using var _channel = await Connection.CreateChannelAsync(channelOpts).ConfigureAwait(false);
-            headers ??= [];
-            headers.TryAdd(xretrycount, 0);
-            headers.TryAdd(xexchangename, exchangeName);
-            headers.TryAdd(xexchangeroutingkey, routingKey);            
-            var basicProperties = new BasicProperties();
-            basicProperties.Persistent = true;
-            basicProperties.Headers = headers;
-            var publishTasks = new List<ValueTask>();
-            for (int i = 0; i < msgs.Count; i++)
-            {
-                var msg = msgs[i];
-                byte[] payload;
-                if (msg is string str)
-                    payload = Encoding.UTF8.GetBytes(str);
-                else
-                    payload = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(msg));
+        public async Task SendAsync<T>(string exchangeName, T message, string routingKey = "", IDictionary<string, object?>? headers = null, CancellationToken cancellationToken = default) => await SendInternalAsync(exchangeName, routingKey, headers, cancellationToken, message).ConfigureAwait(false);
 
-                ValueTask publishTask = _channel.BasicPublishAsync(exchangeName, routingKey, true, basicProperties, payload);
+        /// <inheritdoc/>
+        public async Task SendBatchAsync<T>(string exchangeName, IList<T> messages, string routingKey = "", IDictionary<string, object?>? headers = null, CancellationToken cancellationToken = default) => await SendInternalAsync(exchangeName, routingKey, headers, cancellationToken, messages.ToArray()).ConfigureAwait(false);
+
+        private async Task SendInternalAsync<T>(string exchangeName, string routingKey = "", IDictionary<string, object?>? headers = null, CancellationToken cancellationToken = default, params T[] messages)
+        {
+            using var limiter = new ThrottlingRateLimiter(_messageOption.MaxOutstandingConfirms);
+            var channelOpts = new CreateChannelOptions(true, true, limiter);
+            using var _channel = await Connection.CreateChannelAsync(channelOpts, cancellationToken).ConfigureAwait(false);
+            headers ??= new Dictionary<string, object?>();
+            headers[xretrycount] = 0;
+            headers[xexchangename] = exchangeName;
+            headers[xexchangeroutingkey] = routingKey;
+            var basicProperties = new BasicProperties
+            {
+                Persistent = true,
+                Headers = headers
+            };
+            var publishTasks = new List<ValueTask>();
+            if (messages.Length == 1)
+            {
+                var msg = messages[0];
+                byte[] payload = msg is string str
+                    ? Encoding.UTF8.GetBytes(str)
+                    : Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(msg));
+                await _channel.BasicPublishAsync(exchangeName, routingKey, true, basicProperties, payload, cancellationToken).ConfigureAwait(false);
+            }
+            for (int i = 0; i < messages.Length; i++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var msg = messages[i];
+                byte[] payload = msg is string str
+                    ? Encoding.UTF8.GetBytes(str)
+                    : Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(msg));
+                ValueTask publishTask = _channel.BasicPublishAsync(exchangeName, routingKey, true, basicProperties, payload, cancellationToken);
                 publishTasks.Add(publishTask);
 
-                await Publishes(publishTasks, _messageRetryPolicy.BatchSize).ConfigureAwait(false);
+                if (publishTasks.Count >= _messageOption.BatchSize)
+                {
+                    await Publishes(publishTasks).ConfigureAwait(false);
+                }
             }
 
-            // Await any remaining tasks in case message count was not
-            // evenly divisible by batch size.
-            await Publishes(publishTasks, 0).ConfigureAwait(false);
+            if (publishTasks.Count > 0)
+                await Publishes(publishTasks).ConfigureAwait(false);
 
-            async Task Publishes(List<ValueTask> publishTasks, int batchSize)
+            static async Task Publishes(List<ValueTask> publishTasks)
             {
-                if (publishTasks.Count >= batchSize)
+                foreach (ValueTask pt in publishTasks)
                 {
-                    foreach (ValueTask pt in publishTasks)
-                    {
-                        try
-                        {
-                            await pt.ConfigureAwait(false);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger?.LogError(ex, receiveError, "");
-                        }
-                    }
-                    publishTasks.Clear();
+                    await pt.ConfigureAwait(false);
                 }
+                publishTasks.Clear();
             }
         }
 
         /// <inheritdoc/>
-        public async IChannel Receive<T>(string queueName, Func<T?, Task<bool>> func, ushort prefetchCount = 1)
+        public async Task<IChannel> ReceiveAsync<T>(string queueName, Func<T?, Task<bool>> func, ushort prefetchCount = 1, CancellationToken cancellationToken = default)
         {
-            var _channel = await connection.CreateChannelAsync().ConfigureAwait(false);
-            await _channel.BasicQosAsync(prefetchSize: 0, prefetchCount: 1, global: false).ConfigureAwait(false);
+            var _channel = await Connection.CreateChannelAsync(null, cancellationToken).ConfigureAwait(false);
+            await _channel.BasicQosAsync(0, prefetchCount, false, cancellationToken).ConfigureAwait(false);
             var consumer = new AsyncEventingBasicConsumer(_channel);
-
+            string consumerTag = null!;
+            cancellationToken.Register(async () =>
+            {
+                try
+                {
+                    if (consumerTag != null)
+                        await _channel.BasicCancelAsync(consumerTag).ConfigureAwait(false);
+                    _channel.Dispose();
+                }
+                catch { /* ignore */ }
+            });
             consumer.ReceivedAsync += async (ch, ea) =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                    return;
                 string message = Encoding.UTF8.GetString(ea.Body.ToArray());
                 try
                 {
@@ -121,76 +142,69 @@ namespace JfYu.RabbitMQ
                     if (await func(obj).ConfigureAwait(false))
                         await _channel.BasicAckAsync(ea.DeliveryTag, false).ConfigureAwait(false);
                     else
-                    {
-                        if (_messageRetryPolicy.EnableDeadQueue)
-                            await _channel.BasicRejectAsync(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea)).ConfigureAwait(false);
-                        else
-                            await _channel.BasicRejectAsync(ea.DeliveryTag, true).ConfigureAwait(false);
-                    }
+                        await TryToMoveToDeadLetterQueue(ea, _channel, cancellationToken).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
                     _logger?.LogError(ex, receiveError, message);
-                    if (_messageRetryPolicy.EnableDeadQueue)
-                        await _channel.BasicRejectAsync(ea.DeliveryTag, !TryToMoveToDeadLetterQueue(ea)).ConfigureAwait(false);
-                    else
-                        await _channel.BasicRejectAsync(ea.DeliveryTag, true).ConfigureAwait(false);
+                    await TryToMoveToDeadLetterQueue(ea, _channel, cancellationToken).ConfigureAwait(false);
                 }
             };
-            AddModelShutdownEvent(_channel);
-            await _channel.BasicConsumeAsync(queueName, false, consumer).ConfigureAwait(false);
+            consumerTag = await _channel.BasicConsumeAsync(queueName, false, consumer, cancellationToken).ConfigureAwait(false);
             return _channel;
         }
 
-        /// <inheritdoc/>
-        private bool TryToMoveToDeadLetterQueue(BasicDeliverEventArgs ea)
+        private async Task TryToMoveToDeadLetterQueue(BasicDeliverEventArgs ea, IChannel channel, CancellationToken cancellationToken = default)
         {
             if (ea.BasicProperties.Headers is null)
-                return false;
+            {
+                await channel.BasicRejectAsync(ea.DeliveryTag, true, cancellationToken).ConfigureAwait(false);
+                return;
+            }
 
             try
             {
-                using var channel = Connection.CreateModel();
-                channel.ConfirmSelect();
                 int retryCount = -1;
                 var originalRoutingKey = "";
                 var originalExchangeName = "";
                 if (ea.BasicProperties.Headers.TryGetValue(xretrycount, out object? value))
                     retryCount = Convert.ToInt32(value);
-                if (ea.BasicProperties.Headers.TryGetValue(xexchangename, out object? value1))
-                    originalExchangeName = Encoding.UTF8.GetString((byte[])value1);
-                if (ea.BasicProperties.Headers.TryGetValue(xexchangeroutingkey, out object? value2))
-                    originalRoutingKey = Encoding.UTF8.GetString((byte[])value2);
-                if (retryCount == -1 || string.IsNullOrEmpty(originalExchangeName))
+                if (ea.BasicProperties.Headers.TryGetValue(xexchangename, out object? value1) && value1 is byte[] bytes1 && bytes1 != null)
+                    originalExchangeName = Encoding.UTF8.GetString(bytes1);
+                if (ea.BasicProperties.Headers.TryGetValue(xexchangeroutingkey, out object? value2) && value2 is byte[] bytes2 && bytes2 != null)
+                    originalRoutingKey = Encoding.UTF8.GetString(bytes2);
+
+                if (retryCount == -1)
                 {
-                    _logger?.LogWarning("Message didn't have x-retry-count,x-exchange-name,x-exchange-routing-key can't use dead letter queue.");
-                    return false;
+                    _logger?.LogWarning("This Message didn't have x-retry-count header,can't use retry algorithm.");
+                    await channel.BasicRejectAsync(ea.DeliveryTag, true, cancellationToken).ConfigureAwait(false);
+                    return;
                 }
-                if (retryCount >= _messageRetryPolicy.MaxRetryCount)
+                if (retryCount >= _messageOption.MaxRetryCount)
                 {
-                    //send to dead letter queue
-                    _logger?.LogInformation("Message tried to exceed the retry limit:{maxRetryCount}，send it to dead queue:{queueName}.", _messageRetryPolicy.MaxRetryCount, _messageRetryPolicy.DeadLetterQueue);
-                    var basicProperties = channel.CreateBasicProperties();
-                    basicProperties.Persistent = true;
-                    basicProperties.Headers = ea.BasicProperties.Headers;
-                    basicProperties.Headers["x-original-routing-key"] = ea.RoutingKey;
-                    channel.BasicPublish(_messageRetryPolicy.DeadLetterExchange, "", basicProperties, ea.Body);
-                    return channel.WaitForConfirms(channel.ContinuationTimeout);
+                    //send to dead letter queue 
+                    _logger?.LogWarning("This message exceeds the retry count and goes to a dead letter directly.");
+                    await channel.BasicRejectAsync(ea.DeliveryTag, false, cancellationToken).ConfigureAwait(false);
                 }
                 else
                 {
-                    //retry message
                     retryCount++;
                     ea.BasicProperties.Headers[xretrycount] = retryCount;
-                    channel.BasicPublish(originalExchangeName, originalRoutingKey, ea.BasicProperties, ea.Body);
-                    return channel.WaitForConfirms(channel.ContinuationTimeout);
+                    var basicProperties = new BasicProperties
+                    {
+                        Persistent = true,
+                        Headers = ea.BasicProperties.Headers
+                    };
+                    await channel.BasicPublishAsync(originalExchangeName, originalRoutingKey, true, basicProperties, ea.Body, cancellationToken).ConfigureAwait(false);
+                    await channel.BasicAckAsync(ea.DeliveryTag, false, cancellationToken).ConfigureAwait(false);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger?.LogError(ex, "This Message retry encountered error.");
                 throw;
             }
         }
-         
+
     }
 }
